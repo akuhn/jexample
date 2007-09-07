@@ -1,0 +1,12 @@
+org.junit
+org.junit.experimental.results
+org.junit.internal
+org.junit.internal.requests
+org.junit.internal.runners
+org.junit.matchers
+org.junit.runner
+org.junit.runner.manipulation
+org.junit.runner.notification
+org.junit.runners
+org.junit.samples
+org.junit.samples.money
