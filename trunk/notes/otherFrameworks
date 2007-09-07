@@ -1,0 +1,45 @@
+JTiger:
+basically the same as junit 4. they claim to have a better design, but i think this refers to junit 3.8 and not junit 4
+one of the named advantages is the use of annotations
+
+TestNG:
+Dependent methods are implemented. if a dependent method didn't run, the method will be marked as SKIPED.
+You can group your tests and only run a specific group of tests, if you like to.
+
+csUnit for .NET-Languages:
+allows grouping of tests
+
+PHPUnit:
+based on Junit 3.8. Integrates ideas from TestNG such as grouping tests, testing for failures and setUp and tearDown, which
+is all integrated in Junit 4, too.
+
+Java Frameworks:
+
+Framework		Differences to JUnit													Things in common
+
+JTiger			return value can be different from void, 
+				but the returned object is only used for
+				printing a message, toString() is called 
+				on the returned object
+					
+				some complex assertions like 											basic assertions like assertTrue, 
+				ObjectFactoryContract.assertObjectFactoryXConsistentlyEqual()			assertEquals, etc. are the same
+					
+				if a test fails, JTiger says, if failure was 							@Ignore, to skip resp. ignore
+				in the testmethod or in the setUp resp. tearDown						testmethods
+				
+				@Repeat	you can repeat a test n times									expect exception (in JTiger it's
+																						an own Annotation, in JUnit it's a
+																						method of the Test Annotation)
+																						
+																						can be run by ant
+
+
+TestNG			dependent methods
+
+				flexible configuration system, partly through XML configuration
+				
+				categories and ignores (are part of the Test Annotation)
+
+
+http://www.theserverside.com/tt/articles/article.tss?l=TestFrameworkComparison
