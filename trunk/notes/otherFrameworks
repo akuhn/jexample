@@ -3,7 +3,7 @@ basically the same as junit 4. they claim to have a better design, but i think t
 one of the named advantages is the use of annotations
 
 TestNG:
-Dependent methods are implemented. if a dependent method didn't run, the method will be marked as SKIPED.
+Dependent methods are implemented. if a dependent method didn't run, the method will be marked as SKIPPED.
 You can group your tests and only run a specific group of tests, if you like to.
 
 csUnit for .NET-Languages:
