@@ -1,3 +1,6 @@
+extension
+extension.annotations
+extension.tests
 org.junit
 org.junit.experimental.results
 org.junit.internal

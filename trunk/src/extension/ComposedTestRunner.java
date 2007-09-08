@@ -16,9 +16,11 @@ import org.junit.runner.notification.RunNotifier;
 import extension.annotations.MyTest;
 
 /**
- * @author Lea Hänsenberger Date: Sep 7, 2007
+ * @author Lea Haensenberger 
+ * Date: Sep 7, 2007
  * 
  */
+
 public class ComposedTestRunner extends Runner {
 
 	private Class<?> testClass;
@@ -62,6 +64,10 @@ public class ComposedTestRunner extends Runner {
 		this.runTestMethods( test );
 	}
 
+	/**
+	 * Iterate over all testmethods and run them.
+	 * @param test
+	 */
 	private void runTestMethods( Object test ) {
 		for ( Method method : this.testMethods ) {
 			try {
@@ -73,10 +79,19 @@ public class ComposedTestRunner extends Runner {
 		}
 	}
 
+	/**
+	 * Get all methods with the Annotation <code>MyTest</code>
+	 * @return
+	 */
 	private List<Method> getTestMethods() {
 		return this.getAnnotatedMethods( MyTest.class );
 	}
 
+	/**
+	 * Get all methods annotated with <code>annotationClass</code>
+	 * @param annotationClass
+	 * @return
+	 */
 	private List<Method> getAnnotatedMethods( Class<? extends Annotation> annotationClass ) {
 		List<Method> results = new ArrayList<Method>();
 		Method[] methods = this.testClass.getDeclaredMethods();
@@ -93,22 +108,50 @@ public class ComposedTestRunner extends Runner {
 		return Description.createTestDescription( getTestClass(), testName( method ), testAnnotations( method ) );
 	}
 
+	/**
+	 * Get the name of <code>method</code>
+	 * @param method
+	 * @return the name of <code>method</code>
+	 */
 	protected String testName( Method method ) {
 		return method.getName();
 	}
 
+	/**
+	 * Get the <code>Annotations</code> of a testmethod
+	 * @param method
+	 * @return an <code>Array</code> of <code>Annotations</code>
+	 */
 	protected Annotation[] testAnnotations( Method method ) {
 		return method.getAnnotations();
 	}
 
+	/**
+	 * Get the name of the class under test
+	 * @return the name of the class.
+	 */
 	protected String getName() {
 		return this.testClass.getName();
 	}
 
+	/**
+	 * Get the <code>Annotations</code> of the testclass
+	 * @return an <code>Array</code> of <code>Annotations</code>
+	 */
 	protected Annotation[] classAnnotations() {
 		return this.testClass.getAnnotations();
 	}
 
+	/**
+	 * Creates a new instance of the class under Test.
+	 * @return the new instance of the testclass
+	 * @throws IllegalArgumentException
+	 * @throws SecurityException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 */
 	protected Object createTest() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException,
 	        InvocationTargetException, NoSuchMethodException {
 		return this.testClass.getConstructor().newInstance();

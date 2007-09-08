@@ -11,7 +11,7 @@ import java.util.List;
 import extension.annotations.MyTest;
 
 /**
- * @author Lea Hänsenberger Date: Sep 7, 2007
+ * @author Lea Haensenberger Date: Sep 7, 2007
  */
 public class MyTestClass {
 

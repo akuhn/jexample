@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Lea Hänsenberger
+ * @author Lea Haensenberger
  * Date: Sep 7, 2007
  * 
  * <p>The <code>MyTest</code> Annotation is only for testing purposes and will eventually become
