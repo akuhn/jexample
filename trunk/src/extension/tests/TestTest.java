@@ -32,4 +32,9 @@ public class TestTest {
 		System.out.println( "anotherTest" );
 		assertFalse( false );
 	}
+
+	public void noTestMethod() {
+		System.out.println( "noTest" );
+		assertTrue( false );
+	}
 }
