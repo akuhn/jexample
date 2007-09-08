@@ -17,6 +17,10 @@ import extension.annotations.MyTest;
 @RunWith( ComposedTestRunner.class )
 public class TestTest {
 
+	public TestTest() {
+
+	}
+
 	@MyTest
 	public void testTestMethod() {
 		System.out.println( "aTest" );

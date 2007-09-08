@@ -4,29 +4,30 @@
 package extension;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
+import extension.annotations.MyTest;
+
 /**
  * @author Lea Hänsenberger Date: Sep 7, 2007
  * 
  */
 public class ComposedTestRunner extends Runner {
-	private MyTestClass testClass;
+
+	private Class<?> testClass;
 
 	private final List<Method> testMethods;
 
 	public ComposedTestRunner( Class<?> toTest ) {
-		this.testClass = new MyTestClass( toTest );
+		this.testClass = toTest;
 		this.testMethods = this.getTestMethods();
-	}
-
-	private List<Method> getTestMethods() {
-		return this.testClass.getTestMethods();
 	}
 
 	/*
@@ -50,12 +51,46 @@ public class ComposedTestRunner extends Runner {
 	 */
 	@Override
 	public void run( RunNotifier notifier ) {
-		// TODO Auto-generated method stub
+		Object test;
+		try {
+			test = this.createTest();
+		} catch ( Throwable e ) {
+			// TODO failure handling
+			e.printStackTrace();
+			return;
+		}
+		this.runTestMethods( test );
+	}
 
+	private void runTestMethods( Object test ) {
+		for ( Method method : this.testMethods ) {
+			try {
+				method.invoke( test );
+			} catch ( Throwable e ) {
+				// TODO failure handling
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private List<Method> getTestMethods() {
+		return this.getAnnotatedMethods( MyTest.class );
+	}
+
+	private List<Method> getAnnotatedMethods( Class<? extends Annotation> annotationClass ) {
+		List<Method> results = new ArrayList<Method>();
+		Method[] methods = this.testClass.getDeclaredMethods();
+		for ( Method eachMethod : methods ) {
+			Annotation annotation = eachMethod.getAnnotation( annotationClass );
+			if ( annotation != null )
+				results.add( eachMethod );
+		}
+
+		return results;
 	}
 
 	protected Description methodDescription( Method method ) {
-		return Description.createTestDescription( getTestClass().getJavaClass(), testName( method ), testAnnotations( method ) );
+		return Description.createTestDescription( getTestClass(), testName( method ), testAnnotations( method ) );
 	}
 
 	protected String testName( Method method ) {
@@ -71,10 +106,15 @@ public class ComposedTestRunner extends Runner {
 	}
 
 	protected Annotation[] classAnnotations() {
-		return this.testClass.getJavaClass().getAnnotations();
+		return this.testClass.getAnnotations();
 	}
 
-	public MyTestClass getTestClass() {
+	protected Object createTest() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException,
+	        InvocationTargetException, NoSuchMethodException {
+		return this.testClass.getConstructor().newInstance();
+	}
+
+	public Class<?> getTestClass() {
 		return this.testClass;
 	}
 
