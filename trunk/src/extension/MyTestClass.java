@@ -11,7 +11,8 @@ import java.util.List;
 import extension.annotations.MyTest;
 
 /**
- * @author Lea Haensenberger Date: Sep 7, 2007
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * 
  */
 public class MyTestClass {
 

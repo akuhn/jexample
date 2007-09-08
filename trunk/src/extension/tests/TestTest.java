@@ -12,8 +12,8 @@ import extension.ComposedTestRunner;
 import extension.annotations.MyTest;
 
 /**
- * @author Lea Haensenberger 
- * Date: Sep 7, 2007
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * 
  */
 @RunWith( ComposedTestRunner.class )
 public class TestTest {
