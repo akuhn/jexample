@@ -6,15 +6,12 @@ package extension;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
-
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -160,35 +157,4 @@ public class ComposedTestRunner extends Runner {
 		validator.validateMethodsForDefaultRunner();
 		validator.assertValid();
 	}
-
-	private void validateMethods() throws InitializationError {
-		validateTestMethods( MyTest.class );
-	}
-
-	private void validateTestMethods( Class<? extends Annotation> class1 ) throws InitializationError {
-		for ( Method method : this.testMethods ) {
-			if ( !Modifier.isPublic( method.getModifiers() ) ) {
-				// TODO add to a list of errors
-				throw new InitializationError( "modifier not public" );
-			}
-			if ( method.getReturnType() != Void.TYPE ) {
-				// TODO add to a list of errors
-				throw new InitializationError( "return type not void" );
-			}
-			if ( method.getParameterTypes().length > 0 ) {
-				// TODO add to a list of errors
-				throw new InitializationError( "there are parameters" );
-			}
-		}
-	}
-
-	private void validateConstructor() {
-		try {
-			this.testClass.getConstructor();
-		} catch ( Throwable e ) {
-			// TODO failure handling
-			e.printStackTrace();
-		}
-	}
-
 }

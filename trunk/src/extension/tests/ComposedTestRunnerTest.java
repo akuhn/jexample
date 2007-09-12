@@ -35,16 +35,22 @@ public class ComposedTestRunnerTest {
 			assertTrue( false );
 			return true;
 		}
+
+		@MyTest
+		public void goodTest() {
+			assertTrue( true );
+		}
 	}
 
 	@Test
 	// the testmethods are not run, otherwise the test would fail
 	public void badTestMethods() {
 		Result result = JUnitCore.runClasses( BadTestMethods.class );
-		assertEquals( 1, result.getRunCount() );
-		// i don't exactly know, why it's 1 failure, but i think it counts just
-		// the initializationerror
-		assertEquals( 1, result.getFailureCount() );
+		// if there are initialization errors, here there are two of them, then for each
+		// initialization error, a ErrorReportingRunner is created and only those are run, so
+		// there are only two Runs
+		assertEquals( 2, result.getRunCount() );
+		assertEquals( 2, result.getFailureCount() );
 	}
 
 }
