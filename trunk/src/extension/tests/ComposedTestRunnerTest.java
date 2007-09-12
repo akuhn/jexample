@@ -46,7 +46,7 @@ public class ComposedTestRunnerTest {
 	// the testmethods are not run, otherwise the test would fail
 	public void badTestMethods() {
 		Result result = JUnitCore.runClasses( BadTestMethods.class );
-		// if there are initialization errors, here there are two of them, then for each
+		// if there are initialization errors, here, there are two of them, then for each
 		// initialization error, a ErrorReportingRunner is created and only those are run, so
 		// there are only two Runs
 		assertEquals( 2, result.getRunCount() );
