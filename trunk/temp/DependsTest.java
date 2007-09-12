@@ -22,7 +22,7 @@ public class DependsTest {
 
 	@Depends( "runBefore" )
 	public void runAfter() {
-		System.out.println( "And I was run afterwards!" );
+
 	}
 
 	@Test
@@ -55,7 +55,6 @@ public class DependsTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		assertEquals( "Yeah, I was run before!", (String) aString );
 	}
 }
