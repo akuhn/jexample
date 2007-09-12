@@ -26,7 +26,7 @@ public class ComposedTestRunnerTest {
 		public BadTestMethods() {}
 
 		@MyTest
-		public void noParametersAccepted( ) {
+		public void noParametersAccepted( String bla ) {
 			assertTrue( false );
 		}
 

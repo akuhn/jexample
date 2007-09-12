@@ -7,7 +7,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
@@ -24,12 +23,12 @@ import extension.annotations.MyTest;
 
 public class ComposedTestRunner extends Runner {
 
-	private Class<?> testClass;
+	private MyTestClass testClass;
 
 	private final List<Method> testMethods;
 
 	public ComposedTestRunner( Class<?> toTest ) throws InitializationError {
-		this.testClass = toTest;
+		this.testClass = new MyTestClass( toTest );
 		this.testMethods = this.getTestMethods();
 		this.validate();
 	}
@@ -54,31 +53,41 @@ public class ComposedTestRunner extends Runner {
 	 * @see org.junit.runner.Runner#run(org.junit.runner.notification.RunNotifier)
 	 */
 	@Override
-	public void run( RunNotifier notifier ) {
-		Object test;
-		try {
-			test = this.createTest();
-		} catch ( Throwable e ) {
-			// TODO failure handling
-			e.printStackTrace();
-			return;
-		}
-		this.runTestMethods( test );
+	public void run( final RunNotifier notifier ) {
+		new MyClassRoadie( notifier, this.testClass, this.getDescription(), new Runnable() {
+
+			@Override
+			public void run() {
+				runMethods( notifier );
+			}
+
+		} ).runProtected();
 	}
 
-	/**
-	 * Iterate over all testmethods and run them.
-	 * @param test
-	 */
-	private void runTestMethods( Object test ) {
+	protected void runMethods( RunNotifier notifier ) {
 		for ( Method method : this.testMethods ) {
-			try {
-				method.invoke( test );
-			} catch ( Throwable e ) {
-				// TODO failure handling
-				e.printStackTrace();
-			}
+			this.invokeTestMethod( method, notifier );
 		}
+	}
+
+	protected void invokeTestMethod( Method method, RunNotifier notifier ) {
+		Description description = methodDescription( method );
+		Object test;
+		try {
+			test = createTest();
+		} catch ( InvocationTargetException e ) {
+			notifier.testAborted( description, e.getCause() );
+			return;
+		} catch ( Exception e ) {
+			notifier.testAborted( description, e );
+			return;
+		}
+		MyTestMethod testMethod = wrapMethod( method );
+		new MyMethodRoadie( test, testMethod, notifier, description ).run();
+	}
+
+	protected MyTestMethod wrapMethod( Method method ) {
+		return new MyTestMethod( method, this.testClass );
 	}
 
 	/**
@@ -86,24 +95,7 @@ public class ComposedTestRunner extends Runner {
 	 * @return
 	 */
 	private List<Method> getTestMethods() {
-		return this.getAnnotatedMethods( MyTest.class );
-	}
-
-	/**
-	 * Get all methods annotated with <code>annotationClass</code>
-	 * @param annotationClass
-	 * @return
-	 */
-	private List<Method> getAnnotatedMethods( Class<? extends Annotation> annotationClass ) {
-		List<Method> results = new ArrayList<Method>();
-		Method[] methods = this.testClass.getDeclaredMethods();
-		for ( Method eachMethod : methods ) {
-			Annotation annotation = eachMethod.getAnnotation( annotationClass );
-			if ( annotation != null )
-				results.add( eachMethod );
-		}
-
-		return results;
+		return this.testClass.getTestMethods();
 	}
 
 	protected Description methodDescription( Method method ) {
@@ -141,7 +133,7 @@ public class ComposedTestRunner extends Runner {
 	 * @return an <code>Array</code> of <code>Annotations</code>
 	 */
 	protected Annotation[] classAnnotations() {
-		return this.testClass.getAnnotations();
+		return this.testClass.getJavaClass().getAnnotations();
 	}
 
 	/**
@@ -160,12 +152,13 @@ public class ComposedTestRunner extends Runner {
 	}
 
 	public Class<?> getTestClass() {
-		return this.testClass;
+		return this.testClass.getClass();
 	}
 
 	private void validate() throws InitializationError {
-		validateConstructor();
-		validateMethods();
+		MyMethodValidator validator = new MyMethodValidator( this.testClass );
+		validator.validateMethodsForDefaultRunner();
+		validator.assertValid();
 	}
 
 	private void validateMethods() throws InitializationError {
