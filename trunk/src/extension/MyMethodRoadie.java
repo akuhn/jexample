@@ -3,12 +3,6 @@ package extension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.Assume.AssumptionViolatedException;
 import org.junit.runner.Description;
@@ -38,44 +32,10 @@ public class MyMethodRoadie {
 		}
 		fNotifier.fireTestStarted( fDescription );
 		try {
-			long timeout = fTestMethod.getTimeout();
-			if ( timeout > 0 )
-				runWithTimeout( timeout );
-			else
-				runTest();
+			runTest();
 		} finally {
 			fNotifier.fireTestFinished( fDescription );
 		}
-	}
-
-	private void runWithTimeout( final long timeout ) {
-		runBeforesThenTestThenAfters( new Runnable() {
-
-			public void run() {
-				ExecutorService service = Executors.newSingleThreadExecutor();
-				Callable<Object> callable = new Callable<Object>() {
-					public Object call() throws Exception {
-						runTestMethod();
-						return null;
-					}
-				};
-				Future<Object> result = service.submit( callable );
-				service.shutdown();
-				try {
-					boolean terminated = service.awaitTermination( timeout, TimeUnit.MILLISECONDS );
-					if ( !terminated )
-						service.shutdownNow();
-					result.get( 0, TimeUnit.MILLISECONDS ); // throws the
-					// exception if one
-					// occurred during
-					// the invocation
-				} catch ( TimeoutException e ) {
-					addFailure( new Exception( String.format( "test timed out after %d milliseconds", timeout ) ) );
-				} catch ( Exception e ) {
-					addFailure( e );
-				}
-			}
-		} );
 	}
 
 	public void runTest() {
@@ -101,21 +61,11 @@ public class MyMethodRoadie {
 	protected void runTestMethod() {
 		try {
 			fTestMethod.invoke( fTest );
-			// if the method didn't throw any exceptions, but expected one, the
-			// test fails
-			if ( fTestMethod.expectsException() )
-				addFailure( new AssertionError( "Expected exception: " + fTestMethod.getExpectedException().getName() ) );
+
 		} catch ( InvocationTargetException e ) {
 			Throwable actual = e.getTargetException();
 			if ( actual instanceof AssumptionViolatedException )
 				return;
-			else if ( !fTestMethod.expectsException() )
-				addFailure( actual );
-			else if ( fTestMethod.isUnexpected( actual ) ) {
-				String message = "Unexpected exception, expected<" + fTestMethod.getExpectedException().getName() + "> but was<"
-				        + actual.getClass().getName() + ">";
-				addFailure( new Exception( message, actual ) );
-			}
 		} catch ( Throwable e ) {
 			addFailure( e );
 		}

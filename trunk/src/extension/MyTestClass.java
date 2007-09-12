@@ -38,6 +38,10 @@ public class MyTestClass {
 			Method[] methods = eachClass.getDeclaredMethods();
 			for ( Method eachMethod : methods ) {
 				Annotation annotation = eachMethod.getAnnotation( annotationClass );
+				// if there are superclasses, whose testmethods are overwritten, isShadowed()
+				// checks, if there
+				// are overwritten methods, those are not added to the results list, so only
+				// the "lowest" submethod is added
 				if ( annotation != null && !isShadowed( eachMethod, results ) )
 					results.add( eachMethod );
 			}
