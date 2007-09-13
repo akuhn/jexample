@@ -62,7 +62,8 @@ public class MyMethodRoadie {
 		try {
 			fTestMethod.invoke( fTest );
 
-		} catch ( InvocationTargetException e ) {
+		} catch ( InvocationTargetException e ) { // wrapper-Exception, wraps an Exception throw
+													// by an invoked method or constructor
 			Throwable actual = e.getTargetException();
 			if ( actual instanceof AssumptionViolatedException )
 				return;
