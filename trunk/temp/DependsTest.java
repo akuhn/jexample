@@ -2,8 +2,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
+
+import extension.annotations.MyTest;
 
 /**
  * 
@@ -23,6 +27,16 @@ public class DependsTest {
 	@Depends( "runBefore" )
 	public void runAfter() {
 
+	}
+
+	@Depends( "runBefore" )
+	@MyTest
+	public List<String> runAfterWithParameter( String test ) {
+		List<String> strings = new ArrayList<String>();
+		strings.add( test );
+		strings.add( new String( "And I was run afterwards!" ) );
+
+		return strings;
 	}
 
 	@Test
@@ -56,5 +70,14 @@ public class DependsTest {
 			e.printStackTrace();
 		}
 		assertEquals( "Yeah, I was run before!", (String) aString );
+	}
+
+	@Test
+	public void testDependsWithParameters() {
+		Runner runner = new Runner( this.getClass() );
+		List<String> res = runner.run();
+		assertEquals( 2, res.size() );
+		assertEquals( "Yeah, I was run before!", res.get( 0 ) );
+		assertEquals( "And I was run afterwards!", res.get( 1 ) );
 	}
 }
