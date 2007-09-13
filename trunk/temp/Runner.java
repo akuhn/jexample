@@ -35,36 +35,42 @@ public class Runner {
 		return testmethods;
 	}
 
-	@SuppressWarnings( "unchecked" )
 	public List<String> run() {
 		List<String> result = new ArrayList<String>();
 		for ( Method method : this.methods ) {
 			Depends annotation = method.getAnnotation( Depends.class );
 			if ( annotation != null ) {
-				try {
-					Object instance = this.clazz.getConstructor().newInstance();
-					result = (List<String>) method.invoke( instance, this.runDependencies( annotation.value(), instance ) );
-
-				} catch ( IllegalArgumentException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch ( IllegalAccessException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch ( InvocationTargetException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch ( SecurityException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch ( NoSuchMethodException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch ( InstantiationException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				result = this.invokeMethod( method, annotation.value() );
 			}
+		}
+		return result;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	private List<String> invokeMethod( Method method, String dependency ) {
+		List<String> result = new ArrayList<String>();
+		try {
+			Object instance = this.clazz.getConstructor().newInstance();
+			result = (List<String>) method.invoke( instance, this.runDependencies( dependency, instance ) );
+
+		} catch ( IllegalArgumentException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( IllegalAccessException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( InvocationTargetException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( SecurityException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( NoSuchMethodException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( InstantiationException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return result;
 	}
