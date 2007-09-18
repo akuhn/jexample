@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Lea Hänsenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class TestNode {
 

@@ -14,7 +14,7 @@ import extension.annotations.MyTest;
  */
 
 /**
- * @author Lea Hänsenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class DependsTest {
 

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 
 /**
- * @author Lea Hänsenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 
 @Retention( RetentionPolicy.RUNTIME )

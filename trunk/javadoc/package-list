@@ -1,5 +1,9 @@
 extension
 extension.annotations
+extension.graph
+extension.graph.tests
+extension.parser
+extension.parser.tests
 extension.tests
 org.junit
 org.junit.experimental.results

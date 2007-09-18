@@ -14,7 +14,7 @@ import org.junit.Test;
 import extension.graph.TestNode;
 
 /**
- * @author Lea Hänsenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class TestNodeTest {
 

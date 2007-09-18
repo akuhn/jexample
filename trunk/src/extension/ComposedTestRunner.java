@@ -89,7 +89,7 @@ public class ComposedTestRunner extends Runner {
 
 	/**
 	 * Get all methods with the Annotation <code>MyTest</code>
-	 * @return
+	 * @return a <code>List</code> of methods
 	 */
 	private List<Method> getTestMethods() {
 		return this.testClass.getTestMethods();
