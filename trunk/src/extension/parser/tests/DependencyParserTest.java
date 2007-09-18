@@ -46,6 +46,7 @@ public class DependencyParserTest {
 		assertEquals(2,methods.size());
 	}
 	
+	
 	public void annotatedMethod(){
 		
 	}

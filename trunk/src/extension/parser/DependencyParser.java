@@ -11,6 +11,10 @@ import extension.MyTestClass;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * 
+ * This class gets the value from the <code>Annotation Depends</code> and extracts method
+ * names and parameters. with this information it creates a <code>List</code> of <code>Method Objects</code>
+ * which represent the dependencies of the current test method.
  */
 public class DependencyParser {
 
