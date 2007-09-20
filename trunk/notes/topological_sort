@@ -1,0 +1,3 @@
+1. get all nodes that have no parent nodes that are in the nodes list
+2. add them to the sorted list
+3. delete them from the nodes list
