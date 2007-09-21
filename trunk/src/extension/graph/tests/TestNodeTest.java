@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import extension.graph.TestNode;
+import extension.graph.exception.ParentExistsException;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -20,9 +21,7 @@ public class TestNodeTest {
 
 	private Method testMethod, testMethod2;
 
-	private TestNode node, node2, node3;
-
-	private Method testMethod3;
+	private TestNode node, node2;
 
 	private TestNode node4;
 
@@ -33,11 +32,9 @@ public class TestNodeTest {
 	public void setUp() throws Exception {
 		this.testMethod = this.getClass().getMethod( "methodToAdd" );
 		this.testMethod2 = this.getClass().getMethod( "methodToAdd2" );
-		this.testMethod3 = this.getClass().getMethod( "methodToAdd3" );
 
 		this.node = new TestNode( this.testMethod );
 		this.node2 = new TestNode( this.testMethod2 );
-		this.node3 = new TestNode( this.testMethod3 );
 		this.node4 = new TestNode( this.testMethod );
 	}
 
@@ -49,13 +46,13 @@ public class TestNodeTest {
 	}
 
 	@Test
-	public void testSetAndGetParent() {
+	public void testSetAndGetParent() throws ParentExistsException {
 		this.node2.addParent( this.node );
 		assertEquals( 1, this.node2.getParents().size() );
 	}
 
-	@Test
-	public void testAddParentOnlyOnce() {
+	@Test(expected = ParentExistsException.class)
+	public void testAddParentOnlyOnce() throws ParentExistsException {
 		this.node2.addParent( this.node );
 		assertEquals( 1, this.node2.getParents().size() );
 
@@ -63,37 +60,13 @@ public class TestNodeTest {
 		assertFalse( 2 == this.node2.getParents().size() );
 		assertEquals( 1, this.node2.getParents().size() );
 	}
-	
-	@Test
-	public void testDontAddMeAsMyParent(){
+
+	@Test(expected = ParentExistsException.class)
+	public void testDontAddMeAsMyParent() throws ParentExistsException {
 		this.node.addParent( this.node4 );
 		assertEquals( 0, this.node.getParents().size() );
 	}
 
-	@Test
-	public void testAddAndGetChlidren() {
-		this.node.addChild( this.node2 );
-		assertEquals( 1, this.node.getChildren().size() );
-
-		this.node.addChild( this.node3 );
-		assertEquals( 2, this.node.getChildren().size() );
-	}
-
-	@Test
-	public void testAddChildOnlyOnce() {
-		this.node.addChild( this.node2 );
-		assertEquals( 1, this.node.getChildren().size() );
-
-		this.node.addChild( this.node2 );
-		assertFalse( 2 == this.node.getChildren().size() );
-		assertEquals( 1, this.node.getChildren().size() );
-	}
-	
-	@Test
-	public void testDontAddMeAsMyChild(){
-		this.node.addChild( this.node4 );
-		assertEquals( 0, this.node.getChildren().size() );
-	}
 
 	public void methodToAdd() {
 
