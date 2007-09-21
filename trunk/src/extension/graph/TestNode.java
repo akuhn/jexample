@@ -21,7 +21,7 @@ public class TestNode {
 
 	private List<TestNode> parentNodes;
 	
-	//TODO: this object should know, if it's testmethod failed or is skipped
+	// TODO (Sep 21, 2007 11:19:39 AM) this object should know, if it's testmethod failed or is skipped
 	//becaus it's parent has failed or was skipped.
 
 	public TestNode( Method testMethod ) {
