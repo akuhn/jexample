@@ -1,6 +1,7 @@
 extension
 extension.annotations
 extension.graph
+extension.graph.exception
 extension.graph.tests
 extension.parser
 extension.parser.tests

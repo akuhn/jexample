@@ -10,11 +10,11 @@ import java.util.List;
 import extension.MyTestClass;
 
 /**
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
- * 
  * This class gets the value from the <code>Annotation Depends</code> and extracts method
  * names and parameters. with this information it creates a <code>List</code> of <code>Method Objects</code>
  * which represent the dependencies of the current test method.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class DependencyParser {
 
@@ -30,6 +30,18 @@ public class DependencyParser {
 
 	}
 
+	/**
+	 * This methods parses the <code>String annotationValue</code> and extracts method names
+	 * and the parameters of this method, if there are overloaded methods. With the extracted
+	 * information it creates <code>Method</code> Objects.
+	 * 
+	 * @return a <code>List</code> of <code>Method</code> Objects which are created from the
+	 * <code>String value</code>.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
 	public List<Method> getDependencies() throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		this.dependencies = new ArrayList<Method>();
 
