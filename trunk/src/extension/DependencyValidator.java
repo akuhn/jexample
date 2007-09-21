@@ -44,10 +44,10 @@ public class DependencyValidator {
 			if ( params.length != dependencies.length ) {
 				this.fErrors.add( new Exception( "Method " + method.getName() + " has not same number of parameters and dependencies." ) );
 			} else {
-				compareTypes( dependencies, params );
+				this.compareTypes( dependencies, params );
 			}
 		} else {
-			assertVoidReturnTypes( dependencies );
+			this.assertVoidReturnTypes( dependencies );
 		}
 	}
 
