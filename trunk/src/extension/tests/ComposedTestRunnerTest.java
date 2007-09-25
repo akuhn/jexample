@@ -85,4 +85,37 @@ public class ComposedTestRunnerTest {
 		Result result = JUnitCore.runClasses( CycleMethods.class );
 		assertEquals( 1, result.getFailureCount() );
 	}
+	
+	@RunWith( ComposedTestRunner.class )
+	static public class SkipMethods {
+
+		public SkipMethods() {}
+
+		@MyTest
+		public void firstMethod( ) {
+			assertTrue( true );
+		}
+
+		// test is supposed to fail
+		@MyTest
+		@Depends("firstMethod")
+		public void secondMethod() {
+			assertTrue( false );
+		}
+
+		// this test is ignored, because secondMethod failed
+		@MyTest
+		@Depends("secondMethod")
+		public void thirdMethod() {
+			assertTrue( true );
+		}
+	}
+	
+	@Test
+	public void skipMethods() {
+		Result result = JUnitCore.runClasses( SkipMethods.class );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( 1, result.getIgnoreCount() );
+		assertEquals( 2, result.getRunCount() );
+	}
 }
