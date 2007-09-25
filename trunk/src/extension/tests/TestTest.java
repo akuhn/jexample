@@ -35,6 +35,13 @@ public class TestTest {
 		System.out.println( "anotherTest" );
 		assertFalse( true == true );
 	}
+	
+	@MyTest
+	@Depends("testTestMethod")
+	public void lastMethod(){
+		System.out.println( "lastTest" );
+		assertTrue(true);
+	}
 
 	public void noTestMethod() {
 		System.out.println( "noTest" );

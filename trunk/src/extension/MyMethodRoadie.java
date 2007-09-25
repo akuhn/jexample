@@ -26,8 +26,14 @@ public class MyMethodRoadie {
 	}
 
 	public void run() {
-		if ( fTestNode.getTestMethod().isIgnored() || fTestNode.parentFailedOrSkipped() ) {
+		if ( fTestNode.getTestMethod().isIgnored() ) {
 			fNotifier.fireTestIgnored( fDescription );
+			return;
+		}
+		
+		if(fTestNode.parentFailedOrSkipped()){
+			fNotifier.fireTestIgnored( fDescription );
+			fTestNode.setSkipped();
 			return;
 		}
 
