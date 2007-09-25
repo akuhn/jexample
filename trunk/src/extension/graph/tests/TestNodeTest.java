@@ -6,11 +6,11 @@ package extension.graph.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import java.lang.reflect.Method;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import extension.MyTestClass;
+import extension.MyTestMethod;
 import extension.graph.TestNode;
 import extension.graph.exception.ParentExistsException;
 
@@ -19,7 +19,9 @@ import extension.graph.exception.ParentExistsException;
  */
 public class TestNodeTest {
 
-	private Method testMethod, testMethod2;
+	MyTestMethod testMethod;
+
+	private MyTestMethod testMethod2;
 
 	private TestNode node, node2;
 
@@ -30,9 +32,12 @@ public class TestNodeTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.testMethod = this.getClass().getMethod( "methodToAdd" );
-		this.testMethod2 = this.getClass().getMethod( "methodToAdd2" );
+		MyTestClass testClass = new MyTestClass(this.getClass());
+		
+		this.testMethod = new MyTestMethod(this.getClass().getMethod( "methodToAdd" ), testClass);
+		this.testMethod2 = new MyTestMethod(this.getClass().getMethod( "methodToAdd2" ), testClass);
 
+		
 		this.node = new TestNode( this.testMethod );
 		this.node2 = new TestNode( this.testMethod2 );
 		this.node4 = new TestNode( this.testMethod );

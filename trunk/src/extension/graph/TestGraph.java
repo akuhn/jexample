@@ -10,10 +10,9 @@ import java.util.List;
 import org.junit.internal.runners.InitializationError;
 
 import extension.MyTestClass;
-import extension.annotations.Depends;
+import extension.MyTestMethod;
 import extension.graph.exception.GraphCyclicException;
 import extension.graph.exception.ParentExistsException;
-import extension.parser.DependencyParser;
 
 /**
  * This class is the representation of a graph of tests. From a <code>List</code> of <code>Method</code> Objects
@@ -28,13 +27,15 @@ public class TestGraph {
 
 	private final MyTestClass testClass;
 
-	public TestGraph( List<Method> methods, MyTestClass testClass ) throws SecurityException, NoSuchMethodException, ClassNotFoundException,
+	private List<MyTestMethod> testMethods;
+
+	public TestGraph( List<MyTestMethod> methods, MyTestClass testClass ) throws SecurityException, NoSuchMethodException, ClassNotFoundException,
 	        GraphCyclicException, InitializationError {
 		this.testClass = testClass;
 		this.nodes = new ArrayList<TestNode>();
 		this.sorted = new ArrayList<TestNode>();
-
-		this.createNodes( methods );
+		this.testMethods = methods;
+		this.createNodes();
 		this.sort();
 	}
 
@@ -44,7 +45,7 @@ public class TestGraph {
 	public List<TestNode> getNodes() {
 		return this.nodes;
 	}
-	
+
 	/**
 	 * @return a <code>List</code> of topoligical sorted <code>TestNode</code> Objects
 	 */
@@ -119,11 +120,11 @@ public class TestGraph {
 		return false;
 	}
 
-	private void createNodes( List<Method> methods ) throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException {
-		assert !methods.isEmpty();
+	private void createNodes() throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException {
+		assert !this.testMethods.isEmpty();
 
 		TestNode node;
-		for ( Method method : methods ) {
+		for ( MyTestMethod method : this.testMethods ) {
 			node = new TestNode( method );
 			this.addNode( node );
 		}
@@ -134,19 +135,24 @@ public class TestGraph {
 		// if the child is null, then it's the node we start to build the graph with
 
 		if ( !this.nodes.contains( node ) ) {
-			Depends annotation = node.getTestMethod().getAnnotation( Depends.class );
-			if ( annotation != null ) {
-				List<Method> deps = new DependencyParser( annotation.value(), this.testClass ).getDependencies();
-				for ( Method dependency : deps ) {
-					try {
-	                    node.addParent( new TestNode( dependency ) );
-                    } catch ( ParentExistsException e ) {
-                    	throw new GraphCyclicException("The dependencies for this Test contains cycles.");
-                    }
+			for ( Method dependency : node.getTestMethod().getDependencies() ) {
+				try {
+					node.addParent( new TestNode( this.getCorrespondingTestMethod( dependency ) ) );
+				} catch ( ParentExistsException e ) {
+					throw new GraphCyclicException( "The dependencies for this Test contains cycles." );
 				}
 			}
 			this.nodes.add( node );
 		}
+	}
+
+	private MyTestMethod getCorrespondingTestMethod( Method dependency ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+		for ( MyTestMethod method : this.testMethods ) {
+			if ( method.getMethod().equals( dependency ) ) {
+				return method;
+			}
+		}
+		return new MyTestMethod( dependency, this.testClass );
 	}
 
 	// private boolean nodeExists( TestNode node ) {

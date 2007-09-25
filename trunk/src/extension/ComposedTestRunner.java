@@ -70,8 +70,10 @@ public class ComposedTestRunner extends Runner {
 	protected void invokeTestMethod( Method method, RunNotifier notifier ) {
 		Description description = methodDescription( method );
 		Object test;
+		MyTestMethod testMethod;
 		try {
 			test = createTest();
+			testMethod = wrapMethod( method );
 		} catch ( InvocationTargetException e ) {
 			notifier.testAborted( description, e.getCause() );
 			return;
@@ -79,11 +81,10 @@ public class ComposedTestRunner extends Runner {
 			notifier.testAborted( description, e );
 			return;
 		}
-		MyTestMethod testMethod = wrapMethod( method );
 		new MyMethodRoadie( test, testMethod, notifier, description ).run();
 	}
 
-	protected MyTestMethod wrapMethod( Method method ) {
+	protected MyTestMethod wrapMethod( Method method ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
 		return new MyTestMethod( method, this.testClass );
 	}
 

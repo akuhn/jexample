@@ -3,10 +3,10 @@
  */
 package extension.graph;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import extension.MyTestMethod;
 import extension.graph.exception.ParentExistsException;
 
 /**
@@ -17,15 +17,15 @@ import extension.graph.exception.ParentExistsException;
  */
 public class TestNode {
 
-	private final Method testMethod;
+	private final MyTestMethod testMethod;
 
 	private List<TestNode> parentNodes;
 	
 	// TODO (Sep 21, 2007 11:19:39 AM) this object should know, if it's testmethod failed or is skipped
 	//becaus it's parent has failed or was skipped.
 
-	public TestNode( Method testMethod ) {
-		this.testMethod = testMethod;
+	public TestNode( MyTestMethod method ) {
+		this.testMethod = method;
 		this.parentNodes = new ArrayList<TestNode>();
 	}
 
@@ -33,7 +33,7 @@ public class TestNode {
 	/**
 	 * @return the represented <code>Method</code>
 	 */
-	public Method getTestMethod() {
+	public MyTestMethod getTestMethod() {
 		assert this.testMethod != null;
 
 		return this.testMethod;
