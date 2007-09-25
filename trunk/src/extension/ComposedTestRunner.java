@@ -16,6 +16,7 @@ import org.junit.runner.notification.RunNotifier;
 
 import extension.graph.TestGraph;
 import extension.graph.TestNode;
+import extension.graph.exception.GraphCyclicException;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -30,19 +31,25 @@ public class ComposedTestRunner extends Runner {
 
 	private TestGraph testGraph;
 
-	public ComposedTestRunner( Class<?> toTest ) throws InitializationError {
+	public ComposedTestRunner( Class<?> toTest ) throws InitializationError, GraphCyclicException {
 		this.testClass = new MyTestClass( toTest );
 		this.testMethods = this.getTestMethods();
 		this.validate();
 		this.createTestGraph();
 	}
 
-	private void createTestGraph() throws InitializationError {
-		try {
-			this.testGraph = new TestGraph( this.wrapMethods(), this.testClass );
-		} catch ( Exception e ) {
-			throw new InitializationError( e.getMessage() );
-		}
+	private void createTestGraph() throws InitializationError, GraphCyclicException {
+			try {
+	            this.testGraph = new TestGraph( this.wrapMethods(), this.testClass );
+            } catch ( SecurityException e ) {
+            	throw new InitializationError("Error while initializing TestGraph");
+            } catch ( NoSuchMethodException e ) {
+            	throw new InitializationError("Error while initializing TestGraph");
+            } catch ( ClassNotFoundException e ) {
+            	throw new InitializationError("Error while initializing TestGraph");
+            } catch ( GraphCyclicException e ) {
+	            throw e;
+            }
 
 	}
 
