@@ -1,0 +1,44 @@
+MyTestMethod
+
+new attribute: Method before;
+when wraping the testmethods, something like a tree of testmethods is built,
+as every method knows, which method it depends on. if a test fails it throws some sort of
+exception, a new one or just the normal AssertionError, which is catched in the method below and then all
+methods below are marked as skipped or something like that. this information should appear
+in the failure log.
+=> is there a better solution?
+=> the method invoke() needs to be changed
+the methods getBefores() and getAfters() won't be needed anymore as there won't be any tearDown or setUp to do
+
+
+MyTestClass
+
+everything ok
+getBefores() and getAfters() are needed here as we will have the possibility to run something
+before and after the whole class is run.
+
+
+MyMethodValidator
+
+parameters and return-types other than void have to be allowed.
+Annotations After and Before don't need checking
+
+different validation for MyTest and AfterClass and BeforeClass may be needed.
+should a constructor be allowed to have parameters?
+
+needs to check, if the return-type of the method before is of the same type as the parameter needed by 
+the method run afterwards.
+
+needs to check, if the method passed to the Annotation as dependency exists
+
+
+MyMethodRoadie
+
+in place of the befores and afters the methods, which the current method depends on, are run
+=> MyTestMethod.invoke() would only need to get the parameters it will run with, besides the Test-Object
+
+
+ComposedTestRunner
+
+methods are wrapped only when they're run. eventually they need to be wrapped when getting the methods from 
+the testclass to build the tree of testmethods to run.
