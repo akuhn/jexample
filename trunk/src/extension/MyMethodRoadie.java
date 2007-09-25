@@ -1,13 +1,13 @@
 package extension;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
 
 import org.junit.Assume.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
+
+import extension.graph.TestNode;
 
 public class MyMethodRoadie {
 	private final Object fTest;
@@ -16,20 +16,21 @@ public class MyMethodRoadie {
 
 	private final Description fDescription;
 
-	private MyTestMethod fTestMethod;
+	private TestNode fTestNode;
 
-	public MyMethodRoadie( Object test, MyTestMethod method, RunNotifier notifier, Description description ) {
+	public MyMethodRoadie( Object test, TestNode node, RunNotifier notifier, Description description ) {
 		fTest = test;
 		fNotifier = notifier;
 		fDescription = description;
-		fTestMethod = method;
+		fTestNode = node;
 	}
 
 	public void run() {
-		if ( fTestMethod.isIgnored() ) {
+		if ( fTestNode.getTestMethod().isIgnored() || fTestNode.parentFailedOrSkipped() ) {
 			fNotifier.fireTestIgnored( fDescription );
 			return;
 		}
+
 		fNotifier.fireTestStarted( fDescription );
 		try {
 			runTest();
@@ -48,57 +49,59 @@ public class MyMethodRoadie {
 
 	public void runBeforesThenTestThenAfters( Runnable test ) {
 		try {
-			runBefores();
+//			runBefores();
 			test.run();
-		} catch ( MyFailedBefore e ) {
 		} catch ( Exception e ) {
 			throw new RuntimeException( "test should never throw an exception to this level" );
 		} finally {
-			runAfters();
+//			runAfters();
 		}
 	}
 
 	protected void runTestMethod() {
 		try {
-			fTestMethod.invoke( fTest );
+			fTestNode.getTestMethod().invoke( fTest );
 
-		} catch ( InvocationTargetException e ) { // wrapper-Exception, wraps an Exception throw
+		} catch ( InvocationTargetException e ) { // wrapper-Exception, wraps an Exception thrown
 													// by an invoked method or constructor
 			Throwable actual = e.getTargetException();
 			if ( actual instanceof AssumptionViolatedException )
 				return;
+			else
+				addFailure( actual );
 		} catch ( Throwable e ) {
 			addFailure( e );
 		}
 	}
 
-	private void runBefores() throws MyFailedBefore {
-		try {
-			List<Method> befores = fTestMethod.getBefores();
-			for ( Method before : befores )
-				before.invoke( fTest );
-		} catch ( InvocationTargetException e ) {
-			addFailure( e.getTargetException() );
-			throw new MyFailedBefore();
-		} catch ( Throwable e ) {
-			addFailure( e );
-			throw new MyFailedBefore();
-		}
-	}
-
-	private void runAfters() {
-		List<Method> afters = fTestMethod.getAfters();
-		for ( Method after : afters )
-			try {
-				after.invoke( fTest );
-			} catch ( InvocationTargetException e ) {
-				addFailure( e.getTargetException() );
-			} catch ( Throwable e ) {
-				addFailure( e ); // Untested, but seems impossible
-			}
-	}
+//	private void runBefores() throws MyFailedBefore {
+//		try {
+//			List<Method> befores = fTestNode.getBefores();
+//			for ( Method before : befores )
+//				before.invoke( fTest );
+//		} catch ( InvocationTargetException e ) {
+//			addFailure( e.getTargetException() );
+//			throw new MyFailedBefore();
+//		} catch ( Throwable e ) {
+//			addFailure( e );
+//			throw new MyFailedBefore();
+//		}
+//	}
+//
+//	private void runAfters() {
+//		List<Method> afters = fTestNode.getAfters();
+//		for ( Method after : afters )
+//			try {
+//				after.invoke( fTest );
+//			} catch ( InvocationTargetException e ) {
+//				addFailure( e.getTargetException() );
+//			} catch ( Throwable e ) {
+//				addFailure( e ); // Untested, but seems impossible
+//			}
+//	}
 
 	protected void addFailure( Throwable e ) {
 		fNotifier.fireTestFailure( new Failure( fDescription, e ) );
+		fTestNode.setFailed();
 	}
 }

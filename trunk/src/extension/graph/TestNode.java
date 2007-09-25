@@ -69,4 +69,24 @@ public class TestNode {
 		return this.getTestMethod().equals( ( (TestNode) obj ).getTestMethod() );
 	}
 
+
+	public boolean parentFailedOrSkipped() {
+		for ( TestNode parent : this.parentNodes ) {
+	        if(parent.getTestMethod().hasFailed() || parent.getTestMethod().isSkipped()){
+	        	return true;
+	        }
+        }
+	    return false;
+    }
+
+
+	public void setSkipped() {
+	    this.testMethod.setSkipped();
+    }
+
+
+	public void setFailed() {
+	    this.testMethod.setFailed();
+    }
+
 }

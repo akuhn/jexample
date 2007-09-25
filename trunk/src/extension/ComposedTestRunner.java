@@ -6,12 +6,16 @@ package extension;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
+
+import extension.graph.TestGraph;
+import extension.graph.TestNode;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -24,10 +28,31 @@ public class ComposedTestRunner extends Runner {
 
 	private final List<Method> testMethods;
 
+	private TestGraph testGraph;
+
 	public ComposedTestRunner( Class<?> toTest ) throws InitializationError {
 		this.testClass = new MyTestClass( toTest );
 		this.testMethods = this.getTestMethods();
 		this.validate();
+		this.createTestGraph();
+	}
+
+	private void createTestGraph() throws InitializationError {
+		try {
+			this.testGraph = new TestGraph( this.wrapMethods(), this.testClass );
+		} catch ( Exception e ) {
+			throw new InitializationError( e.getMessage() );
+		}
+
+	}
+
+	private List<MyTestMethod> wrapMethods() throws SecurityException, ClassNotFoundException, NoSuchMethodException, InitializationError {
+		List<MyTestMethod> methods = new ArrayList<MyTestMethod>();
+
+		for ( Method each : this.testMethods ) {
+			methods.add( this.wrapMethod( each ) );
+		}
+		return methods;
 	}
 
 	/*
@@ -62,18 +87,16 @@ public class ComposedTestRunner extends Runner {
 	}
 
 	protected void runMethods( RunNotifier notifier ) {
-		for ( Method method : this.testMethods ) {
-			this.invokeTestMethod( method, notifier );
+		for ( TestNode node : this.testGraph.getSortedNodes() ) {
+			this.invokeTestMethod( node, notifier );
 		}
 	}
 
-	protected void invokeTestMethod( Method method, RunNotifier notifier ) {
-		Description description = methodDescription( method );
+	protected void invokeTestMethod( TestNode node, RunNotifier notifier ) {
+		Description description = methodDescription( node.getTestMethod().getMethod() );
 		Object test;
-		MyTestMethod testMethod;
 		try {
 			test = createTest();
-			testMethod = wrapMethod( method );
 		} catch ( InvocationTargetException e ) {
 			notifier.testAborted( description, e.getCause() );
 			return;
@@ -81,7 +104,7 @@ public class ComposedTestRunner extends Runner {
 			notifier.testAborted( description, e );
 			return;
 		}
-		new MyMethodRoadie( test, testMethod, notifier, description ).run();
+		new MyMethodRoadie( test, node, notifier, description ).run();
 	}
 
 	protected MyTestMethod wrapMethod( Method method ) throws SecurityException, ClassNotFoundException, NoSuchMethodException, InitializationError {

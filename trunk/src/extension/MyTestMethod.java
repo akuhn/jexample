@@ -21,6 +21,10 @@ public class MyTestMethod {
 
 	private List<Method> dependencies;
 
+	private boolean failed = false;
+
+	private boolean skipped = false;
+
 	public MyTestMethod( Method method, MyTestClass testClass ) throws SecurityException, ClassNotFoundException, NoSuchMethodException,
 	        InitializationError {
 		fMethod = method;
@@ -28,7 +32,6 @@ public class MyTestMethod {
 		this.dependencies = new ArrayList<Method>();
 
 		this.extractDependencies();
-		this.validateDependencies();
 	}
 
 	public boolean isIgnored() {
@@ -59,7 +62,7 @@ public class MyTestMethod {
 		return this.getMethod().equals( ( (MyTestMethod) obj ).getMethod() );
 	}
 
-	private void extractDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException, InitializationError {
+	private void extractDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
 
 		Depends annotation = this.fMethod.getAnnotation( Depends.class );
 		if ( annotation != null ) {
@@ -67,10 +70,19 @@ public class MyTestMethod {
 		}
 	}
 
-	private void validateDependencies() throws InitializationError {
-		DependencyValidator validator = new DependencyValidator();
-		if ( !validator.dependencyIsValid( this.fMethod, this.dependencies.toArray( new Method[this.dependencies.size()] ) ) ) {
-			throw new InitializationError( "Invalid dependencies on method " + this.fMethod.getName() );
-		}
-	}
+	public void setFailed() {
+	    this.failed  = true;
+    }
+
+	public boolean hasFailed() {
+	    return this.failed;
+    }
+
+	public boolean isSkipped() {
+	    return this.skipped ;
+    }
+
+	public void setSkipped() {
+	    this.skipped = true;
+    }
 }

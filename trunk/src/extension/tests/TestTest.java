@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
+import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
 /**
@@ -23,6 +24,7 @@ public class TestTest {
 	}
 
 	@MyTest
+	@Depends("anotherTestMethod")
 	public void testTestMethod() {
 		System.out.println( "aTest" );
 		assertTrue( true );
@@ -31,7 +33,7 @@ public class TestTest {
 	@MyTest
 	public void anotherTestMethod() {
 		System.out.println( "anotherTest" );
-		assertFalse( false );
+		assertFalse( true == true );
 	}
 
 	public void noTestMethod() {

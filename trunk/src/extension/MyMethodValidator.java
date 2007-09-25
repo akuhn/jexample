@@ -12,7 +12,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.internal.runners.InitializationError;
 
+import extension.annotations.Depends;
 import extension.annotations.MyTest;
+import extension.parser.DependencyParser;
 
 public class MyMethodValidator {
 
@@ -43,6 +45,7 @@ public class MyMethodValidator {
 		validateNoArgConstructor();
 		validateStaticMethods();
 		validateInstanceMethods();
+		validateDependencies();
 		return fErrors;
 	}
 
@@ -71,10 +74,24 @@ public class MyMethodValidator {
 				fErrors.add( new Exception( "Class " + each.getDeclaringClass().getName() + " should be public" ) );
 			if ( !Modifier.isPublic( each.getModifiers() ) )
 				fErrors.add( new Exception( "Method " + each.getName() + " should be public" ) );
-			if ( each.getReturnType() != Void.TYPE )
-				fErrors.add( new Exception( "Method " + each.getName() + " should be void" ) );
-			if ( each.getParameterTypes().length != 0 )
-				fErrors.add( new Exception( "Method " + each.getName() + " should have no parameters" ) );
+
+		}
+	}
+
+	private void validateDependencies() {
+		DependencyParser parser;
+		DependencyValidator depValidator = new DependencyValidator();
+
+		List<Method> methods = fTestClass.getAnnotatedMethods( Depends.class );
+		List<Method> dependencies = new ArrayList<Method>();
+		for ( Method each : methods ) {
+			parser = new DependencyParser( each.getAnnotation( Depends.class ).value(), fTestClass );
+			try {
+	            dependencies = parser.getDependencies();
+	            depValidator.dependencyIsValid( each, dependencies.toArray( new Method[dependencies.size()] ) );
+            } catch ( Exception e ) {
+	            fErrors.add( e );
+            }
 		}
 	}
 }
