@@ -84,7 +84,7 @@ public class ComposedTestRunner extends Runner {
 		new MyMethodRoadie( test, testMethod, notifier, description ).run();
 	}
 
-	protected MyTestMethod wrapMethod( Method method ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+	protected MyTestMethod wrapMethod( Method method ) throws SecurityException, ClassNotFoundException, NoSuchMethodException, InitializationError {
 		return new MyTestMethod( method, this.testClass );
 	}
 

@@ -50,19 +50,19 @@ public class TestGraphTest {
 	}
 
 	@Test
-	public void testRootHasNoParent() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
+	public void testRootHasNoParent() throws SecurityException, NoSuchMethodException, ClassNotFoundException, InitializationError {
 		TestNode node = this.graph.getEqualNode( new TestNode( new MyTestMethod( this.getClass().getMethod( "rootMethod" ), testClass ) ) );
 		assertEquals( 0, node.getParents().size() );
 	}
 
 	@Test
-	public void testBottomHasParents() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
+	public void testBottomHasParents() throws SecurityException, NoSuchMethodException, ClassNotFoundException, InitializationError {
 		TestNode node = this.graph.getEqualNode( new TestNode( new MyTestMethod( this.getClass().getMethod( "bottomMethod" ), testClass ) ) );
 		assertEquals( 2, node.getParents().size() );
 	}
 
 	@Test
-	public void testMiddleHasParentsAndChildren() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
+	public void testMiddleHasParentsAndChildren() throws SecurityException, NoSuchMethodException, ClassNotFoundException, InitializationError {
 		TestNode node = this.graph.getEqualNode( new TestNode( new MyTestMethod( this.getClass().getMethod( "middleMethod" ), testClass ) ) );
 		assertEquals( 1, node.getParents().size() );
 
@@ -70,7 +70,7 @@ public class TestGraphTest {
 	}
 
 	@Test
-	public void testSort() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
+	public void testSort() throws SecurityException, NoSuchMethodException, ClassNotFoundException, InitializationError {
 		List<TestNode> sorted = this.graph.getSortedNodes();
 
 		assertEquals( new TestNode( new MyTestMethod( this.getClass().getMethod( "rootMethod" ), testClass ) ), sorted.get( 0 ) );

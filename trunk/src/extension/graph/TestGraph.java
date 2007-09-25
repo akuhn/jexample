@@ -120,7 +120,7 @@ public class TestGraph {
 		return false;
 	}
 
-	private void createNodes() throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException {
+	private void createNodes() throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException, InitializationError {
 		assert !this.testMethods.isEmpty();
 
 		TestNode node;
@@ -130,7 +130,7 @@ public class TestGraph {
 		}
 	}
 
-	private void addNode( TestNode node ) throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException {
+	private void addNode( TestNode node ) throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException, InitializationError {
 
 		// if the child is null, then it's the node we start to build the graph with
 
@@ -146,7 +146,7 @@ public class TestGraph {
 		}
 	}
 
-	private MyTestMethod getCorrespondingTestMethod( Method dependency ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+	private MyTestMethod getCorrespondingTestMethod( Method dependency ) throws SecurityException, ClassNotFoundException, NoSuchMethodException, InitializationError {
 		for ( MyTestMethod method : this.testMethods ) {
 			if ( method.getMethod().equals( dependency ) ) {
 				return method;
