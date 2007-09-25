@@ -55,7 +55,7 @@ public class TestGraph {
 
 	/**
 	 * Searches the <code>TestNode</code> which contains the same
-	 * Method as <code>node</code>.
+	 * <code>MyTestMethod</code> as <code>node</code>.
 	 * 
 	 * @param node
 	 * @return a <code>TestNode</code>
