@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
 
+import extension.annotations.MyTest;
+
 /**
  * This class validates the specified dependencies between tests.
  * 
@@ -32,13 +34,14 @@ public class DependencyValidator {
 	}
 
 	private boolean assertValid() throws InitializationError {
-		if(!this.fErrors.isEmpty()){
-			throw new InitializationError(this.fErrors);
+		if ( !this.fErrors.isEmpty() ) {
+			throw new InitializationError( this.fErrors );
 		}
-	    return true;
-    }
+		return true;
+	}
 
 	private void validateDependencies( Method method, Method[] dependencies ) {
+		this.assertDependenciesAreTestMethods( dependencies );
 		Class<?>[] params = method.getParameterTypes();
 		if ( params.length > 0 ) {
 			if ( params.length != dependencies.length ) {
@@ -51,13 +54,23 @@ public class DependencyValidator {
 		}
 	}
 
+	private void assertDependenciesAreTestMethods( Method[] dependencies ) {
+		MyTest annotation;
+		for ( Method method : dependencies ) {
+			annotation = method.getAnnotation( MyTest.class );
+			if ( annotation == null ) {
+				this.fErrors.add( new Exception( "Dependency " + method.getName() + " is not a test method." ) );
+			}
+		}
+	}
+
 	private void assertVoidReturnTypes( Method[] dependencies ) {
-	    for ( Method method : dependencies ) {
-	        if(method.getReturnType() != Void.TYPE){
-	        	this.fErrors.add( new Exception("Method "+method.getName()+" has a return type other than void.") );
-	        }
-        }
-    }
+		for ( Method method : dependencies ) {
+			if ( method.getReturnType() != Void.TYPE ) {
+				this.fErrors.add( new Exception( "Method " + method.getName() + " has a return type other than void." ) );
+			}
+		}
+	}
 
 	private void compareTypes( Method[] dependencies, Class<?>[] params ) {
 		for ( int i = 0; i < params.length; i++ ) {

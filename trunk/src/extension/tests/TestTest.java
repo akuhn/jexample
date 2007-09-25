@@ -33,7 +33,7 @@ public class TestTest {
 	@MyTest
 	public void anotherTestMethod() {
 		System.out.println( "anotherTest" );
-		assertFalse( true == true );
+		assertFalse( false );
 	}
 	
 	@MyTest

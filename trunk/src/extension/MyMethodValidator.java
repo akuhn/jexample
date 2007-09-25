@@ -81,8 +81,11 @@ public class MyMethodValidator {
 	private void validateDependencies() {
 		DependencyParser parser;
 		DependencyValidator depValidator = new DependencyValidator();
-
-		List<Method> methods = fTestClass.getAnnotatedMethods( Depends.class );
+		List<Class<? extends Annotation>> annotations = new ArrayList<Class<? extends Annotation>>();
+		annotations.add( Depends.class );
+		annotations.add( MyTest.class );
+		
+		List<Method> methods = fTestClass.getAnnotatedMethods( annotations );
 		List<Method> dependencies = new ArrayList<Method>();
 		for ( Method each : methods ) {
 			parser = new DependencyParser( each.getAnnotation( Depends.class ).value(), fTestClass );

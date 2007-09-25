@@ -50,6 +50,33 @@ public class MyTestClass {
 			Collections.reverse( results );
 		return results;
 	}
+	
+	public List<Method> getAnnotatedMethods( List<Class<? extends Annotation>> annotationClasses ) {
+		List<Method> results = new ArrayList<Method>();
+		Annotation annotation;
+		for ( Class<?> eachClass : getSuperClasses( fClass ) ) {
+			Method[] methods = eachClass.getDeclaredMethods();
+			for ( Method eachMethod : methods ) {
+				boolean nullAnnotation = false;
+				for ( Class<? extends Annotation> annotationClass : annotationClasses ) {	                
+					annotation = eachMethod.getAnnotation( annotationClass );
+					if(annotation == null){
+						nullAnnotation = true;
+						break;
+					}
+                }
+				// if there are superclasses, whose testmethods are overwritten, isShadowed()
+				// checks, if there
+				// are overwritten methods, those are not added to the results list, so only
+				// the "lowest" submethod is added
+				if ( !nullAnnotation  && !isShadowed( eachMethod, results ) )
+					results.add( eachMethod );
+			}
+		}
+//		if ( runsTopToBottom( annotationClass ) )
+//			Collections.reverse( results );
+		return results;
+    }
 
 	private boolean runsTopToBottom( Class<? extends Annotation> annotation ) {
 		return annotation.equals( Before.class ) || annotation.equals( BeforeClass.class );
