@@ -84,17 +84,19 @@ public class MyMethodValidator {
 		List<Class<? extends Annotation>> annotations = new ArrayList<Class<? extends Annotation>>();
 		annotations.add( Depends.class );
 		annotations.add( MyTest.class );
-		
+
 		List<Method> methods = fTestClass.getAnnotatedMethods( annotations );
 		List<Method> dependencies = new ArrayList<Method>();
+		List<Throwable> errors = new ArrayList<Throwable>();
 		for ( Method each : methods ) {
 			parser = new DependencyParser( each.getAnnotation( Depends.class ).value(), fTestClass );
 			try {
-	            dependencies = parser.getDependencies();
-	            depValidator.dependencyIsValid( each, dependencies.toArray( new Method[dependencies.size()] ) );
-            } catch ( Exception e ) {
-	            fErrors.add( e );
-            }
+				dependencies = parser.getDependencies();
+			} catch ( Exception e ) {
+				fErrors.add( e );
+			}
+			errors = depValidator.dependencyIsValid( each, dependencies.toArray( new Method[dependencies.size()] ) );
+			fErrors.addAll( errors );
 		}
 	}
 }

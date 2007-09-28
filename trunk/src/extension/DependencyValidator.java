@@ -17,6 +17,7 @@ public class DependencyValidator {
 
 	private final List<Throwable> fErrors = new ArrayList<Throwable>();
 
+	
 	/**
 	 * If the number of parameters of <code>method</code> is greater than 0 the number
 	 * of parameters and the number of <code>dependencies</code> have to be the same.
@@ -28,16 +29,9 @@ public class DependencyValidator {
 	 * @return <code>true</code>, if all the dependencies are valid, <code>false</code> otherwise
 	 * @throws InitializationError 
 	 */
-	public boolean dependencyIsValid( Method method, Method... dependencies ) throws InitializationError {
+	public List<Throwable> dependencyIsValid( Method method, Method... dependencies ) {
 		this.validateDependencies( method, dependencies );
-		return this.assertValid();
-	}
-
-	private boolean assertValid() throws InitializationError {
-		if ( !this.fErrors.isEmpty() ) {
-			throw new InitializationError( this.fErrors );
-		}
-		return true;
+		return this.fErrors;
 	}
 
 	private void validateDependencies( Method method, Method[] dependencies ) {

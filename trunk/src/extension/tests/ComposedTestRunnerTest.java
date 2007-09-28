@@ -84,6 +84,7 @@ public class ComposedTestRunnerTest {
 	public void cycleMethods() {
 		Result result = JUnitCore.runClasses( CycleMethods.class );
 		assertEquals( 1, result.getFailureCount() );
+		assertEquals( "The dependencies are cyclic.", result.getFailures().get( 0 ).getMessage() );
 	}
 	
 	@RunWith( ComposedTestRunner.class )
@@ -117,5 +118,35 @@ public class ComposedTestRunnerTest {
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( 1, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
+	}
+	
+	@RunWith( ComposedTestRunner.class )
+	static public class BadDependencies {
+
+		public BadDependencies() {}
+
+		public void firstMethod( ) {
+			assertTrue( true );
+		}
+
+		@MyTest
+		@Depends("firstMethod")
+		public void secondMethod() {
+			assertTrue( false );
+		}
+
+		@MyTest
+		@Depends("secondMethod")
+		public void thirdMethod() {
+			assertTrue( true );
+		}
+	}
+	
+	@Test
+	public void badDependencies() {
+		Result result = JUnitCore.runClasses( BadDependencies.class );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( 1, result.getRunCount() );
+		assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
 	}
 }
