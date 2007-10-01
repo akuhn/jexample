@@ -32,7 +32,7 @@ public class MyTestMethodTest {
 	}
 	
 	@Test
-	public void testGetDependencies(){
+	public void testGetDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException{
 		assertEquals(1, this.testMethod.getDependencies().size());
 		assertEquals(0, this.testMethod2.getDependencies().size());
 	}

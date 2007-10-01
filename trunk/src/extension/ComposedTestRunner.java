@@ -34,6 +34,14 @@ public class ComposedTestRunner extends Runner {
 		this.testMethods = this.getTestMethods();
 		this.validate();
 		this.createTestGraph();
+		
+		try {
+			throw new Exception();
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
 	}
 
 	private void createTestGraph() throws InitializationError {
@@ -81,6 +89,14 @@ public class ComposedTestRunner extends Runner {
 	 */
 	@Override
 	public void run( final RunNotifier notifier ) {
+
+		try {
+			throw new Exception();
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+				
 		new MyClassRoadie( notifier, this.testClass, this.getDescription(), new Runnable() {
 
 			@Override
@@ -88,7 +104,7 @@ public class ComposedTestRunner extends Runner {
 				runMethods( notifier );
 			}
 
-		} ).runProtected();
+		} ).runProtected();		
 	}
 
 	protected void runMethods( RunNotifier notifier ) {

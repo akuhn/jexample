@@ -16,8 +16,6 @@ import extension.parser.DependencyParser;
 
 public class MyTestMethod {
 
-	private List<Method> dependencies;
-
 	private boolean failed = false;
 
 	private final Method fMethod;
@@ -28,13 +26,10 @@ public class MyTestMethod {
 
 	private boolean skipped = false;
 
-	public MyTestMethod( Method method, MyTestClass testClass ) throws SecurityException, ClassNotFoundException, NoSuchMethodException,
-	        InitializationError {
+	public MyTestMethod( Method method, MyTestClass testClass ) {
 		fMethod = method;
 		fTestClass = testClass;
-		this.dependencies = new ArrayList<Method>();
 		this.parentNodes = new ArrayList<MyTestMethod>();
-		this.extractDependencies();
 	}
 
 	/**
@@ -57,14 +52,6 @@ public class MyTestMethod {
 		return this.getMethod().equals( ( (MyTestMethod) obj ).getMethod() );
 	}
 
-	private void extractDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-
-		Depends annotation = this.fMethod.getAnnotation( Depends.class );
-		if ( annotation != null ) {
-			this.dependencies = new DependencyParser( annotation.value(), this.fTestClass ).getDependencies();
-		}
-	}
-
 	List<Method> getAfters() {
 		return fTestClass.getAnnotatedMethods( After.class );
 	}
@@ -73,8 +60,13 @@ public class MyTestMethod {
 		return fTestClass.getAnnotatedMethods( Before.class );
 	}
 
-	public List<Method> getDependencies() {
-		return this.dependencies;
+	public List<Method> getDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+		List<Method> dependencies = new ArrayList<Method>();
+		Depends annotation = this.fMethod.getAnnotation( Depends.class );
+		if ( annotation != null ) {
+			dependencies = new DependencyParser( annotation.value(), this.fTestClass ).getDependencies();
+		}
+		return dependencies;
 	}
 
 	public Method getMethod() {
