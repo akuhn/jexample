@@ -1,7 +1,7 @@
 /**
  * 
  */
-package extension.graph;
+package extension;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
 
-import extension.MyTestClass;
-import extension.MyTestMethod;
 import extension.graph.exception.GraphCyclicException;
 import extension.graph.exception.ParentExistsException;
 
@@ -21,19 +19,19 @@ import extension.graph.exception.ParentExistsException;
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
-public class TestGraph {
+public class DependencyGraph {
 
-	private List<TestNode> nodes, sorted;
+	private List<MyTestMethod> nodes, sorted;
 
 	private final MyTestClass testClass;
 
 	private List<MyTestMethod> testMethods;
 
-	public TestGraph( List<MyTestMethod> methods, MyTestClass testClass ) throws SecurityException, NoSuchMethodException, ClassNotFoundException,
+	public DependencyGraph( List<MyTestMethod> methods, MyTestClass testClass ) throws SecurityException, NoSuchMethodException, ClassNotFoundException,
 	        GraphCyclicException, InitializationError {
 		this.testClass = testClass;
-		this.nodes = new ArrayList<TestNode>();
-		this.sorted = new ArrayList<TestNode>();
+		this.nodes = new ArrayList<MyTestMethod>();
+		this.sorted = new ArrayList<MyTestMethod>();
 		this.testMethods = methods;
 		this.createNodes();
 		this.sort();
@@ -42,14 +40,14 @@ public class TestGraph {
 	/**
 	 * @return a <code>List</code> of <code>TestNode</code> Objects
 	 */
-	public List<TestNode> getNodes() {
+	public List<MyTestMethod> getNodes() {
 		return this.nodes;
 	}
 
 	/**
 	 * @return a <code>List</code> of topoligical sorted <code>TestNode</code> Objects
 	 */
-	public List<TestNode> getSortedNodes() {
+	public List<MyTestMethod> getSortedNodes() {
 		return this.sorted;
 	}
 
@@ -60,8 +58,8 @@ public class TestGraph {
 	 * @param node
 	 * @return a <code>TestNode</code>
 	 */
-	public TestNode getEqualNode( TestNode node ) {
-		for ( TestNode testNode : this.nodes ) {
+	public MyTestMethod getEqualNode( MyTestMethod node ) {
+		for ( MyTestMethod testNode : this.nodes ) {
 			if ( node.equals( testNode ) ) {
 				return testNode;
 			}
@@ -70,33 +68,33 @@ public class TestGraph {
 	}
 
 	private void sort() throws GraphCyclicException, InitializationError {
-		List<TestNode> origNodes = new ArrayList<TestNode>();
+		List<MyTestMethod> origNodes = new ArrayList<MyTestMethod>();
 		origNodes.addAll( this.nodes );
 
 		while ( !origNodes.isEmpty() ) {
-			List<TestNode> withoutParents = this.getNodesWithoutParents( origNodes );
+			List<MyTestMethod> withoutParents = this.getNodesWithoutParents( origNodes );
 			if ( !this.deleteFromNodes( origNodes, withoutParents ) || !this.addNodesToSorted( withoutParents ) ) {
 				throw new InitializationError( "Could not delete or add nodes." );
 			}
 		}
 	}
 
-	private boolean addNodesToSorted( List<TestNode> withoutParents ) {
+	private boolean addNodesToSorted( List<MyTestMethod> withoutParents ) {
 		assert withoutParents != null;
 
 		return this.sorted.addAll( withoutParents );
 	}
 
-	private boolean deleteFromNodes( List<TestNode> origNodes, List<TestNode> withoutParents ) {
+	private boolean deleteFromNodes( List<MyTestMethod> origNodes, List<MyTestMethod> withoutParents ) {
 		assert withoutParents != null;
 
 		return origNodes.removeAll( withoutParents );
 	}
 
-	private List<TestNode> getNodesWithoutParents( List<TestNode> origNodes ) throws GraphCyclicException {
-		List<TestNode> withoutParents = new ArrayList<TestNode>();
+	private List<MyTestMethod> getNodesWithoutParents( List<MyTestMethod> origNodes ) throws GraphCyclicException {
+		List<MyTestMethod> withoutParents = new ArrayList<MyTestMethod>();
 
-		for ( TestNode testNode : origNodes ) {
+		for ( MyTestMethod testNode : origNodes ) {
 			if ( !this.hasParentsInOrigNodes( testNode, origNodes ) ) {
 				withoutParents.add( testNode );
 			}
@@ -109,9 +107,9 @@ public class TestGraph {
 		return withoutParents;
 	}
 
-	private boolean hasParentsInOrigNodes( TestNode testNode, List<TestNode> origNodes ) {
+	private boolean hasParentsInOrigNodes( MyTestMethod testNode, List<MyTestMethod> origNodes ) {
 
-		for ( TestNode node : testNode.getParents() ) {
+		for ( MyTestMethod node : testNode.getParents() ) {
 			if ( origNodes.contains( node ) ) {
 				return true;
 			}
@@ -123,21 +121,19 @@ public class TestGraph {
 	private void createNodes() throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException, InitializationError {
 		assert !this.testMethods.isEmpty();
 
-		TestNode node;
 		for ( MyTestMethod method : this.testMethods ) {
-			node = new TestNode( method );
-			this.addNode( node );
+			this.addNode( method );
 		}
 	}
 
-	private void addNode( TestNode node ) throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException, InitializationError {
+	private void addNode( MyTestMethod node ) throws SecurityException, NoSuchMethodException, ClassNotFoundException, GraphCyclicException, InitializationError {
 
 		// if the child is null, then it's the node we start to build the graph with
 
 		if ( !this.nodes.contains( node ) ) {
 			for ( Method dependency : node.getTestMethod().getDependencies() ) {
 				try {
-					node.addParent( new TestNode( this.getCorrespondingTestMethod( dependency ) ) );
+					node.addParent( this.getCorrespondingTestMethod( dependency ) );
 				} catch ( ParentExistsException e ) {
 					throw new GraphCyclicException( "The dependencies for this Test contains cycles." );
 				}

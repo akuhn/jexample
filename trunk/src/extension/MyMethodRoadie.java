@@ -7,7 +7,6 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
-import extension.graph.TestNode;
 
 public class MyMethodRoadie {
 	private final Object fTest;
@@ -16,9 +15,9 @@ public class MyMethodRoadie {
 
 	private final Description fDescription;
 
-	private TestNode fTestNode;
+	private MyTestMethod fTestNode;
 
-	public MyMethodRoadie( Object test, TestNode node, RunNotifier notifier, Description description ) {
+	public MyMethodRoadie( Object test, MyTestMethod node, RunNotifier notifier, Description description ) {
 		fTest = test;
 		fNotifier = notifier;
 		fDescription = description;

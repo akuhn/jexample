@@ -14,8 +14,6 @@ import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
-import extension.graph.TestGraph;
-import extension.graph.TestNode;
 import extension.graph.exception.GraphCyclicException;
 
 /**
@@ -29,7 +27,7 @@ public class ComposedTestRunner extends Runner {
 
 	private final List<Method> testMethods;
 
-	private TestGraph testGraph;
+	private DependencyGraph testGraph;
 
 	public ComposedTestRunner( Class<?> toTest ) throws InitializationError {
 		this.testClass = new MyTestClass( toTest );
@@ -40,7 +38,7 @@ public class ComposedTestRunner extends Runner {
 
 	private void createTestGraph() throws InitializationError {
 		try {
-			this.testGraph = new TestGraph( this.wrapMethods(), this.testClass );
+			this.testGraph = new DependencyGraph( this.wrapMethods(), this.testClass );
 		} catch ( SecurityException e ) {
 			throw new InitializationError( "Error while initializing TestGraph" );
 		} catch ( NoSuchMethodException e ) {
@@ -94,12 +92,12 @@ public class ComposedTestRunner extends Runner {
 	}
 
 	protected void runMethods( RunNotifier notifier ) {
-		for ( TestNode node : this.testGraph.getSortedNodes() ) {
+		for ( MyTestMethod node : this.testGraph.getSortedNodes() ) {
 			this.invokeTestMethod( node, notifier );
 		}
 	}
 
-	protected void invokeTestMethod( TestNode node, RunNotifier notifier ) {
+	protected void invokeTestMethod( MyTestMethod node, RunNotifier notifier ) {
 		Description description = methodDescription( node.getTestMethod().getMethod() );
 		Object test;
 		try {
