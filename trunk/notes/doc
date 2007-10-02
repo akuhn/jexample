@@ -1,0 +1,3 @@
+The Graph Object is a Singleton, it knows all the classes under test and all the TestMethod's.
+A Graph has a Map of Method -> TestMethod to make sure, that one Method has only one TestMethod-Instance.
+A Graph has a Set of TestClass, all the classes under test.
