@@ -39,16 +39,18 @@ public class Graph {
 
 		this.validate( testClass ); // validate the methods of the testClass
 
+		// TODO (Oct 2, 2007 6:18:30 PM) cycle detection, but for this, I need all the methods, also
+		// the ones from other classes which, eventually, are not yet added to the graph
+
 		// if everything is fine, add the testClass to the list of classes under test
 		// and add all the testmethods and its dependencies to the list of testmethods
 		this.classesUnderTest.add( testClass );
 
-		// TODO: cycle detection
-		
 		this.addTestMethods( testClass.getAnnotatedMethods( MyTest.class ), testClass );
 
 		// add dependencies to the testMethods
 		this.addDependencies( testClass );
+
 	}
 
 	public Description descriptionForClass( TestClass testClass ) {
@@ -102,7 +104,7 @@ public class Graph {
 	private void addDependencies( TestClass testClass ) throws InitializationError {
 		List<Method> deps = new ArrayList<Method>();
 		for ( TestMethod testMethod : this.testMethods.values() ) {
-			
+
 			try {
 				deps = testMethod.extractDependencies( testClass );
 			} catch ( Exception e ) {
@@ -128,8 +130,8 @@ public class Graph {
 	 * @return a {@link Set} of {@link TestClass} Objects
 	 */
 	public Set<TestClass> getClasses() {
-	    // TODO Auto-generated method stub
-	    return this.classesUnderTest;
-    }
+		// TODO Auto-generated method stub
+		return this.classesUnderTest;
+	}
 
 }
