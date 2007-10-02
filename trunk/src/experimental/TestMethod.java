@@ -83,4 +83,12 @@ public class TestMethod {
 	    return this.javaMethod.equals( method );
     }
 
+	public void addDependency( TestMethod testMethod ) {
+	    this.dependencies.add( testMethod );
+    }
+
+	public Set<TestMethod> getDependencies() {
+	    return this.dependencies;
+    }
+
 }

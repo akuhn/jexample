@@ -1,3 +1,14 @@
 The Graph Object is a Singleton, it knows all the classes under test and all the TestMethod's.
 A Graph has a Map of Method -> TestMethod to make sure, that one Method has only one TestMethod-Instance.
 A Graph has a Set of TestClass, all the classes under test.
+
+The Graph first validates the test methods and its dependencies, then it adds the TestClass to the list of classes under test, 
+it adds all the testmethods to the map of testmethods, then it adds the dependencies to each of the testmethods.
+
+Wrote a CycleDetector which works as follows:
+first it searches all the bottom nodes, the nodes, which no other node has as a parent. then it iterates over all
+bottom nodes, checks, if the node's childs were already processed and if the notVisited list is empty. if it is not empty and all
+childs were processed, there is a cycle. otherwise it checks if a node was already visited, if not, it adds the node to the visited list and removes it from
+the notVisited list. then it checks, if there is a node in the notVisited list, that has the node as a parent. if not, it
+is added to the childProcessed list. then the same method is called for all the parents of the node. seems to work, at least the test 
+is green ;-).

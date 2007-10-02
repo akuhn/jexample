@@ -2,3 +2,29 @@
 1. a) if no such node is found, but there are still nodes in the nodes list, the graph is cyclic
 2. add them to the sorted list
 3. delete them from the nodes list
+
+
+cycle detection bottom up
+
+list visited
+list notVisited
+
+cycleDetection(){
+	foreach(node : notVisited){
+		checkNode(node)
+	}
+}
+
+checkNode(){
+	if(not visited contains node){
+		visited add node
+		notVisited remove node
+	}
+	else if(not notVisited contains nodeWithParent(node)){
+		return true;
+	}
+	
+	foreach(parent : parentsOfNode){
+		checkNode(parent)
+	}
+}

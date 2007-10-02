@@ -1,6 +1,7 @@
 package experimental;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,26 +44,30 @@ public class Graph {
 		this.classesUnderTest.add( testClass );
 
 		// TODO: cycle detection
+		
 		this.addTestMethods( testClass.getAnnotatedMethods( MyTest.class ), testClass );
+
+		// add dependencies to the testMethods
+		this.addDependencies( testClass );
 	}
 
 	public Description descriptionForClass( TestClass testClass ) {
-    	Description description = Description.createSuiteDescription( testClass.getJavaClass() );
-    	for ( TestMethod method : this.testMethods.values() ) {
-    		if ( method.belongsToClass( testClass ) ) {
-    			description.addChild( method.createDescription() );
-    		}
-    	}
-    	return description;
-    }
+		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
+		for ( TestMethod method : this.testMethods.values() ) {
+			if ( method.belongsToClass( testClass ) ) {
+				description.addChild( method.createDescription() );
+			}
+		}
+		return description;
+	}
 
 	public void runClass( TestClass testClass, RunNotifier notifier ) {
-    	for ( TestMethod method : this.testMethods.values() ) {
-    		if ( method.belongsToClass( testClass ) ) {
-    			method.run( notifier );
-    		}
-    	}
-    }
+		for ( TestMethod method : this.testMethods.values() ) {
+			if ( method.belongsToClass( testClass ) ) {
+				method.run( notifier );
+			}
+		}
+	}
 
 	private void validate( TestClass testClass ) throws InitializationError {
 		MethodValidator validator = new MethodValidator( testClass );
@@ -75,32 +80,56 @@ public class Graph {
 		for ( Method method : methods ) {
 			testMethod = this.addTestMethod( method );
 			try {
-	            this.addTestMethods( testMethod.extractDependencies( testClass ), testClass );
-            } catch ( Exception e ) {
-	            throw new InitializationError(e);
-            }
+				this.addTestMethods( testMethod.extractDependencies( testClass ), testClass );
+			} catch ( Exception e ) {
+				throw new InitializationError( e );
+			}
 		}
 	}
 
 	private TestMethod addTestMethod( Method method ) {
 		TestMethod testMethod;
-	    if(!this.testMethods.containsKey( method )){
-	    	testMethod = new TestMethod(method);
-	    	this.testMethods.put( method, testMethod );
-	    } else {
-	    	testMethod = this.testMethods.get( method );
-	    }
-	    
-	    return testMethod;
-    }
+		if ( !this.testMethods.containsKey( method ) ) {
+			testMethod = new TestMethod( method );
+			this.testMethods.put( method, testMethod );
+		} else {
+			testMethod = this.testMethods.get( method );
+		}
 
+		return testMethod;
+	}
+
+	private void addDependencies( TestClass testClass ) throws InitializationError {
+		List<Method> deps = new ArrayList<Method>();
+		for ( TestMethod testMethod : this.testMethods.values() ) {
+			
+			try {
+				deps = testMethod.extractDependencies( testClass );
+			} catch ( Exception e ) {
+				throw new InitializationError( e );
+			}
+
+			for ( Method method : deps ) {
+				testMethod.addDependency( this.testMethods.get( method ) );
+			}
+		}
+	}
 
 	/**
 	 * Only for testing purposes
-	 * @return a {@link Map} with the mapping {@link Method}  -> {@link TestMethod}
+	 * @return a {@link Map} with the mapping {@link Method} -&gt; {@link TestMethod}
 	 */
 	public Map<Method, TestMethod> getTestMethods() {
-	    return this.testMethods;
+		return this.testMethods;
+	}
+
+	/**
+	 * Only for testing purposes
+	 * @return a {@link Set} of {@link TestClass} Objects
+	 */
+	public Set<TestClass> getClasses() {
+	    // TODO Auto-generated method stub
+	    return this.classesUnderTest;
     }
 
 }
