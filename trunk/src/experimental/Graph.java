@@ -95,6 +95,10 @@ public class Graph {
     }
 
 
+	/**
+	 * Only for testing purposes
+	 * @return a {@link Map} with the mapping {@link Method}  -> {@link TestMethod}
+	 */
 	public Map<Method, TestMethod> getTestMethods() {
 	    return this.testMethods;
     }
