@@ -16,16 +16,15 @@ import java.util.List;
  */
 public class DependencyParser {
 
-	private final String annotationValue;
+	private String annotationValue;
 
 	private final TestClass testClass;
 
 	private List<Method> dependencies;
 
-	public DependencyParser( String value, TestClass myTestClass ) {
-		this.annotationValue = value;
+	public DependencyParser( TestClass myTestClass ) {
+		this.annotationValue = "";
 		this.testClass = myTestClass;
-
 	}
 
 	/**
@@ -40,20 +39,42 @@ public class DependencyParser {
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 */
-	public List<Method> getDependencies() throws ClassNotFoundException, SecurityException, NoSuchMethodException {
+	public List<Method> getDependencies( String value ) throws ClassNotFoundException, SecurityException, NoSuchMethodException {
+		this.annotationValue = value;
 		this.dependencies = new ArrayList<Method>();
 
 		String[] methodNames = this.getMethodNames();
+
 		for ( String dependency : methodNames ) {
-			String[] parameters = this.getParameters( dependency );
-			this.addDependency( dependency, parameters );
+			this.addDependency( this.getDeclaringClass( dependency ), dependency, this.getParameters( dependency ) );
 		}
 
 		return dependencies;
 	}
 
-	private void addDependency( String dependency, String[] parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException {
-		Method dep = this.testClass.getJavaClass().getMethod( this.extractName(dependency), this.getParameterClasses( parameters ) );
+	private Class<?> getDeclaringClass( String dependency ) throws ClassNotFoundException {
+		int index;
+		if ( ( index = dependency.indexOf( "(" ) ) > -1 ) {
+			// remove parameters, because there could be a class declaration, too
+			dependency = dependency.substring( 0, index );
+		}
+		Class<?> clazz;
+		if ( ( index = dependency.lastIndexOf( "." ) ) > -1 ) {
+			try {
+	            clazz = Class.forName( this.testClass.getJavaClass().getPackage() + dependency.substring( 0, index ) );
+            } catch ( ClassNotFoundException e ) {
+	            throw new ClassNotFoundException("The class "+ this.testClass.getJavaClass().getPackage() + dependency.substring( 0, index ) + " was not found.");
+            }
+		} else {
+			clazz = this.testClass.getJavaClass();
+		}
+
+		return clazz;
+	}
+
+	private void addDependency( Class<?> clazz, String dependency, String[] parameters ) throws ClassNotFoundException, SecurityException,
+	        NoSuchMethodException {
+		Method dep = clazz.getMethod( this.extractName( dependency ), this.getParameterClasses( parameters ) );
 		if ( !this.dependencies.contains( dep ) ) {
 			this.dependencies.add( dep );
 		}
@@ -66,7 +87,7 @@ public class DependencyParser {
 		} else {
 			return dependency;
 		}
-    }
+	}
 
 	private Class<?>[] getParameterClasses( String[] parameters ) throws ClassNotFoundException {
 		Class<?>[] newParams = new Class<?>[parameters.length];
