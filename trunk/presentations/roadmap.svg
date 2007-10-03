@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="26cm" height="14cm" viewBox="4 5 26 14">
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="5.05" y1="15.1" x2="30.0997" y2="15.1"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="5.09969" y1="14.05" x2="5.05" y2="19.05"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="19.9997" y1="14.05" x2="19.9803" y2="19.0453"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="10.0497" y1="14.05" x2="10.0103" y2="18.9903"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="14.9997" y1="14.1" x2="14.9903" y2="18.9853"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="25.0997" y1="14.05" x2="25.1203" y2="19.0303"/>
+  <text style="fill: #000000; font-size: 1.5 cm; length: 2.41 cm; font-family: sans; font-style: normal; font-weight: normal" x="6.35" y="17.4">Sep.</text>
+  <text style="fill: #000000; font-size: 1.5 cm; length: 2.24 cm; font-family: sans; font-style: normal; font-weight: normal" x="11.23" y="17.4125">Oct.</text>
+  <text style="fill: #000000; font-size: 1.5 cm; length: 2.3975 cm; font-family: sans; font-style: normal; font-weight: normal" x="16.3097" y="17.3575">Nov.</text>
+  <text style="fill: #000000; font-size: 1.5 cm; length: 2.465 cm; font-family: sans; font-style: normal; font-weight: normal" x="21.3897" y="17.2525">Dec.</text>
+  <text style="fill: #000000; font-size: 1.5 cm; length: 2.0325 cm; font-family: sans; font-style: normal; font-weight: normal" x="26.6697" y="17.2475">Jan.</text>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x1="30.0497" y1="14.05" x2="30.03" y2="18.9953"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #ff0000" x1="10.8997" y1="7.4" x2="10.8534" y2="13.4632"/>
+  <polygon style="fill: #ff0000" points="10.8506,13.8382 10.6044,13.3363 10.8534,13.4632 11.1044,13.3401 "/>
+  <polygon style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #ff0000" points="10.8506,13.8382 10.6044,13.3363 10.8534,13.4632 11.1044,13.3401 "/>
+  <text style="fill: #ff0000; font-size: 1.5 cm; length: 2.2575 cm; font-family: sans; font-style: normal; font-weight: normal" x="9.84969" y="6.65">now</text>
+  <rect style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x="14.8497" y="11" width="5.15" height="2.05" rx="1.17549e-38" ry="1.17549e-38"/>
+  <text style="fill: #000000; font-size: 1.2 cm; length: 4.71 cm; font-family: sans; font-style: normal; font-weight: normal" x="15.0247" y="12.275">case study</text>
+  <rect style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x="20.6497" y="11" width="9.3" height="2.05" rx="1.17549e-38" ry="1.17549e-38"/>
+  <text style="fill: #000000; font-size: 1.2 cm; length: 3.0125 cm; font-family: sans; font-style: normal; font-weight: normal" x="23.4997" y="12.275">writing</text>
+  <rect style="fill: none; fill-opacity:0; stroke-width: 0.1; stroke: #000000" x="5.09969" y="8.3" width="24.75" height="2.15" rx="1.17549e-38" ry="1.17549e-38"/>
+  <text style="fill: #000000; font-size: 1.2 cm; length: 6.07 cm; font-family: sans; font-style: normal; font-weight: normal" x="14.5247" y="9.725">implementing</text>
+</svg>
