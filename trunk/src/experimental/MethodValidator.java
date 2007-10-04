@@ -78,7 +78,7 @@ public class MethodValidator {
 	}
 
 	private void validateDependencies() {
-		DependencyParser parser;
+		DependencyParser parser = new DependencyParser(fTestClass);
 		DependencyValidator depValidator = new DependencyValidator();
 		List<Class<? extends Annotation>> annotations = new ArrayList<Class<? extends Annotation>>();
 		annotations.add( Depends.class );
@@ -88,9 +88,8 @@ public class MethodValidator {
 		List<Method> dependencies = new ArrayList<Method>();
 		List<Throwable> errors = new ArrayList<Throwable>();
 		for ( Method each : methods ) {
-			parser = new DependencyParser( each.getAnnotation( Depends.class ).value(), fTestClass );
 			try {
-				dependencies = parser.getDependencies();
+				dependencies = parser.getDependencies(each.getAnnotation( Depends.class ).value());
 			} catch ( Exception e ) {
 				fErrors.add( e );
 			}
