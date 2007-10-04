@@ -33,7 +33,7 @@ public class TestMethod {
 		List<Method> deps = new ArrayList<Method>();
 		Depends annotation = this.javaMethod.getAnnotation( Depends.class );
 		if ( annotation != null ) {
-			deps = new DependencyParser( annotation.value(), testClass ).getDependencies();
+			deps = new DependencyParser( testClass ).getDependencies(annotation.value());
 		}
 		return deps;
     }
@@ -78,10 +78,6 @@ public class TestMethod {
 	public boolean equals( Object obj ) {
 		return this.javaMethod.equals( ( (TestMethod) obj ).javaMethod );
 	}
-
-	public boolean hasJavaMethod( Method method ) {
-	    return this.javaMethod.equals( method );
-    }
 
 	public void addDependency( TestMethod testMethod ) {
 	    this.dependencies.add( testMethod );
