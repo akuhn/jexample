@@ -60,11 +60,15 @@ public class DependencyParser {
 		}
 		Class<?> clazz;
 		if ( ( index = dependency.lastIndexOf( "." ) ) > -1 ) {
+			String className = dependency.substring( 0, index );
+			if( ( index = className.indexOf( "." ) ) == -1 ){				
+				className = this.testClass.getJavaClass().getPackage().getName() + "." + className;
+			}
 			try {
-	            clazz = Class.forName( this.testClass.getJavaClass().getPackage() + dependency.substring( 0, index ) );
-            } catch ( ClassNotFoundException e ) {
-	            throw new ClassNotFoundException("The class "+ this.testClass.getJavaClass().getPackage() + dependency.substring( 0, index ) + " was not found.");
-            }
+				clazz = Class.forName( className );
+			} catch ( ClassNotFoundException e ) {
+				throw new ClassNotFoundException( "The class " + className + " was not found." );
+			}
 		} else {
 			clazz = this.testClass.getJavaClass();
 		}
@@ -82,11 +86,16 @@ public class DependencyParser {
 
 	private String extractName( String dependency ) {
 		int index;
+		
 		if ( ( index = dependency.indexOf( "(" ) ) > -1 ) {
-			return dependency.substring( 0, index );
-		} else {
-			return dependency;
+			dependency = dependency.substring( 0, index );
 		}
+		
+		if( ( index = dependency.lastIndexOf( "." ) ) > -1 ){
+			dependency = dependency.substring( index+1 );
+		}
+		
+		return dependency;
 	}
 
 	private Class<?>[] getParameterClasses( String[] parameters ) throws ClassNotFoundException {
