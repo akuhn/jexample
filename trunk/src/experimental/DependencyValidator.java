@@ -2,6 +2,7 @@ package experimental;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
@@ -36,6 +37,8 @@ public class DependencyValidator {
 
 	private void validateDependencies( Method method, Method[] dependencies ) {
 		this.assertDependenciesAreTestMethods( dependencies );
+		this.assertHasNotItselfAsDependency( method, dependencies );
+		
 		Class<?>[] params = method.getParameterTypes();
 		if ( params.length > 0 ) {
 			if ( params.length != dependencies.length ) {
@@ -47,6 +50,12 @@ public class DependencyValidator {
 			this.assertVoidReturnTypes( dependencies );
 		}
 	}
+
+	private void assertHasNotItselfAsDependency( Method method, Method[] dependencies ) {
+		if(Arrays.asList( dependencies ).contains( method )){
+			this.fErrors.add( new Exception("The method "+ method.getName() + " depends on itself.") );
+		}
+    }
 
 	private void assertDependenciesAreTestMethods( Method[] dependencies ) {
 		MyTest annotation;

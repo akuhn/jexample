@@ -16,3 +16,15 @@ class boundaries)
 
 DependencyParser: if the dependency is in another class than the called testclass, the parser gets the classname. if the classname 
 is specified without package, the package of the testclass is taken, if there is a package specified, this package is taken.
+
+DependencyValidator: tests also, if a method depends on itself. first it tests, if all dependencies are, themself, testmethods. then it tests,
+if the method depends on itself, then it compares parameter types and return value types. if something is not ok, it returns a list
+with all errors, that are thrown as InitializationError.
+
+CycleDetector now works differentely: it simply saves all the edges it passes and if it passes an edge it has already passed once, there is
+a cycle. simultaneously, it saves all the passed methods in a list and if there were no cycles, the list of methods is returned.
+
+The Graph makes a cycle detection before it does anything else, when adding a class.
+
+The MethodValidator gets a List of Methods instead of only the TestClass, because there could be from other classes, which wouldn't be
+checked otherwise.

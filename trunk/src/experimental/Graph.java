@@ -46,7 +46,7 @@ public class Graph {
 			throw new InitializationError( e );
 		}
 
-		this.validate( testClass ); // validate the methods of the testClass
+		this.validate( methodsUnderTest, testClass ); // validate the methods of the testClass
 
 		// TODO (Oct 2, 2007 6:18:30 PM) cycle detection, but for this, I need all the methods, also
 		// the ones from other classes which, eventually, are not yet added to the graph
@@ -80,8 +80,8 @@ public class Graph {
 		}
 	}
 
-	private void validate( TestClass testClass ) throws InitializationError {
-		MethodValidator validator = new MethodValidator( testClass );
+	private void validate( List<Method> methodsUnderTest, TestClass testClass ) throws InitializationError {
+		MethodValidator validator = new MethodValidator( methodsUnderTest, testClass );
 		validator.validateMethodsForDefaultRunner();
 		validator.assertValid();
 	}
