@@ -11,7 +11,8 @@ bottom nodes, checks, if the node's childs were already processed and if the not
 childs were processed, there is a cycle. otherwise it checks if a node was already visited, if not, it adds the node to the visited list and removes it from
 the notVisited list. then it checks, if there is a node in the notVisited list, that has the node as a parent. if not, it
 is added to the childProcessed list. then the same method is called for all the parents of the node. seems to work, at least the test 
-is green ;-).
+is green ;-). (note: does not work, if not all nodes are known at the beginning, which is the case, if there are dependencies over
+class boundaries)
 
 DependencyParser: if the dependency is in another class than the called testclass, the parser gets the classname. if the classname 
 is specified without package, the package of the testclass is taken, if there is a package specified, this package is taken.
