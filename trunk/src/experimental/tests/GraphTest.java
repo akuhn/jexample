@@ -29,34 +29,99 @@ public class GraphTest {
 
 	@Test
 	public void testAddOneClass() throws InitializationError {
-		graph.addClass( this.testClass );
+		graph.addClass( new TestClass(OneClass.class) );
 		assertEquals( 1, graph.getClasses().size() );
-		assertEquals(2, graph.getTestMethods().size());
+		assertEquals( 4, graph.getTestMethods().size() );
 	}
-	
+
 	@Test
 	public void testAddMethodsOfOneClass() throws InitializationError {
-		graph.addClass( this.testClass );
-		assertEquals(2, graph.getTestMethods().size());
+		graph.addClass( new TestClass(OneClass.class) );
+		assertEquals( 4, graph.getTestMethods().size() );
+	}
+
+	@Test
+	public void testAddDependenciesOfOneClass() throws InitializationError, SecurityException, NoSuchMethodException {
+		graph.addClass( new TestClass(OneClass.class) );
+		Map<Method, TestMethod> testMethods = graph.getTestMethods();
+		assertEquals( 0, testMethods.get( OneClass.class.getMethod( "testMethod" ) ).getDependencies().size() );
+		assertEquals( 1, testMethods.get( OneClass.class.getMethod( "anotherTestMethod" ) ).getDependencies().size() );
+		assertEquals( 1, testMethods.get( OneClass.class.getMethod( "depOnOtherTest" ) ).getDependencies().size() );
+		assertEquals( 0, testMethods.get( B.class.getMethod( "otherTest" ) ).getDependencies().size() );
 	}
 	
-	@Test
-	public void testAddDependenciesOfOneClass() throws InitializationError, SecurityException, NoSuchMethodException{
-		graph.addClass( this.testClass );
-		Map<Method, TestMethod> testMethods = graph.getTestMethods();
-		assertEquals( 0, testMethods.get( this.getClass().getMethod( "testMethod" ) ).getDependencies().size() );
-		assertEquals( 1, testMethods.get( this.getClass().getMethod( "anotherTestMethod" ) ).getDependencies().size() );
+	@Test(expected=InitializationError.class)
+	public void detectCycles() throws InitializationError{
+		graph.addClass( new TestClass(Cyclic.class) );
 	}
 
-	@MyTest
-	public void testMethod() {
+	static public class OneClass {
+		
+		public OneClass() {
+			
+		}
+		
+		@MyTest
+		public void testMethod() {
 
+		}
+
+		@MyTest
+		@Depends( "testMethod" )
+		public void anotherTestMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "B.otherTest" )
+		public void depOnOtherTest() {
+
+		}
 	}
+	
+	static public class Cyclic {
+		public Cyclic() {
+			
+		}
+		
+		@MyTest
+		public void testMethod() {
 
-	@MyTest
-	@Depends( "testMethod" )
-	public void anotherTestMethod() {
+		}
 
+		@MyTest
+		@Depends( "testMethod;depOnOtherTest" )
+		public void anotherTestMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "anotherTestMethod" )
+		public void depOnOtherTest() {
+
+		}
 	}
+	
+	static public class CyclicOverClasses {
+		public CyclicOverClasses() {
+			
+		}
+		
+		@MyTest
+		public void testMethod() {
 
+		}
+
+		@MyTest
+		@Depends( "testMethod" )
+		public void anotherTestMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "B.otherTestCyclic" )
+		public void depOnOtherTest() {
+
+		}
+	}
 }

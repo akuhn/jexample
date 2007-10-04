@@ -12,8 +12,6 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-import extension.annotations.MyTest;
-
 public class Graph {
 
 	private static Graph graph;
@@ -37,6 +35,17 @@ public class Graph {
 
 	public void addClass( TestClass testClass ) throws InitializationError {
 
+		// TODO (Oct 3, 2007 2:50:47 PM) get all needed methods, ev. from other classes
+		CycleDetector detector = new CycleDetector( testClass );
+		List<Method> methodsUnderTest;
+		try {
+			if ( ( methodsUnderTest = detector.checkCyclesAndGetMethods() ) == null ) {
+				throw new InitializationError( "The dependencies are cyclic." );
+			}
+		} catch ( Exception e ) {
+			throw new InitializationError( e );
+		}
+
 		this.validate( testClass ); // validate the methods of the testClass
 
 		// TODO (Oct 2, 2007 6:18:30 PM) cycle detection, but for this, I need all the methods, also
@@ -46,7 +55,7 @@ public class Graph {
 		// and add all the testmethods and its dependencies to the list of testmethods
 		this.classesUnderTest.add( testClass );
 
-		this.addTestMethods( testClass.getAnnotatedMethods( MyTest.class ), testClass );
+		this.addTestMethods( methodsUnderTest, testClass );
 
 		// add dependencies to the testMethods
 		this.addDependencies( testClass );
@@ -77,9 +86,9 @@ public class Graph {
 		validator.assertValid();
 	}
 
-	private void addTestMethods( List<Method> methods, TestClass testClass ) throws InitializationError {
+	private void addTestMethods( List<Method> methodsUnderTest, TestClass testClass ) throws InitializationError {
 		TestMethod testMethod;
-		for ( Method method : methods ) {
+		for ( Method method : methodsUnderTest ) {
 			testMethod = this.addTestMethod( method );
 			try {
 				this.addTestMethods( testMethod.extractDependencies( testClass ), testClass );
@@ -130,7 +139,6 @@ public class Graph {
 	 * @return a {@link Set} of {@link TestClass} Objects
 	 */
 	public Set<TestClass> getClasses() {
-		// TODO Auto-generated method stub
 		return this.classesUnderTest;
 	}
 

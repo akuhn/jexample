@@ -3,16 +3,15 @@
  */
 package experimental.tests;
 
-import static org.junit.Assert.assertFalse;
-
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.internal.runners.InitializationError;
 
 import experimental.CycleDetector;
-import experimental.TestMethod;
+import experimental.TestClass;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
@@ -21,101 +20,159 @@ import extension.annotations.MyTest;
  */
 public class CycleDetectorTest {
 
-	private HashSet<TestMethod> methodsWithoutCycle;
-
-	private TestMethod rootMethod, middleMethod, bottomMethod;
-	
-	private TestMethod cyclicMethod, middleCyclicMethod, bottomCyclicMethod;
-
-	private Set<TestMethod> methodsWithCycle;
-
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.methodsWithoutCycle = new HashSet<TestMethod>();
-		this.methodsWithCycle = new HashSet<TestMethod>();
 
-		this.rootMethod = new TestMethod( this.getClass().getMethod( "rootMethod" ) );
-		this.middleMethod = new TestMethod( this.getClass().getMethod( "middleMethod" ) );
-		this.middleMethod.addDependency( this.rootMethod );
-		this.bottomMethod = new TestMethod( this.getClass().getMethod( "bottomMethod" ) );
-		this.bottomMethod.addDependency( this.middleMethod );
-		this.bottomMethod.addDependency( this.rootMethod );
-
-		this.methodsWithoutCycle.add( this.rootMethod );
-		this.methodsWithoutCycle.add( this.middleMethod );
-		this.methodsWithoutCycle.add( this.bottomMethod );
-
-		this.cyclicMethod = new TestMethod( this.getClass().getMethod( "cyclicMethod" ) );
-		this.bottomCyclicMethod = new TestMethod( this.getClass().getMethod( "bottomMethod" ) );
-		this.middleCyclicMethod = new TestMethod( this.getClass().getMethod( "middleCyclicMethod" ) );
-		
-		this.cyclicMethod.addDependency( this.bottomCyclicMethod );
-		
-		this.middleCyclicMethod.addDependency( this.rootMethod );
-		this.middleCyclicMethod.addDependency( this.cyclicMethod );
-		
-		this.bottomCyclicMethod.addDependency( this.middleCyclicMethod );
-		this.bottomCyclicMethod.addDependency( this.rootMethod );
-		
-		this.methodsWithCycle.add( this.rootMethod );
-		this.methodsWithCycle.add( this.cyclicMethod );
-		this.methodsWithCycle.add( this.middleCyclicMethod );
-		this.methodsWithCycle.add( this.bottomCyclicMethod );
 	}
 
 	/**
 	 * Test method for {@link experimental.CycleDetector#testHasNoCycles()}.
+	 * @throws NoSuchMethodException 
+	 * @throws ClassNotFoundException 
+	 * @throws InitializationError 
+	 * @throws SecurityException 
 	 */
 	@Test
-	public void testHasNoCycles() {
-		CycleDetector detector = new CycleDetector( this.methodsWithoutCycle );
-		assertFalse( detector.hasCycles() );
+	public void testHasNoCycles() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
+		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycles.class ) );
+		assertEquals( 3, detector.checkCyclesAndGetMethods().size() );
+	}
+
+	/**
+	 * Test method for {@link experimental.CycleDetector#testHasCycles()}.
+	 * @throws NoSuchMethodException 
+	 * @throws ClassNotFoundException 
+	 * @throws InitializationError 
+	 * @throws SecurityException 
+	 */
+	@Test
+	public void testHasCycles() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
+		CycleDetector detector = new CycleDetector( new TestClass( WithCycles.class ) );
+		assertNull( detector.checkCyclesAndGetMethods() );
+	}
+
+	/**
+	 * Test method for {@link experimental.CycleDetector#testHasCycles()}.
+	 * @throws NoSuchMethodException 
+	 * @throws ClassNotFoundException 
+	 * @throws InitializationError 
+	 * @throws SecurityException 
+	 */
+	@Test
+	public void testHasCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
+		CycleDetector detector = new CycleDetector( new TestClass( WithCycleOverClasses.class ) );
+		assertNull( detector.checkCyclesAndGetMethods() );
 	}
 	
 	/**
-	 * Test method for {@link experimental.CycleDetector#testHasCycles()}.
+	 * Test method for {@link experimental.CycleDetector#testHasNoCycles()}.
+	 * @throws NoSuchMethodException 
+	 * @throws ClassNotFoundException 
+	 * @throws InitializationError 
+	 * @throws SecurityException 
 	 */
 	@Test
-	public void testHasCycles() {
-		CycleDetector detector = new CycleDetector( this.methodsWithCycle );
-		assertFalse( detector.hasCycles() );
+	public void testHasNoCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
+		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycleOverClasses.class ) );
+		assertEquals( 4, detector.checkCyclesAndGetMethods().size() );
 	}
 
-	@MyTest
-	public void rootMethod() {
+	private class WithoutCycles {
+		@MyTest
+		public void rootMethod() {
 
+		}
+
+		@MyTest
+		@Depends( "rootMethod" )
+		public void middleMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "middleMethod;rootMethod" )
+		public void bottomMethod() {
+
+		}
 	}
 
-	@MyTest
-	@Depends( "rootMethod" )
-	public void middleMethod() {
+	private class WithCycles {
+		@MyTest
+		public void rootMethod() {
 
+		}
+
+		@MyTest
+		@Depends( "bottomCyclicMethod" )
+		public void cyclicMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "rootMethod;cyclicMethod" )
+		public void middleCyclicMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "middleCyclicMethod;rootMethod" )
+		public void bottomCyclicMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "bottomCyclicMethod" )
+		public void bottomBottomMethod() {
+
+		}
 	}
 
-	@MyTest
-	@Depends( "middleMethod;rootMethod" )
-	public void bottomMethod() {
+	private class WithCycleOverClasses {
+		// with cycle over classes
+		@MyTest
+		public void rootMethod() {
 
+		}
+
+		@MyTest
+		@Depends( "rootMethod;experimental.tests.B.cyclicMethod" )
+		public void middleCyclicMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "middleCyclicMethod;rootMethod" )
+		public void bottomCyclicMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "bottomCyclicMethod" )
+		public void bottomBottomMethod() {
+
+		}
 	}
+	
+	private class WithoutCycleOverClasses {
+		// with cycle over classes
+		@MyTest
+		public void rootMethod() {
 
-	@MyTest
-	@Depends( "bottomCyclicMethod" )
-	public void cyclicMethod() {
+		}
 
-	}
+		@MyTest
+		@Depends( "rootMethod" )
+		public void middleMethod() {
 
-	@MyTest
-	@Depends( "rootMethod;cyclicMethod" )
-	public void middleCyclicMethod() {
+		}
 
-	}
+		@MyTest
+		@Depends( "middleMethod;B.middleMethod" )
+		public void bottomCyclicMethod() {
 
-	@MyTest
-	@Depends( "middleCyclicMethod;rootMethod" )
-	public void bottomCyclicMethod() {
-
+		}
 	}
 }
