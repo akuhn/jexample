@@ -1,5 +1,5 @@
 * DependenyParser: cope with primitive datatypes
 
-* Direct the exceptions correctly to the junit framework
-
-* see TODO comments
+* this thing with the descriptions doesn't work properly. if i take only the methods from the run class, there are so named
+  unrooted methods, if i take the descriptions for all the methods and run all the tests and not just the source class, then all the 
+  methods are in all the classes in the tree.
