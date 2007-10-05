@@ -4,7 +4,6 @@
 package experimental.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +27,7 @@ public class CycleDetectorTest {
 
 	}
 
+
 	/**
 	 * Test method for {@link experimental.CycleDetector#testHasNoCycles()}.
 	 * @throws NoSuchMethodException 
@@ -48,10 +48,10 @@ public class CycleDetectorTest {
 	 * @throws InitializationError 
 	 * @throws SecurityException 
 	 */
-	@Test
+	@Test(expected = InitializationError.class)
 	public void testHasCycles() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
 		CycleDetector detector = new CycleDetector( new TestClass( WithCycles.class ) );
-		assertNull( detector.checkCyclesAndGetMethods() );
+		detector.checkCyclesAndGetMethods();
 	}
 
 	/**
@@ -61,10 +61,10 @@ public class CycleDetectorTest {
 	 * @throws InitializationError 
 	 * @throws SecurityException 
 	 */
-	@Test
+	@Test(expected = InitializationError.class)
 	public void testHasCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
 		CycleDetector detector = new CycleDetector( new TestClass( WithCycleOverClasses.class ) );
-		assertNull( detector.checkCyclesAndGetMethods() );
+		detector.checkCyclesAndGetMethods();
 	}
 	
 	/**

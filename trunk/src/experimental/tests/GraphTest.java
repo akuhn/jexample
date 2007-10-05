@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
-import experimental.Graph;
+import experimental.TestGraph;
 import experimental.TestClass;
 import experimental.TestMethod;
 import extension.annotations.Depends;
@@ -17,14 +17,11 @@ import extension.annotations.MyTest;
 
 public class GraphTest {
 
-	private static Graph graph;
-
-	private TestClass testClass;
+	private static TestGraph graph;
 
 	@Before
 	public void setUp() throws Exception {
-		graph = Graph.getInstance();
-		this.testClass = new TestClass( this.getClass() );
+		graph = TestGraph.getInstance();
 	}
 
 	@Test

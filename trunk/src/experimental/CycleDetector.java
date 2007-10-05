@@ -48,18 +48,19 @@ public class CycleDetector {
 		}
 
 		if ( this.bottomNodes.isEmpty() ) {
-			return null;
+			throw new InitializationError( new Exception( "The dependencies are cyclic." ) );
 		}
 
 		if ( !this.hasCycles() ) {
 			return this.visited;
 		}
 
-		return null;
+		throw new InitializationError( new Exception( "The dependencies are cyclic." ) );
 	}
 
 	private boolean hasCycles() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
 		for ( Method testMethod : this.bottomNodes ) {
+			this.links.clear();
 			if ( this.checkNode( testMethod, null ) ) {
 				return true;
 			}
@@ -91,7 +92,9 @@ public class CycleDetector {
 				}
 			}
 		} else {
-			this.visited.add( testMethod );
+			if ( !this.visited.contains( testMethod ) ) {
+				this.visited.add( testMethod );
+			}
 		}
 
 		Depends annotation = testMethod.getAnnotation( Depends.class );

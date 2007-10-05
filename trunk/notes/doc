@@ -28,3 +28,9 @@ The Graph makes a cycle detection before it does anything else, when adding a cl
 
 The MethodValidator gets a List of Methods instead of only the TestClass, because there could be from other classes, which wouldn't be
 checked otherwise.
+
+The TestMethod runs first its dependencies, if all dependencies were GREEN, it runs itself, if one of the dependencies failed or 
+was skipped, it set its state to IGNORED and tells the RunNotifier that it was ignored.
+
+Had to change the CycleDetector: only the Links for one traversation are saved, because if all the links are saved there are
+cases for which it detects a cycle where there isn't one (A -> C, B -> C, C -> D).

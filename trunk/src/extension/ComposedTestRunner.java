@@ -35,13 +35,6 @@ public class ComposedTestRunner extends Runner {
 		this.validate();
 		this.createTestGraph();
 		
-		try {
-			throw new Exception();
-		}
-		catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		
 	}
 
 	private void createTestGraph() throws InitializationError {

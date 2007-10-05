@@ -2,12 +2,16 @@ package experimental.tests;
 
 import org.junit.runner.RunWith;
 
-import experimental.FooRunner;
+import experimental.ComposedTestRunner;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
-@RunWith(FooRunner.class)
+@RunWith(ComposedTestRunner.class)
 public class B {
+	
+	public B(){
+		
+	}
 
 	@MyTest
 	public void otherTest(){

@@ -12,22 +12,22 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-public class Graph {
+public class TestGraph {
 
-	private static Graph graph;
+	private static TestGraph graph;
 
 	private Set<TestClass> classesUnderTest;
 
 	private Map<Method, TestMethod> testMethods;
 
-	private Graph() {
+	private TestGraph() {
 		this.classesUnderTest = new HashSet<TestClass>();
 		this.testMethods = new HashMap<Method, TestMethod>();
 	}
 
-	public static Graph getInstance() {
+	public static TestGraph getInstance() {
 		if ( graph == null ) {
-			graph = new Graph();
+			graph = new TestGraph();
 		}
 
 		return graph;
@@ -35,21 +35,17 @@ public class Graph {
 
 	public void addClass( TestClass testClass ) throws InitializationError {
 
-		// TODO (Oct 3, 2007 2:50:47 PM) get all needed methods, ev. from other classes
 		CycleDetector detector = new CycleDetector( testClass );
 		List<Method> methodsUnderTest;
 		try {
-			if ( ( methodsUnderTest = detector.checkCyclesAndGetMethods() ) == null ) {
-				throw new InitializationError( "The dependencies are cyclic." );
-			}
-		} catch ( Exception e ) {
+			methodsUnderTest = detector.checkCyclesAndGetMethods();
+		} catch ( InitializationError e ) {
+			throw e;
+		} catch ( Throwable e ) {
 			throw new InitializationError( e );
 		}
 
 		this.validate( methodsUnderTest, testClass ); // validate the methods of the testClass
-
-		// TODO (Oct 2, 2007 6:18:30 PM) cycle detection, but for this, I need all the methods, also
-		// the ones from other classes which, eventually, are not yet added to the graph
 
 		// if everything is fine, add the testClass to the list of classes under test
 		// and add all the testmethods and its dependencies to the list of testmethods
@@ -58,16 +54,15 @@ public class Graph {
 		this.addTestMethods( methodsUnderTest, testClass );
 
 		// add dependencies to the testMethods
-		this.addDependencies( testClass );
+		this.addDependencies( methodsUnderTest, testClass );
 
 	}
 
 	public Description descriptionForClass( TestClass testClass ) {
 		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
 		for ( TestMethod method : this.testMethods.values() ) {
-			if ( method.belongsToClass( testClass ) ) {
-				description.addChild( method.createDescription() );
-			}
+			description.addChild( method.createDescription() );
+
 		}
 		return description;
 	}
@@ -110,18 +105,19 @@ public class Graph {
 		return testMethod;
 	}
 
-	private void addDependencies( TestClass testClass ) throws InitializationError {
+	private void addDependencies( List<Method> methodsUnderTest, TestClass testClass ) throws InitializationError {
 		List<Method> deps = new ArrayList<Method>();
-		for ( TestMethod testMethod : this.testMethods.values() ) {
-
+		TestMethod testMethod;
+		for ( Method method : methodsUnderTest ) {
+			testMethod = this.testMethods.get( method );
 			try {
 				deps = testMethod.extractDependencies( testClass );
 			} catch ( Exception e ) {
 				throw new InitializationError( e );
 			}
 
-			for ( Method method : deps ) {
-				testMethod.addDependency( this.testMethods.get( method ) );
+			for ( Method dep : deps ) {
+				testMethod.addDependency( this.testMethods.get( dep ) );
 			}
 		}
 	}
