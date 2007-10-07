@@ -135,4 +135,8 @@ public class TestMethod {
 		return state != TestResult.NOT_YET_RUN;
 	}
 
+	public Class<?> getDeclaringClass() {
+	    return this.javaMethod.getDeclaringClass();
+    }
+
 }

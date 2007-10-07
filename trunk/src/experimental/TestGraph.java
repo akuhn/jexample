@@ -60,11 +60,50 @@ public class TestGraph {
 
 	public Description descriptionForClass( TestClass testClass ) {
 		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
+		Set<Description> subDescriptions = new HashSet<Description>();
 		for ( TestMethod method : this.testMethods.values() ) {
-			description.addChild( method.createDescription() );
+			if ( method.belongsToClass( testClass ) ) {
+				description.addChild( method.createDescription() );
+			} else if ( this.methodBelongsToNoClass( method ) ) {
+				subDescriptions = this.addChildDescription(subDescriptions, method );
+			}
 
 		}
+		for ( Description subDescription : subDescriptions ) {
+	        description.addChild( subDescription );
+        }
 		return description;
+	}
+
+	private Set<Description> addChildDescription( Set<Description> subDescriptions, TestMethod method ) {
+	    Class<?> declaringClass = method.getDeclaringClass();
+	    Description description;
+	    
+		if((description = this.getDescriptionForClass(declaringClass,subDescriptions)) == null){
+			description = Description.createSuiteDescription( declaringClass );
+			subDescriptions.add( description );
+		}
+		description.addChild( method.createDescription() );
+	    
+		return subDescriptions;
+    }
+
+	private Description getDescriptionForClass( Class<?> declaringClass, Set<Description> subDescriptions ) {
+	    for ( Description description : subDescriptions ) {
+	        if(description.getDisplayName().equals( declaringClass.getName() )){
+	        	return description;
+	        }
+        }
+	    return null;
+    }
+
+	private boolean methodBelongsToNoClass( TestMethod method ) {
+		for ( TestClass testClass : this.classesUnderTest ) {
+			if ( method.belongsToClass( testClass ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void runClass( TestClass testClass, RunNotifier notifier ) {
