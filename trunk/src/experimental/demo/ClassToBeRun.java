@@ -27,13 +27,13 @@ public class ClassToBeRun {
 	@MyTest
 	@Depends( "middleMethod" )
 	public void bottomMethod() {
-		System.out.println( "I have to be run at the bottom of the tree." );
+		System.out.println( "I have to be run as a leaf of the graph." );
 	}
 
 	@MyTest
 	@Depends( "SomeDependencies.middleMethodDeps" )
 	public void secondBottomMethod() {
-		System.out.println( "I have to be run at the bottom of the tree, too." );
+		System.out.println( "I have to be run as a leaf of the graph, too." );
 	}
 
 	@MyTest
