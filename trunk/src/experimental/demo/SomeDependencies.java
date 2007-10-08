@@ -3,7 +3,6 @@
  */
 package experimental.demo;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 
 import experimental.ComposedTestRunner;
