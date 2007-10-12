@@ -1,7 +1,7 @@
 /**
  * 
  */
-package extension.tests;
+package extension.old;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import extension.annotations.MyTest;
-import extension.old.DependencyValidator;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -40,7 +39,7 @@ public class DependencyValidatorTest {
 		this.validator = new DependencyValidator();
 
 		this.stringAsParam = this.getClass().getMethod( "stringAsParam", java.lang.String.class );
-		this.twoParams = this.getClass().getMethod( "twoParams", java.lang.String.class, int.class );
+		this.twoParams = this.getClass().getMethod( "twoParams", java.lang.String.class, java.lang.Integer.class );
 		this.voidReturnType = this.getClass().getMethod( "voidReturnType" );
 		this.returnsString = this.getClass().getMethod( "returnsString" );
 		this.returnsInt = this.getClass().getMethod( "returnsInt" );
@@ -83,11 +82,6 @@ public class DependencyValidatorTest {
 	public void testDependencyHasToBeTestMethod(){
 		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.noTestMethod ).size() );
 	}
-	
-	@Test
-	public void testDependencyCannotBeItself(){
-		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.returnsInt ).size() );
-	}
 
 	@MyTest
 	public void voidReturnType() {
@@ -100,7 +94,7 @@ public class DependencyValidatorTest {
 	}
 
 	@MyTest
-	public int returnsInt() {
+	public Integer returnsInt() {
 		return 1;
 	}
 
@@ -110,7 +104,7 @@ public class DependencyValidatorTest {
 	}
 
 	@MyTest
-	public void twoParams( String string, int integer ) {
+	public void twoParams( String string, Integer integer ) {
 
 	}
 	

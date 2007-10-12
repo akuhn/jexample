@@ -5,7 +5,7 @@ package experimental.demo;
 
 import org.junit.runner.RunWith;
 
-import experimental.ComposedTestRunner;
+import extension.ComposedTestRunner;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
