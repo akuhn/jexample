@@ -29,7 +29,6 @@ public class CycleDetectorTest {
 
 
 	/**
-	 * Test method for {@link extension.CycleDetector#testHasNoCycles()}.
 	 * @throws NoSuchMethodException 
 	 * @throws ClassNotFoundException 
 	 * @throws InitializationError 
@@ -42,7 +41,6 @@ public class CycleDetectorTest {
 	}
 
 	/**
-	 * Test method for {@link extension.CycleDetector#testHasCycles()}.
 	 * @throws NoSuchMethodException 
 	 * @throws ClassNotFoundException 
 	 * @throws InitializationError 
@@ -55,7 +53,6 @@ public class CycleDetectorTest {
 	}
 
 	/**
-	 * Test method for {@link extension.CycleDetector#testHasCycles()}.
 	 * @throws NoSuchMethodException 
 	 * @throws ClassNotFoundException 
 	 * @throws InitializationError 
@@ -68,7 +65,6 @@ public class CycleDetectorTest {
 	}
 	
 	/**
-	 * Test method for {@link extension.CycleDetector#testHasNoCycles()}.
 	 * @throws NoSuchMethodException 
 	 * @throws ClassNotFoundException 
 	 * @throws InitializationError 

@@ -12,6 +12,12 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
+/**
+ * This class knows all TestClasses that are run. It checks the dependencies for cycles and runs all the TestMethods of
+ * a class.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ */
 public class TestGraph {
 
 	private static TestGraph graph;
@@ -33,6 +39,14 @@ public class TestGraph {
 		return graph;
 	}
 
+	/**
+	 * All the {@link Method}'s of the {@link TestClass} are checked for cycles in the dependencies
+	 * and are validated. If erverything is ok, the {@link Method}'s are wrapped and added to the graph.
+	 * After that, the dependencies are added to the {@link TestMethod}'s.
+	 * 
+	 * @param testClass the {@link TestClass} to be added
+	 * @throws InitializationError
+	 */
 	public void addClass( TestClass testClass ) throws InitializationError {
 
 		CycleDetector detector = new CycleDetector( testClass );
@@ -58,6 +72,15 @@ public class TestGraph {
 
 	}
 
+	
+	/**
+	 * The {@link Description}'s for the {@link Method}'s of this class are added as childs to the class description.
+	 * If there are dependencies from {@link TestMethod}'s which are not declared in a {@link TestClass} that
+	 * is run in this turn, the {@link Description} of the declaring {@link Class} is also added as a child.
+	 * 
+	 * @param testClass the {@link TestClass} to get the {@link Description} from
+	 * @return the <code>description</code> for <code>testClass</code>;
+	 */
 	public Description descriptionForClass( TestClass testClass ) {
 		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
 		Set<Description> subDescriptions = new HashSet<Description>();
@@ -73,6 +96,20 @@ public class TestGraph {
 	        description.addChild( subDescription );
         }
 		return description;
+	}
+
+	/**
+	 * All {@link TestMethod}'s of <code>testClass</code> are run, incl. their dependencies.
+	 * 
+	 * @param testClass the {@link TestClass} to be run
+	 * @param notifier {@link RunNotifier}
+	 */
+	public void runClass( TestClass testClass, RunNotifier notifier ) {
+		for ( TestMethod method : this.testMethods.values() ) {
+			if ( method.belongsToClass( testClass ) ) {
+				method.run( notifier );
+			}
+		}
 	}
 
 	private Set<Description> addChildDescription( Set<Description> subDescriptions, TestMethod method ) {
@@ -104,14 +141,6 @@ public class TestGraph {
 			}
 		}
 		return true;
-	}
-
-	public void runClass( TestClass testClass, RunNotifier notifier ) {
-		for ( TestMethod method : this.testMethods.values() ) {
-			if ( method.belongsToClass( testClass ) ) {
-				method.run( notifier );
-			}
-		}
 	}
 
 	private void validate( List<Method> methodsUnderTest, TestClass testClass ) throws InitializationError {

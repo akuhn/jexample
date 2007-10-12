@@ -15,6 +15,9 @@ import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
 /**
+ * This class checks the dependencies for cycles. If there are now cycles it returns the {@link List} of all {@link Method}'s
+ * that will be run for <code>testClass</code>.
+ * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class CycleDetector {
@@ -40,6 +43,17 @@ public class CycleDetector {
 
 	}
 
+	/**
+	 * The bottom nodes are searched. For all bottom nodes a depth-first search is made and every passed {@link Method} is 
+	 * added to the {@link List} of visited {@link Method}'s. Per traversation, the edges of the dependency graph are saved 
+	 * and if you find an edge which you already passed, there is a cycle and an {@link InitializationError} is thrown.
+	 * 
+	 * @return the {@link List} of all {@link Method}'s to be run
+	 * @throws InitializationError thrown if no bottom nodes are found or a cycle is found
+	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
+	 */
 	public List<Method> checkCyclesAndGetMethods() throws InitializationError, SecurityException, ClassNotFoundException, NoSuchMethodException {
 		try {
 			this.bottomNodes = this.getBottomNodes( testClass.getAnnotatedMethods( MyTest.class ) );

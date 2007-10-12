@@ -33,6 +33,13 @@ public class TestMethod {
 		this.state = TestResult.NOT_YET_RUN;
 	}
 
+	/**
+	 * @param testClass the {@link TestClass} the method is declared in
+	 * @return a {@link List} of {@link Method}'s, which are the dependencies of this {@link TestMethod}
+	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
+	 */
 	public List< Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
 		List< Method> deps = new ArrayList< Method>();
@@ -43,10 +50,19 @@ public class TestMethod {
 		return deps;
 	}
 
+	/**
+	 * Checks, if this {@link TestMethod} belongs to <code>testClass</code>
+	 * @param testClass the {@link TestClass} to be compared
+	 * @return true, if the {@link TestMethod} belongs to <code>testClass</code>, false otherwise
+	 */
 	public boolean belongsToClass( TestClass testClass ) {
 		return this.javaMethod.getDeclaringClass().equals( testClass.getJavaClass() );
 	}
 
+	/**
+	 * Runs this {@link TestMethod} after it run all of its dependencies.
+	 * @param notifier the {@link RunNotifier}
+	 */
 	public void run( RunNotifier notifier ) {
 		if ( this.hasBeenRun() )
 			return;
@@ -63,23 +79,45 @@ public class TestMethod {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals( Object obj ) {
 		return this.javaMethod.equals( ( ( TestMethod ) obj ).javaMethod );
 	}
 
+	/**
+	 * If the TestMethod doesn't already have the dependency <code>testMethod</code>, <code>testMethod</code> is added
+	 * as a dependency.
+	 * 
+	 * @param testMethod the {@link TestMethod} to be added as a dependency
+	 */
 	public void addDependency( TestMethod testMethod ) {
 		if ( !this.dependencies.contains( testMethod ) ) {
 			this.dependencies.add( testMethod );
 		}
 	}
 
+	/**
+	 * @return a {@link List} of {@link TestMethod}'s, being the dependencies
+	 */
 	public List< TestMethod> getDependencies() {
 		return this.dependencies;
 	}
 
+	/**
+	 * @return the testdescription of this {@link TestMethod}
+	 */
 	public Description createDescription() {
 		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName(),
 				this.javaMethod.getAnnotations() );
+	}
+
+	/**
+	 * @return the declaring {@link Class} of <code>javaMethod</code>
+	 */
+	public Class< ?> getDeclaringClass() {
+		return this.javaMethod.getDeclaringClass();
 	}
 
 	private void runTestMethod( RunNotifier notifier ) {
@@ -150,10 +188,6 @@ public class TestMethod {
 
 	private boolean hasBeenRun() {
 		return state != TestResult.NOT_YET_RUN;
-	}
-
-	public Class< ?> getDeclaringClass() {
-		return this.javaMethod.getDeclaringClass();
 	}
 
 }
