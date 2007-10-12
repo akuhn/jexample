@@ -40,7 +40,7 @@ public class DependencyValidatorTest {
 		this.validator = new DependencyValidator();
 
 		this.stringAsParam = this.getClass().getMethod( "stringAsParam", java.lang.String.class );
-		this.twoParams = this.getClass().getMethod( "twoParams", java.lang.String.class, java.lang.Integer.class );
+		this.twoParams = this.getClass().getMethod( "twoParams", java.lang.String.class, int.class );
 		this.voidReturnType = this.getClass().getMethod( "voidReturnType" );
 		this.returnsString = this.getClass().getMethod( "returnsString" );
 		this.returnsInt = this.getClass().getMethod( "returnsInt" );
@@ -100,7 +100,7 @@ public class DependencyValidatorTest {
 	}
 
 	@MyTest
-	public Integer returnsInt() {
+	public int returnsInt() {
 		return 1;
 	}
 
@@ -110,7 +110,7 @@ public class DependencyValidatorTest {
 	}
 
 	@MyTest
-	public void twoParams( String string, Integer integer ) {
+	public void twoParams( String string, int integer ) {
 
 	}
 	
