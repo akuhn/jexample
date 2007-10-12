@@ -42,3 +42,6 @@ the return values of the parents, if a testmethod takes arguments
 
 TestMethod: invoking the method is assigned to a variable returnValue of the class TestMethod. before invoking a method, the 
 arguments it takes are checked, and the returnvalues from the parent methods are taken and passed to the method.
+
+DependencyParser: when getting the Class for the arguments, i do an ugly if-elseif-elseif... to get the classes of primitive data
+types, if there are some.
