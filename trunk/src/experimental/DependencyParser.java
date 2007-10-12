@@ -7,10 +7,26 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+//enum PrimitiveDataTypes {
+//	INT( int.class ), LONG( long.class ), DOUBLE( double.class ), FLOAT( float.class ), CHAR( char.class ), BOOLEAN(
+//			boolean.class );
+//
+//	private final Class< ?> clazz;
+//
+//	private PrimitiveDataTypes( Class< ?> clazz ) {
+//		this.clazz = clazz;
+//	}
+//
+//	public Class< ?> getClazz() {
+//		return this.clazz;
+//	}
+//}
+
 /**
- * This class gets the value from the <code>Annotation Depends</code> and extracts method
- * names and parameters. with this information it creates a <code>List</code> of <code>Method Objects</code>
- * which represent the dependencies of the current test method.
+ * This class gets the value from the <code>Annotation Depends</code> and
+ * extracts method names and parameters. with this information it creates a
+ * <code>List</code> of <code>Method Objects</code> which represent the
+ * dependencies of the current test method.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
@@ -20,7 +36,7 @@ public class DependencyParser {
 
 	private final TestClass testClass;
 
-	private List<Method> dependencies;
+	private List< Method> dependencies;
 
 	public DependencyParser( TestClass myTestClass ) {
 		this.annotationValue = "";
@@ -28,20 +44,22 @@ public class DependencyParser {
 	}
 
 	/**
-	 * This methods parses the <code>String annotationValue</code> and extracts method names
-	 * and the parameters of this method, if there are overloaded methods. With the extracted
-	 * information it creates <code>Method</code> Objects.
+	 * This methods parses the <code>String annotationValue</code> and
+	 * extracts method names and the parameters of this method, if there are
+	 * overloaded methods. With the extracted information it creates
+	 * <code>Method</code> Objects.
 	 * 
-	 * @return a <code>List</code> of <code>Method</code> Objects which are created from the
-	 * <code>String value</code>.
+	 * @return a <code>List</code> of <code>Method</code> Objects which are
+	 *         created from the <code>String value</code>.
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 */
-	public List<Method> getDependencies( String value ) throws ClassNotFoundException, SecurityException, NoSuchMethodException {
+	public List< Method> getDependencies( String value ) throws ClassNotFoundException, SecurityException,
+			NoSuchMethodException {
 		this.annotationValue = value;
-		this.dependencies = new ArrayList<Method>();
+		this.dependencies = new ArrayList< Method>();
 
 		String[] methodNames = this.getMethodNames();
 
@@ -52,16 +70,17 @@ public class DependencyParser {
 		return dependencies;
 	}
 
-	private Class<?> getDeclaringClass( String dependency ) throws ClassNotFoundException {
+	private Class< ?> getDeclaringClass( String dependency ) throws ClassNotFoundException {
 		int index;
 		if ( ( index = dependency.indexOf( "(" ) ) > -1 ) {
-			// remove parameters, because there could be a class declaration, too
+			// remove parameters, because there could be a class declaration,
+			// too
 			dependency = dependency.substring( 0, index );
 		}
-		Class<?> clazz;
+		Class< ?> clazz;
 		if ( ( index = dependency.lastIndexOf( "." ) ) > -1 ) {
 			String className = dependency.substring( 0, index );
-			if( ( index = className.indexOf( "." ) ) == -1 ){				
+			if ( ( index = className.indexOf( "." ) ) == -1 ) {
 				className = this.testClass.getJavaClass().getPackage().getName() + "." + className;
 			}
 			try {
@@ -76,8 +95,8 @@ public class DependencyParser {
 		return clazz;
 	}
 
-	private void addDependency( Class<?> clazz, String dependency, String[] parameters ) throws ClassNotFoundException, SecurityException,
-	        NoSuchMethodException {
+	private void addDependency( Class< ?> clazz, String dependency, String[] parameters )
+			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		Method dep = clazz.getMethod( this.extractName( dependency ), this.getParameterClasses( parameters ) );
 		if ( !this.dependencies.contains( dep ) ) {
 			this.dependencies.add( dep );
@@ -86,22 +105,40 @@ public class DependencyParser {
 
 	private String extractName( String dependency ) {
 		int index;
-		
+
 		if ( ( index = dependency.indexOf( "(" ) ) > -1 ) {
 			dependency = dependency.substring( 0, index );
 		}
-		
-		if( ( index = dependency.lastIndexOf( "." ) ) > -1 ){
-			dependency = dependency.substring( index+1 );
+
+		if ( ( index = dependency.lastIndexOf( "." ) ) > -1 ) {
+			dependency = dependency.substring( index + 1 );
 		}
-		
+
 		return dependency;
 	}
 
-	private Class<?>[] getParameterClasses( String[] parameters ) throws ClassNotFoundException {
-		Class<?>[] newParams = new Class<?>[parameters.length];
+	private Class< ?>[] getParameterClasses( String[] parameters ) throws ClassNotFoundException {
+		Class< ?>[] newParams = new Class< ?>[parameters.length];
 		for ( int i = 0; i < parameters.length; i++ ) {
-			newParams[i] = Class.forName( parameters[i].trim() );
+			try {
+				newParams[i] = Class.forName( parameters[i].trim() );
+			} catch ( ClassNotFoundException e ) {
+				if(parameters[i].equals( "int" )){
+					newParams[i] = int.class;
+				} else if(parameters[i].equals( "long" )){
+					newParams[i] = long.class;
+				} else if(parameters[i].equals( "double" )){
+					newParams[i] = double.class;
+				} else if(parameters[i].equals( "float" )){
+					newParams[i] = float.class;
+				} else if(parameters[i].equals( "char" )){
+					newParams[i] = char.class;
+				} else if(parameters[i].equals( "boolean" )){
+					newParams[i] = boolean.class;
+				} else {
+					throw e;
+				}
+			}
 		}
 		return newParams;
 	}

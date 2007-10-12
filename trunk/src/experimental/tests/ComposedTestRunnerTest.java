@@ -288,8 +288,8 @@ public class ComposedTestRunnerTest {
 		}
 		
 		@MyTest
-		public Integer returnInteger() {
-			return new Integer(2);
+		public int returnInteger() {
+			return 2;
 		}
 		
 		@MyTest
@@ -306,9 +306,16 @@ public class ComposedTestRunnerTest {
 		
 		@MyTest
 		@Depends("getsString(java.lang.String);returnInteger")
-		public void getsStringAndInteger(String aString, Integer aInteger){
+		public boolean getsStringAndInteger(String aString, int aInteger){
 			assertEquals("Hello, I'm a string.", aString);
-			assertEquals( new Integer(2), aInteger );
+			assertEquals( 2, aInteger );
+			return true;
+		}
+		
+		@MyTest
+		@Depends("getsStringAndInteger(java.lang.String,int)")
+		public void findsDep(boolean aBool){
+			assertTrue(aBool);
 		}
 	}
 
@@ -317,6 +324,6 @@ public class ComposedTestRunnerTest {
 		Result result = JUnitCore.runClasses(WithAttributes.class);
 		assertEquals(0, result.getFailureCount());
 		assertEquals(0, result.getIgnoreCount());
-		assertEquals(5, result.getRunCount());
+		assertEquals(6, result.getRunCount());
 	}
 }

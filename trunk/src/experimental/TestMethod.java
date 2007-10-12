@@ -101,8 +101,7 @@ public class TestMethod {
 		Class< ?>[] paramTypes = this.javaMethod.getParameterTypes();
 		Object[] arguments = new Object[paramTypes.length];
 		for ( int i = 0; i < paramTypes.length; i++ ) {
-			if ( this.dependencies.get( i ).returnValue != null
-					&& paramTypes[i].equals( this.dependencies.get( i ).returnValue.getClass() ) ) {
+			if ( this.dependencies.get( i ).returnValue != null ) {
 				arguments[i] = this.dependencies.get( i ).returnValue;
 			}
 		}

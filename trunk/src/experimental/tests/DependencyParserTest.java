@@ -43,6 +43,8 @@ public class DependencyParserTest {
 		methods = this.parser.getDependencies("annotatedMethod;annotatedMethod(java.lang.String)");
 		assertEquals(2,methods.size());
 
+		methods = this.parser.getDependencies("annotatedMethod(int)");
+		assertEquals(1,methods.size());
 	}
 	
 	@Test
@@ -68,6 +70,10 @@ public class DependencyParserTest {
 	}
 	
 	public void annotatedMethod(String string){
+		
+	}
+	
+	public void annotatedMethod(int i){
 		
 	}
 
