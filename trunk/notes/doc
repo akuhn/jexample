@@ -34,3 +34,11 @@ was skipped, it set its state to IGNORED and tells the RunNotifier that it was i
 
 Had to change the CycleDetector: only the Links for one traversation are saved, because if all the links are saved there are
 cases for which it detects a cycle where there isn't one (A -> C, B -> C, C -> D).
+
+
+12.10.2007
+changed the type of the dependencies in testmethod from set to list, because the order of the dependencies is important, to get 
+the return values of the parents, if a testmethod takes arguments
+
+TestMethod: invoking the method is assigned to a variable returnValue of the class TestMethod. before invoking a method, the 
+arguments it takes are checked, and the returnvalues from the parent methods are taken and passed to the method.

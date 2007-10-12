@@ -3,9 +3,7 @@ package experimental;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Ignore;
 import org.junit.runner.Description;
@@ -22,18 +20,22 @@ public class TestMethod {
 
 	private Method javaMethod;
 
-	private Set<TestMethod> dependencies;
+	// has to be a list, because the order is important
+	private List< TestMethod> dependencies;
 
 	private TestResult state;
 
+	private Object returnValue;
+
 	public TestMethod( Method method ) {
 		this.javaMethod = method;
-		this.dependencies = new HashSet<TestMethod>();
+		this.dependencies = new ArrayList< TestMethod>();
 		this.state = TestResult.NOT_YET_RUN;
 	}
 
-	public List<Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> deps = new ArrayList<Method>();
+	public List< Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
+			NoSuchMethodException {
+		List< Method> deps = new ArrayList< Method>();
 		Depends annotation = this.javaMethod.getAnnotation( Depends.class );
 		if ( annotation != null ) {
 			deps = new DependencyParser( testClass ).getDependencies( annotation.value() );
@@ -62,20 +64,23 @@ public class TestMethod {
 	}
 
 	public boolean equals( Object obj ) {
-    	return this.javaMethod.equals( ( (TestMethod) obj ).javaMethod );
-    }
+		return this.javaMethod.equals( ( ( TestMethod ) obj ).javaMethod );
+	}
 
 	public void addDependency( TestMethod testMethod ) {
-    	this.dependencies.add( testMethod );
-    }
+		if ( !this.dependencies.contains( testMethod ) ) {
+			this.dependencies.add( testMethod );
+		}
+	}
 
-	public Set<TestMethod> getDependencies() {
-    	return this.dependencies;
-    }
+	public List< TestMethod> getDependencies() {
+		return this.dependencies;
+	}
 
 	public Description createDescription() {
-    	return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName(), this.javaMethod.getAnnotations() );
-    }
+		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName(),
+				this.javaMethod.getAnnotations() );
+	}
 
 	private void runTestMethod( RunNotifier notifier ) {
 		Description description = this.createDescription();
@@ -89,13 +94,26 @@ public class TestMethod {
 			notifier.testAborted( description, e );
 			return;
 		}
-		this.invokeMethod( test, description, notifier );
+		this.invokeMethod( test, description, notifier, this.getArguments() );
 	}
 
-	private void invokeMethod( Object test, Description description, RunNotifier notifier ) {
+	private Object[] getArguments() {
+		Class< ?>[] paramTypes = this.javaMethod.getParameterTypes();
+		Object[] arguments = new Object[paramTypes.length];
+		for ( int i = 0; i < paramTypes.length; i++ ) {
+			if ( this.dependencies.get( i ).returnValue != null
+					&& paramTypes[i].equals( this.dependencies.get( i ).returnValue.getClass() ) ) {
+				arguments[i] = this.dependencies.get( i ).returnValue;
+			}
+		}
+
+		return arguments;
+	}
+
+	private void invokeMethod( Object test, Description description, RunNotifier notifier, Object... args ) {
 		notifier.fireTestStarted( description );
 		try {
-			this.javaMethod.invoke( test );
+			this.returnValue = this.javaMethod.invoke( test, args );
 			this.setGreen();
 		} catch ( InvocationTargetException e ) {
 			this.addFailure( e.getTargetException(), notifier, description );
@@ -116,16 +134,16 @@ public class TestMethod {
 	}
 
 	private void setGreen() {
-        this.state = TestResult.GREEN;
-    }
+		this.state = TestResult.GREEN;
+	}
 
 	private void setIgnored() {
-        this.state = TestResult.IGNORED;
-    }
+		this.state = TestResult.IGNORED;
+	}
 
 	private void setFailed() {
-        this.state = TestResult.RED;
-    }
+		this.state = TestResult.RED;
+	}
 
 	private boolean isGreen() {
 		return state == TestResult.GREEN;
@@ -135,8 +153,8 @@ public class TestMethod {
 		return state != TestResult.NOT_YET_RUN;
 	}
 
-	public Class<?> getDeclaringClass() {
-	    return this.javaMethod.getDeclaringClass();
-    }
+	public Class< ?> getDeclaringClass() {
+		return this.javaMethod.getDeclaringClass();
+	}
 
 }
