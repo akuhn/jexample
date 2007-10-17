@@ -34,8 +34,10 @@ public class TestMethod {
 	}
 
 	/**
-	 * @param testClass the {@link TestClass} the method is declared in
-	 * @return a {@link List} of {@link Method}'s, which are the dependencies of this {@link TestMethod}
+	 * @param testClass
+	 *            the {@link TestClass} the method is declared in
+	 * @return a {@link List} of {@link Method}'s, which are the dependencies
+	 *         of this {@link TestMethod}
 	 * @throws SecurityException
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchMethodException
@@ -52,8 +54,11 @@ public class TestMethod {
 
 	/**
 	 * Checks, if this {@link TestMethod} belongs to <code>testClass</code>
-	 * @param testClass the {@link TestClass} to be compared
-	 * @return true, if the {@link TestMethod} belongs to <code>testClass</code>, false otherwise
+	 * 
+	 * @param testClass
+	 *            the {@link TestClass} to be compared
+	 * @return true, if the {@link TestMethod} belongs to <code>testClass</code>,
+	 *         false otherwise
 	 */
 	public boolean belongsToClass( TestClass testClass ) {
 		return this.javaMethod.getDeclaringClass().equals( testClass.getJavaClass() );
@@ -61,7 +66,9 @@ public class TestMethod {
 
 	/**
 	 * Runs this {@link TestMethod} after it run all of its dependencies.
-	 * @param notifier the {@link RunNotifier}
+	 * 
+	 * @param notifier
+	 *            the {@link RunNotifier}
 	 */
 	public void run( RunNotifier notifier ) {
 		if ( this.hasBeenRun() )
@@ -79,7 +86,9 @@ public class TestMethod {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals( Object obj ) {
@@ -87,10 +96,12 @@ public class TestMethod {
 	}
 
 	/**
-	 * If the TestMethod doesn't already have the dependency <code>testMethod</code>, <code>testMethod</code> is added
-	 * as a dependency.
+	 * If the TestMethod doesn't already have the dependency
+	 * <code>testMethod</code>, <code>testMethod</code> is added as a
+	 * dependency.
 	 * 
-	 * @param testMethod the {@link TestMethod} to be added as a dependency
+	 * @param testMethod
+	 *            the {@link TestMethod} to be added as a dependency
 	 */
 	public void addDependency( TestMethod testMethod ) {
 		if ( !this.dependencies.contains( testMethod ) ) {
@@ -140,11 +151,26 @@ public class TestMethod {
 		Object[] arguments = new Object[paramTypes.length];
 		for ( int i = 0; i < paramTypes.length; i++ ) {
 			if ( this.dependencies.get( i ).returnValue != null ) {
-				arguments[i] = this.dependencies.get( i ).returnValue;
+				if ( this.typeIsCloneable( paramTypes[i] ) ) {
+					// TODO: Oct 17, 2007,5:09:57 PM: should somehow invoke
+					// clone() on the returnValue
+					arguments[i] = this.dependencies.get( i ).returnValue;
+				} else {
+					arguments[i] = this.dependencies.get( i ).returnValue;
+				}
 			}
 		}
 
 		return arguments;
+	}
+
+	private boolean typeIsCloneable( Class< ?> clazz ) {
+		for ( Class< ?> iface : clazz.getInterfaces() ) {
+			if ( iface.getClass().equals( Cloneable.class ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void invokeMethod( Object test, Description description, RunNotifier notifier, Object... args ) {
