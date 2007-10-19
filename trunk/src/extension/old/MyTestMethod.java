@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.internal.runners.InitializationError;
 
 import extension.annotations.Depends;
 
