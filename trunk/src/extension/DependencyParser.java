@@ -7,20 +7,21 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-//enum PrimitiveDataTypes {
-//	INT( int.class ), LONG( long.class ), DOUBLE( double.class ), FLOAT( float.class ), CHAR( char.class ), BOOLEAN(
-//			boolean.class );
+// enum PrimitiveDataTypes {
+// INT( int.class ), LONG( long.class ), DOUBLE( double.class ), FLOAT(
+// float.class ), CHAR( char.class ), BOOLEAN(
+// boolean.class );
 //
-//	private final Class< ?> clazz;
+// private final Class< ?> clazz;
 //
-//	private PrimitiveDataTypes( Class< ?> clazz ) {
-//		this.clazz = clazz;
-//	}
+// private PrimitiveDataTypes( Class< ?> clazz ) {
+// this.clazz = clazz;
+// }
 //
-//	public Class< ?> getClazz() {
-//		return this.clazz;
-//	}
-//}
+// public Class< ?> getClazz() {
+// return this.clazz;
+// }
+// }
 
 /**
  * This class gets the value from the <code>Annotation Depends</code> and
@@ -68,6 +69,17 @@ public class DependencyParser {
 		}
 
 		return dependencies;
+	}
+
+	public List< Method> getDependencies( Method javaMethod ) throws NoSuchMethodException {
+		this.dependencies = new ArrayList< Method>();
+		Method methodBefore = this.testClass.getMethodBefore( javaMethod );
+		if ( methodBefore != null ) {
+			this.dependencies.add( methodBefore );
+		} else {
+			throw new NoSuchMethodException("There is no method declared before "+javaMethod.getName());
+		}
+		return this.dependencies;
 	}
 
 	private Class< ?> getDeclaringClass( String dependency ) throws ClassNotFoundException {
@@ -123,17 +135,17 @@ public class DependencyParser {
 			try {
 				newParams[i] = Class.forName( parameters[i].trim() );
 			} catch ( ClassNotFoundException e ) {
-				if(parameters[i].equals( "int" )){
+				if ( parameters[i].equals( "int" ) ) {
 					newParams[i] = int.class;
-				} else if(parameters[i].equals( "long" )){
+				} else if ( parameters[i].equals( "long" ) ) {
 					newParams[i] = long.class;
-				} else if(parameters[i].equals( "double" )){
+				} else if ( parameters[i].equals( "double" ) ) {
 					newParams[i] = double.class;
-				} else if(parameters[i].equals( "float" )){
+				} else if ( parameters[i].equals( "float" ) ) {
 					newParams[i] = float.class;
-				} else if(parameters[i].equals( "char" )){
+				} else if ( parameters[i].equals( "char" ) ) {
 					newParams[i] = char.class;
-				} else if(parameters[i].equals( "boolean" )){
+				} else if ( parameters[i].equals( "boolean" ) ) {
 					newParams[i] = boolean.class;
 				} else {
 					throw e;

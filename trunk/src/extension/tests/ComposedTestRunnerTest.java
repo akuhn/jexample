@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
+import extension.annotations.DependsOnBefore;
 import extension.annotations.MyTest;
 
 /**
@@ -21,41 +22,39 @@ import extension.annotations.MyTest;
  */
 public class ComposedTestRunnerTest {
 
-
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class CycleMethods {
 
 		public CycleMethods() {
 		}
 
 		@MyTest
-		@Depends("thirdMethod")
+		@Depends( "thirdMethod" )
 		public void firstMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		@MyTest
-		@Depends("firstMethod")
+		@Depends( "firstMethod" )
 		public void secondMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		@MyTest
-		@Depends("secondMethod")
+		@Depends( "secondMethod" )
 		public void thirdMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
 	@Test
 	public void cycleMethods() {
-		Result result = JUnitCore.runClasses(CycleMethods.class);
-		assertEquals(1, result.getFailureCount());
-		assertEquals("The dependencies are cyclic.", result.getFailures()
-				.get(0).getMessage());
+		Result result = JUnitCore.runClasses( CycleMethods.class );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( "The dependencies are cyclic.", result.getFailures().get( 0 ).getMessage() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class SkipMethods {
 
 		public SkipMethods() {
@@ -63,72 +62,71 @@ public class ComposedTestRunnerTest {
 
 		@MyTest
 		public void firstMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		// test is supposed to fail
 		@MyTest
-		@Depends("firstMethod")
+		@Depends( "firstMethod" )
 		public void secondMethod() {
-			assertTrue(false);
+			assertTrue( false );
 		}
 
 		// this test is ignored, because secondMethod failed
 		@MyTest
-		@Depends("secondMethod")
+		@Depends( "secondMethod" )
 		public void thirdMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		// this test is ignored, because secondMethod failed
 		@MyTest
-		@Depends("secondMethod")
+		@Depends( "secondMethod" )
 		public void fourthMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
 	@Test
 	public void skipMethods() {
-		Result result = JUnitCore.runClasses(SkipMethods.class);
-		assertEquals(1, result.getFailureCount());
-		assertEquals(2, result.getIgnoreCount());
-		assertEquals(2, result.getRunCount());
+		Result result = JUnitCore.runClasses( SkipMethods.class );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( 2, result.getIgnoreCount() );
+		assertEquals( 2, result.getRunCount() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class BadDependencies {
 
 		public BadDependencies() {
 		}
 
 		public void firstMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		@MyTest
-		@Depends("firstMethod")
+		@Depends( "firstMethod" )
 		public void secondMethod() {
-			assertTrue(false);
+			assertTrue( false );
 		}
 
 		@MyTest
-		@Depends("secondMethod")
+		@Depends( "secondMethod" )
 		public void thirdMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
 	@Test
 	public void badDependencies() {
-		Result result = JUnitCore.runClasses(BadDependencies.class);
-		assertEquals(1, result.getFailureCount());
-		assertEquals(1, result.getRunCount());
-		assertEquals("Dependency firstMethod is not a test method.", result
-				.getFailures().get(0).getMessage());
+		Result result = JUnitCore.runClasses( BadDependencies.class );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( 1, result.getRunCount() );
+		assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class GoodTest {
 		public GoodTest() {
 		}
@@ -139,27 +137,27 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@Depends("firstMethod")
+		@Depends( "firstMethod" )
 		public void secondMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		@MyTest
-		@Depends("secondMethod")
+		@Depends( "secondMethod" )
 		public void thirdMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
 	@Test
 	public void testGoodTest() {
-		Result result = JUnitCore.runClasses(GoodTest.class);
-		assertEquals(0, result.getFailureCount());
-		assertEquals(0, result.getIgnoreCount());
-		assertEquals(3, result.getRunCount());
+		Result result = JUnitCore.runClasses( GoodTest.class );
+		assertEquals( 0, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class FirstGoodTest {
 		public FirstGoodTest() {
 		}
@@ -170,33 +168,33 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@Depends("ComposedTestRunnerTest$SecondGoodTest.secondMethod")
+		@Depends( "ComposedTestRunnerTest$SecondGoodTest.secondMethod" )
 		public void thirdMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class SecondGoodTest {
 		public SecondGoodTest() {
 		}
 
 		@MyTest
-		@Depends("ComposedTestRunnerTest$FirstGoodTest.firstMethod")
+		@Depends( "ComposedTestRunnerTest$FirstGoodTest.firstMethod" )
 		public void secondMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
 	@Test
 	public void testGoodTests() {
-		Result result = JUnitCore.runClasses(FirstGoodTest.class);
-		assertEquals(0, result.getFailureCount());
-		assertEquals(0, result.getIgnoreCount());
-		assertEquals(3, result.getRunCount());
+		Result result = JUnitCore.runClasses( FirstGoodTest.class );
+		assertEquals( 0, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class FirstBadTest {
 		public FirstBadTest() {
 		}
@@ -207,39 +205,39 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@Depends("ComposedTestRunnerTest$SecondBadTest.secondMethod")
+		@Depends( "ComposedTestRunnerTest$SecondBadTest.secondMethod" )
 		public void secondMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 
 		@MyTest
-		@Depends("secondMethod")
+		@Depends( "secondMethod" )
 		public void thirdMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class SecondBadTest {
 		public SecondBadTest() {
 		}
 
 		@MyTest
-		@Depends("ComposedTestRunnerTest$FirstBadTest.secondMethod")
+		@Depends( "ComposedTestRunnerTest$FirstBadTest.secondMethod" )
 		public void secondMethod() {
-			assertTrue(true);
+			assertTrue( true );
 		}
 	}
 
 	@Test
 	public void testBadTests() {
-		Result result = JUnitCore.runClasses(FirstBadTest.class);
-		assertEquals(1, result.getFailureCount());
-		assertEquals(0, result.getIgnoreCount());
-		assertEquals(1, result.getRunCount());
+		Result result = JUnitCore.runClasses( FirstBadTest.class );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 1, result.getRunCount() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith( ComposedTestRunner.class )
 	static public class WithAttributes {
 		public WithAttributes() {
 
@@ -249,44 +247,77 @@ public class ComposedTestRunnerTest {
 		public String rootMethod() {
 			return "Hello, I'm a string.";
 		}
-		
+
 		@MyTest
 		public int returnInteger() {
 			return 2;
 		}
-		
+
 		@MyTest
-		public void noReturn(){
-			
+		public void noReturn() {
+
 		}
 
 		@MyTest
-		@Depends("rootMethod")
-		public String getsString(String aString) {
-			assertEquals("Hello, I'm a string.", aString);
+		@Depends( "rootMethod" )
+		public String getsString( String aString ) {
+			assertEquals( "Hello, I'm a string.", aString );
 			return aString;
 		}
-		
+
 		@MyTest
-		@Depends("getsString(java.lang.String);returnInteger")
-		public boolean getsStringAndInteger(String aString, int aInteger){
-			assertEquals("Hello, I'm a string.", aString);
+		@Depends( "getsString(java.lang.String);returnInteger" )
+		public boolean getsStringAndInteger( String aString, int aInteger ) {
+			assertEquals( "Hello, I'm a string.", aString );
 			assertEquals( 2, aInteger );
 			return true;
 		}
-		
+
 		@MyTest
-		@Depends("getsStringAndInteger(java.lang.String,int)")
-		public void findsDep(boolean aBool){
-			assertTrue(aBool);
+		@Depends( "getsStringAndInteger(java.lang.String,int)" )
+		public void findsDep( boolean aBool ) {
+			assertTrue( aBool );
 		}
 	}
 
 	@Test
 	public void testWithAttributes() {
-		Result result = JUnitCore.runClasses(WithAttributes.class);
-		assertEquals(0, result.getFailureCount());
-		assertEquals(0, result.getIgnoreCount());
-		assertEquals(6, result.getRunCount());
+		Result result = JUnitCore.runClasses( WithAttributes.class );
+		assertEquals( 0, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 6, result.getRunCount() );
+	}
+
+	@RunWith( ComposedTestRunner.class )
+	static public class DependsOnBeforeTest {
+
+		public DependsOnBeforeTest() {
+		}
+
+		@MyTest
+		public int root() {
+			return 2;
+		}
+
+		@MyTest
+		@DependsOnBefore
+		public String second( int i ) {
+			assertEquals( 2, i );
+			return "bla";
+		}
+
+		@MyTest
+		@DependsOnBefore
+		public void third( String aString ) {
+			assertEquals( "bla", aString );
+		}
+	}
+	
+	@Test
+	public void testDependsOnBefore(){
+		Result result = JUnitCore.runClasses( DependsOnBeforeTest.class );
+		assertEquals( 0, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 3, result.getRunCount() );
 	}
 }

@@ -10,8 +10,6 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
-import extension.annotations.Depends;
-
 enum TestResult {
 	NOT_YET_RUN, GREEN, RED, IGNORED
 }
@@ -44,12 +42,18 @@ public class TestMethod {
 	 */
 	public List< Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
-		List< Method> deps = new ArrayList< Method>();
-		Depends annotation = this.javaMethod.getAnnotation( Depends.class );
-		if ( annotation != null ) {
-			deps = new DependencyParser( testClass ).getDependencies( annotation.value() );
-		}
-		return deps;
+//		List< Method> deps = new ArrayList< Method>();
+//		DependencyParser parser = new DependencyParser( testClass );
+//		Annotation annotation = this.getDependencyAnnotation();
+//		// Depends annotation = this.javaMethod.getAnnotation( Depends.class );
+//		if ( annotation != null ) {
+//			if ( this.annotationHasValue( annotation ) ) {
+//				deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+//			} else {
+//				deps = parser.getDependencies( this.javaMethod );
+//			}
+//		}
+		return testClass.getDependenciesFor( this.javaMethod );
 	}
 
 	/**

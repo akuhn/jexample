@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import extension.DependencyParser;
 import extension.TestClass;
+import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -61,18 +62,28 @@ public class DependencyParserTest {
 	
 	@Test
 	public void testExtDepWithPackageFound() throws SecurityException, ClassNotFoundException, NoSuchMethodException{
-        List<Method> methods = this.parser.getDependencies("experimental.TestClass.getJavaClass");
+        List<Method> methods = this.parser.getDependencies("extension.TestClass.getJavaClass");
         assertEquals(1,methods.size());
 	}
 	
+	@Test
+	public void testGetDependenciesOnBefore() throws SecurityException, NoSuchMethodException {
+		List<Method> methods = this.parser.getDependencies( this.getClass().getMethod( "annotatedMethod", String.class ) );
+		assertEquals( 1, methods.size() );
+		assertEquals( this.getClass().getMethod( "annotatedMethod" ), methods.get( 0 ) );
+	}
+	
+	@MyTest
 	public void annotatedMethod(){
 		
 	}
 	
+	@MyTest
 	public void annotatedMethod(String string){
 		
 	}
 	
+	@MyTest
 	public void annotatedMethod(int i){
 		
 	}

@@ -45,3 +45,9 @@ arguments it takes are checked, and the returnvalues from the parent methods are
 
 DependencyParser: when getting the Class for the arguments, i do an ugly if-elseif-elseif... to get the classes of primitive data
 types, if there are some.
+
+DependencyParser: getDependencies is overloaded. if a method is annotated with DependsOnBefore the method is passed, so 
+the method declared before this method can be found. if there is no method declared before a NoSuchMethodException is thrown.
+
+TestClass has the responsibility to get the dependencies for a method, because it's the only object that is present from
+the beginning.

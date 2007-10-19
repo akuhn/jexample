@@ -15,46 +15,51 @@ import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
 /**
- * This class checks the dependencies for cycles. If there are now cycles it returns the {@link List} of all {@link Method}'s
- * that will be run for <code>testClass</code>.
+ * This class checks the dependencies for cycles. If there are now cycles it
+ * returns the {@link List} of all {@link Method}'s that will be run for
+ * <code>testClass</code>.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class CycleDetector {
 
-	private Set<Method> bottomNodes;
+	private Set< Method> bottomNodes;
 
 	private final TestClass testClass;
 
-	private List<Link> links;
+	private List< Link> links;
 
-	private List<Method> visited;
+	private List< Method> visited;
 
 	private DependencyParser parser;
 
 	public CycleDetector( TestClass testClass ) {
 
 		this.testClass = testClass;
-		this.links = new ArrayList<Link>();
-		this.bottomNodes = new HashSet<Method>();
-		this.visited = new ArrayList<Method>();
+		this.links = new ArrayList< Link>();
+		this.bottomNodes = new HashSet< Method>();
+		this.visited = new ArrayList< Method>();
 
 		this.parser = new DependencyParser( this.testClass );
 
 	}
 
 	/**
-	 * The bottom nodes are searched. For all bottom nodes a depth-first search is made and every passed {@link Method} is 
-	 * added to the {@link List} of visited {@link Method}'s. Per traversation, the edges of the dependency graph are saved 
-	 * and if you find an edge which you already passed, there is a cycle and an {@link InitializationError} is thrown.
+	 * The bottom nodes are searched. For all bottom nodes a depth-first search
+	 * is made and every passed {@link Method} is added to the {@link List} of
+	 * visited {@link Method}'s. Per traversation, the edges of the dependency
+	 * graph are saved and if you find an edge which you already passed, there
+	 * is a cycle and an {@link InitializationError} is thrown.
 	 * 
 	 * @return the {@link List} of all {@link Method}'s to be run
-	 * @throws InitializationError thrown if no bottom nodes are found or a cycle is found
+	 * @throws InitializationError
+	 *             thrown if no bottom nodes are found or a cycle is found
 	 * @throws SecurityException
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchMethodException
 	 */
-	public List<Method> checkCyclesAndGetMethods() throws InitializationError, SecurityException, ClassNotFoundException, NoSuchMethodException {
+	public List< Method> checkCyclesAndGetMethods() throws InitializationError, SecurityException,
+			ClassNotFoundException, NoSuchMethodException {
 		try {
 			this.bottomNodes = this.getBottomNodes( testClass.getAnnotatedMethods( MyTest.class ) );
 		} catch ( Exception e ) {
@@ -83,16 +88,15 @@ public class CycleDetector {
 	}
 
 	/**
-	 * @param testMethod 
-	 * @param level 
+	 * @param testMethod
+	 * @param level
 	 * @return true, if a cycle was detected, false otherwise
-	 * @throws NoSuchMethodException 
-	 * @throws ClassNotFoundException 
-	 * @throws SecurityException 
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws SecurityException
 	 */
-	private boolean checkNode( Method testMethod, Method childMethod ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		// TODO (Oct 3, 2007 10:12:22 PM) save edges, if the same edge is passed
-		// a second time, there is a cycle. somehow save the passed methods while passing them
+	private boolean checkNode( Method testMethod, Method childMethod ) throws SecurityException,
+			ClassNotFoundException, NoSuchMethodException {
 
 		if ( childMethod != null ) {
 			Link newLink = new Link( testMethod, childMethod );
@@ -111,21 +115,19 @@ public class CycleDetector {
 			}
 		}
 
-		Depends annotation = testMethod.getAnnotation( Depends.class );
-		if ( annotation != null ) {
-			List<Method> deps = this.parser.getDependencies( annotation.value() );
-			for ( Method dependency : deps ) {
-				if ( this.checkNode( dependency, testMethod ) ) {
-					return true;
-				}
+		List< Method> deps = this.testClass.getDependenciesFor( testMethod );
+		for ( Method dependency : deps ) {
+			if ( this.checkNode( dependency, testMethod ) ) {
+				return true;
 			}
 		}
 
 		return false;
 	}
 
-	private Set<Method> getBottomNodes( List<Method> methods ) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		Set<Method> bottoms = new HashSet<Method>();
+	private Set< Method> getBottomNodes( List< Method> methods ) throws SecurityException, ClassNotFoundException,
+			NoSuchMethodException {
+		Set< Method> bottoms = new HashSet< Method>();
 		for ( Method method : methods ) {
 			if ( !this.listContainsNodeWithParent( methods, method ) ) {
 				bottoms.add( method );
@@ -134,9 +136,9 @@ public class CycleDetector {
 		return bottoms;
 	}
 
-	private boolean listContainsNodeWithParent( List<Method> methods, Method method ) throws SecurityException, ClassNotFoundException,
-	        NoSuchMethodException {
-		List<Method> deps = new ArrayList<Method>();
+	private boolean listContainsNodeWithParent( List< Method> methods, Method method ) throws SecurityException,
+			ClassNotFoundException, NoSuchMethodException {
+		List< Method> deps = new ArrayList< Method>();
 
 		for ( Method methodToCheck : methods ) {
 			Depends annotation = methodToCheck.getAnnotation( Depends.class );
@@ -161,7 +163,7 @@ public class CycleDetector {
 		}
 
 		public boolean equals( Object obj ) {
-			return ( this.child.equals( ( (Link) obj ).child ) && this.parent.equals( ( (Link) obj ).parent ) );
+			return ( this.child.equals( ( ( Link ) obj ).child ) && this.parent.equals( ( ( Link ) obj ).parent ) );
 		}
 
 		public String toString() {

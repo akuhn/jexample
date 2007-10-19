@@ -8,18 +8,17 @@ import java.util.List;
 
 import org.junit.internal.runners.InitializationError;
 
-import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
 public class MethodValidator {
 
-	private final List<Throwable> fErrors = new ArrayList<Throwable>();
+	private final List< Throwable> fErrors = new ArrayList< Throwable>();
 
-	private List<Method> testMethods;
+	private List< Method> testMethods;
 
 	private final TestClass testClass;
 
-	public MethodValidator( List<Method> methodsUnderTest, TestClass testClass ) {
+	public MethodValidator( List< Method> methodsUnderTest, TestClass testClass ) {
 		testMethods = methodsUnderTest;
 		this.testClass = testClass;
 	}
@@ -27,12 +26,12 @@ public class MethodValidator {
 	public void validateInstanceMethods() {
 		validateTestMethods();
 
-		List<Method> methods = testMethods;
+		List< Method> methods = testMethods;
 		if ( methods.size() == 0 )
 			fErrors.add( new Exception( "No runnable methods" ) );
 	}
 
-	public List<Throwable> validateMethodsForDefaultRunner() {
+	public List< Throwable> validateMethodsForDefaultRunner() {
 		validateNoArgConstructor();
 		validateInstanceMethods();
 		validateDependencies();
@@ -53,7 +52,7 @@ public class MethodValidator {
 	}
 
 	private void validateTestMethods() {
-		List<Method> methods = testMethods;
+		List< Method> methods = testMethods;
 
 		for ( Method each : methods ) {
 			if ( !Modifier.isPublic( each.getDeclaringClass().getModifiers() ) )
@@ -65,18 +64,14 @@ public class MethodValidator {
 	}
 
 	private void validateDependencies() {
-		DependencyParser parser = new DependencyParser( this.testClass );
 		DependencyValidator depValidator = new DependencyValidator();
-		List<Class<? extends Annotation>> annotations = new ArrayList<Class<? extends Annotation>>();
-		annotations.add( Depends.class );
-		annotations.add( MyTest.class );
 
-		List<Method> methods = this.getAnnotatedMethods( annotations );
-		List<Method> dependencies = new ArrayList<Method>();
-		List<Throwable> errors = new ArrayList<Throwable>();
+		List< Method> methods = this.getAnnotatedMethodsWithDependencies();
+		List< Method> dependencies = new ArrayList< Method>();
+		List< Throwable> errors = new ArrayList< Throwable>();
 		for ( Method each : methods ) {
 			try {
-				dependencies = parser.getDependencies( each.getAnnotation( Depends.class ).value() );
+				dependencies = this.testClass.getDependenciesFor( each );
 			} catch ( Exception e ) {
 				fErrors.add( e );
 			}
@@ -85,27 +80,16 @@ public class MethodValidator {
 		}
 	}
 
-	private List<Method> getAnnotatedMethods( List<Class<? extends Annotation>> annotations ) {
-		List<Method> results = new ArrayList<Method>();
-		Annotation annotation;
+	private List< Method> getAnnotatedMethodsWithDependencies() {
+		List< Method> results = new ArrayList< Method>();
+		Annotation depAnnotation, testAnnotation;
 		for ( Method eachMethod : this.testMethods ) {
-			boolean nullAnnotation = false;
-			for ( Class<? extends Annotation> annotationClass : annotations ) {
-				annotation = eachMethod.getAnnotation( annotationClass );
-				if ( annotation == null ) {
-					nullAnnotation = true;
-					break;
-				}
-			}
-			// if there are superclasses, whose testmethods are overwritten, isShadowed()
-			// checks, if there
-			// are overwritten methods, those are not added to the results list, so only
-			// the "lowest" submethod is added
-			if ( !nullAnnotation )
+			depAnnotation = this.testClass.getDependencyAnnotationFor( eachMethod );
+			testAnnotation = eachMethod.getAnnotation( MyTest.class );
+			if ( depAnnotation != null && testAnnotation != null ) {
 				results.add( eachMethod );
+			}
 		}
-		// if ( runsTopToBottom( annotationClass ) )
-		// Collections.reverse( results );
 		return results;
 	}
 }

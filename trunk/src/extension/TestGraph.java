@@ -156,7 +156,7 @@ public class TestGraph {
 			try {
 				this.addTestMethods( testMethod.extractDependencies( testClass ), testClass );
 			} catch ( Exception e ) {
-				throw new InitializationError( e );
+				throw new InitializationError( e.getMessage() );
 			}
 		}
 	}
