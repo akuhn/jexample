@@ -42,17 +42,7 @@ public class TestMethod {
 	 */
 	public List< Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
-//		List< Method> deps = new ArrayList< Method>();
-//		DependencyParser parser = new DependencyParser( testClass );
-//		Annotation annotation = this.getDependencyAnnotation();
-//		// Depends annotation = this.javaMethod.getAnnotation( Depends.class );
-//		if ( annotation != null ) {
-//			if ( this.annotationHasValue( annotation ) ) {
-//				deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
-//			} else {
-//				deps = parser.getDependencies( this.javaMethod );
-//			}
-//		}
+
 		return testClass.getDependenciesFor( this.javaMethod );
 	}
 
@@ -158,7 +148,7 @@ public class TestMethod {
 				if ( this.typeIsCloneable( paramTypes[i] ) ) {
 					// TODO: Oct 17, 2007,5:09:57 PM: should somehow invoke
 					// clone() on the returnValue
-					arguments[i] = this.dependencies.get( i ).returnValue;
+					arguments[i] = this.cloneReturnValue(this.dependencies.get( i ).returnValue);
 				} else {
 					arguments[i] = this.dependencies.get( i ).returnValue;
 				}
@@ -168,9 +158,35 @@ public class TestMethod {
 		return arguments;
 	}
 
+	// really ugly method, but java leaves no alternative, i think
+	private Object cloneReturnValue( Object returnValue ) {
+		Object cloned = null;
+		try {
+			Method cloneMethod = returnValue.getClass().getMethod( "clone");
+			cloneMethod.setAccessible( true );
+			cloned = cloneMethod.invoke( returnValue.getClass().getConstructor().newInstance() );
+		} catch ( Exception e ) {
+			return null;
+		}
+		return cloned;
+	}
+
+	/**
+	 * Checks if <code>clazz</code> implements {@link Cloneable}, declares a {@link Method} 
+	 * <code>clone()</code> and has a default constructor, so you can instantiate the {@link Class}
+	 * to be able to invoke <code>clone()</code> with Reflection.
+	 * @param clazz the {@link Class} to check, if it is cloneable
+	 * @return true, if all this conditions are fulfilled, false otherwise
+	 */
 	private boolean typeIsCloneable( Class< ?> clazz ) {
 		for ( Class< ?> iface : clazz.getInterfaces() ) {
-			if ( iface.getClass().equals( Cloneable.class ) ) {
+			if ( iface.equals( Cloneable.class ) ) {
+				try {
+					clazz.getMethod( "clone" );
+					clazz.getConstructor();
+				} catch ( Exception e ) {
+					return false;
+				}
 				return true;
 			}
 		}

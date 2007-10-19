@@ -320,4 +320,50 @@ public class ComposedTestRunnerTest {
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
+	
+	@RunWith( ComposedTestRunner.class )
+	static public class CloneRetVal {
+
+		public CloneRetVal() {
+		}
+
+		@MyTest
+		public Clone root() {
+			return new Clone("original");
+		}
+
+		@MyTest
+		@DependsOnBefore
+		public void second( Clone aClone ) {
+			assertEquals( "clone", aClone.getName() );
+		}
+	}
+	
+	@Test
+	public void testCloneRetVal(){
+		Result result = JUnitCore.runClasses( CloneRetVal.class );
+		assertEquals( 0, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 2, result.getRunCount() );
+	}
+	
+	static public class Clone implements Cloneable {
+		private final String name;
+
+		public Clone(){
+			this.name = "";
+		}
+		
+		public Clone(String name){
+			this.name = name;
+		}
+		
+		public Object clone(){
+			return new Clone("clone");
+		}
+		
+		public String getName(){
+			return this.name;
+		}
+	}
 }
