@@ -91,7 +91,7 @@ public class ComposedTestRunner extends Runner {
 				
 		new MyClassRoadie( notifier, this.testClass, this.getDescription(), new Runnable() {
 
-			@Override
+//			@Override
 			public void run() {
 				runMethods( notifier );
 			}
