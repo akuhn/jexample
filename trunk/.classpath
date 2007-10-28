@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="hamcrest-core-1.1.jar"/>
 	<classpathentry kind="lib" path="jmock-2.2.0-RC1.jar"/>
 	<classpathentry kind="lib" path="objenesis-1.0.jar"/>
-	<classpathentry kind="lib" path="/home/lea/workspace/BachelorProject/UllmanOriginal/lib/jung-1.7.5.jar"/>
-	<classpathentry kind="lib" path="/home/lea/workspace/BachelorProject/UllmanOriginal/lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/jung-1.7.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
