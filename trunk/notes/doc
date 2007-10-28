@@ -57,10 +57,5 @@ TestMethod: when getting the return values from the dependencies, TestMethod che
 cloneable, which means, it has to implement the interface Cloneable, it has to declare the method clone() and it has to 
 have a default constructor that it is possible to invoke clone() with Reflection.
 
-TestGraph:
-the graph has a map with classes and instances of this classes. when adding the testmethods to the graph, the instance
-of the declaring class of the method is passed to the constructor of TestMethod, because otherwise, the state of an object
-in the class is always reset.
-
-TestMethod: has an instance of the declaring class as class variable, so every testmethod of the same class uses the same
-instance.
+DependencyValidator: it might make sense, that a testmethod returns something, but a testmethod that depends on this method 
+doesn't take an argument because it doesn't need it. => this is also a valid dependency
