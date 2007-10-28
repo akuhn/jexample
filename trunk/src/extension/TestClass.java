@@ -2,7 +2,6 @@ package extension;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +17,6 @@ import extension.annotations.MyTest;
 
 public class TestClass {
 	private final Class< ?> fClass;
-	private Object classInstance;
 
 	public TestClass( Class< ?> klass ) {
 		fClass = klass;
@@ -198,14 +196,6 @@ public class TestClass {
 
 	private boolean annotationHasValue( Annotation annotation ) {
 		return annotation.annotationType().equals( Depends.class );
-	}
-	
-	public Object getClassInstance() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException{
-		if(this.classInstance == null){
-			this.classInstance = this.fClass.getConstructor().newInstance(  );
-		}
-		
-		return this.classInstance;
 	}
 
 }

@@ -25,11 +25,8 @@ public class TestMethod {
 
 	private Object returnValue;
 
-	private final Object testInstance;
-
-	public TestMethod( Method method, Object testInstance ) {
+	public TestMethod( Method method ) {
 		this.javaMethod = method;
-		this.testInstance = testInstance;
 		this.dependencies = new ArrayList< TestMethod>();
 		this.state = TestResult.NOT_YET_RUN;
 	}
@@ -130,7 +127,17 @@ public class TestMethod {
 
 	private void runTestMethod( RunNotifier notifier ) {
 		Description description = this.createDescription();
-		this.invokeMethod( this.testInstance, description, notifier, this.getArguments() );
+		Object test;
+		try {
+			test = this.javaMethod.getDeclaringClass().getConstructor().newInstance();
+		} catch ( InvocationTargetException e ) {
+			notifier.testAborted( description, e.getCause() );
+			return;
+		} catch ( Exception e ) {
+			notifier.testAborted( description, e );
+			return;
+		}
+		this.invokeMethod( test, description, notifier, this.getArguments() );
 	}
 
 	private Object[] getArguments() {
