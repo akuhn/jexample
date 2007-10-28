@@ -46,9 +46,10 @@ public class DependencyValidator {
 			} else {
 				this.compareTypes( dependencies, params );
 			}
-		} else {
-			this.assertVoidReturnTypes( dependencies );
-		}
+		} 
+//		else {
+//			this.assertVoidReturnTypes( dependencies );
+//		}
 	}
 
 	private void assertHasNotItselfAsDependency( Method method, Method[] dependencies ) {
