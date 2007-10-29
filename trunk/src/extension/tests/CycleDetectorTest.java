@@ -39,6 +39,18 @@ public class CycleDetectorTest {
 		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycles.class ) );
 		assertEquals( 3, detector.checkCyclesAndGetMethods().size() );
 	}
+	
+	/**
+	 * @throws NoSuchMethodException 
+	 * @throws ClassNotFoundException 
+	 * @throws InitializationError 
+	 * @throws SecurityException 
+	 */
+	@Test
+	public void testHasNoCyclesComplex() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
+		CycleDetector detector = new CycleDetector( new TestClass( WithoutCyclesComplex.class ) );
+		assertEquals( 4, detector.checkCyclesAndGetMethods().size() );
+	}
 
 	/**
 	 * @throws NoSuchMethodException 
@@ -78,6 +90,32 @@ public class CycleDetectorTest {
 
 	private class WithoutCycles {
 		@MyTest
+		public void rootMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "rootMethod" )
+		public void middleMethod() {
+
+		}
+
+		@MyTest
+		@Depends( "middleMethod;rootMethod" )
+		public void bottomMethod() {
+
+		}
+	}
+	
+	private class WithoutCyclesComplex {
+		
+		@MyTest
+		public void realRootMethod(){
+			
+		}
+		
+		@MyTest
+		@Depends( "realRootMethod" )
 		public void rootMethod() {
 
 		}
@@ -134,7 +172,7 @@ public class CycleDetectorTest {
 		}
 
 		@MyTest
-		@Depends( "rootMethod;experimental.tests.B.cyclicMethod" )
+		@Depends( "rootMethod;extension.tests.B.cyclicMethod" )
 		public void middleCyclicMethod() {
 
 		}

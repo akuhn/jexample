@@ -28,6 +28,18 @@ public class ComposedTestUllman {
 	}
 
 	@MyTest
+	public DirectedSparseGraph testIsomorphWithItself() {
+		DirectedSparseGraph gj = new DirectedSparseGraph();
+		Vertex vX = gj.addVertex( new DirectedSparseVertex() );
+		Vertex vY = gj.addVertex( new DirectedSparseVertex() );
+		gj.addEdge( new DirectedSparseEdge( vX, vY ) );
+
+		assertTrue( Ullman.areIsomorph( gj, gj ) );
+
+		return gj;
+	}
+
+	@MyTest
 	public DirectedSparseGraph testEmptyGraphIsIsomorphToItself() {
 		DirectedSparseGraph g = new DirectedSparseGraph();
 
@@ -51,8 +63,7 @@ public class ComposedTestUllman {
 	public DirectedSparseGraph testAddVerticesNotIsomorph( DirectedSparseGraph g ) {
 		Vertex v1 = g.addVertex( new DirectedSparseVertex() );
 		Vertex v2 = g.addVertex( new DirectedSparseVertex() );
-		DirectedSparseEdge edge = new DirectedSparseEdge( v1, v2 );
-		g.addEdge( edge );
+		g.addEdge( new DirectedSparseEdge( v1, v2 ) );
 
 		assertFalse( Ullman.areIsomorph( g, new DirectedSparseGraph() ) );
 
@@ -81,13 +92,8 @@ public class ComposedTestUllman {
 	}
 
 	@MyTest
-	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
-	public DirectedSparseGraph testSubgraphIsomorphismIsFound( DirectedSparseGraph g ) {
-		DirectedSparseGraph gj = new DirectedSparseGraph();
-		Vertex vX = gj.addVertex( new DirectedSparseVertex() );
-		Vertex vY = gj.addVertex( new DirectedSparseVertex() );
-		gj.addEdge( new DirectedSparseEdge( vX, vY ) );
-
+	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);testIsomorphWithItself" )
+	public DirectedSparseGraph testSubgraphIsomorphismIsFound( DirectedSparseGraph g, DirectedSparseGraph gj ) {
 		List< Set< VertexPair>> subgraphs = Ullman.subgraphIsomorphism( g, gj );
 		assertEquals( 1, subgraphs.size() );
 
@@ -95,27 +101,18 @@ public class ComposedTestUllman {
 	}
 
 	@MyTest
-	@DependsOnBefore
-	public void testSameStructureIsIsomorph( DirectedSparseGraph g ) {
-		// TODO: Oct 28, 2007,1:37:49 PM: this is ugly :-(
-		DirectedSparseGraph gj = new DirectedSparseGraph();
-		Vertex vX = gj.addVertex( new DirectedSparseVertex() );
-		Vertex vY = gj.addVertex( new DirectedSparseVertex() );
-		gj.addEdge( new DirectedSparseEdge( vX, vY ) );
-
+	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);testIsomorphWithItself" )
+	public DirectedSparseGraph testSameStructureIsIsomorph( DirectedSparseGraph g, DirectedSparseGraph gj ) {
 		assertTrue( Ullman.areIsomorph( g, gj ) );
 		assertTrue( Ullman.areIsomorph( gj, g ) );
+		
+		return gj;
 	}
 
 	@MyTest
-	@Depends( "testSubgraphIsomorphismIsFound(edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
-	public void testNotIsomorphWithSelfLoop( DirectedSparseGraph g ) {
-		// TODO: Oct 28, 2007,1:37:49 PM: this is ugly :-(
-		DirectedSparseGraph gj = new DirectedSparseGraph();
-		Vertex vX = gj.addVertex( new DirectedSparseVertex() );
-		Vertex vY = gj.addVertex( new DirectedSparseVertex() );
-		gj.addEdge( new DirectedSparseEdge( vX, vY ) );
-
+	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);" +
+			  "testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
+	public void testNotIsomorphWithSelfLoop( DirectedSparseGraph g, DirectedSparseGraph gj ) {
 		Set< Vertex> vertices = gj.getVertices();
 		for ( Vertex vertex : vertices ) {
 			gj.addEdge( new DirectedSparseEdge( vertex, vertex ) );

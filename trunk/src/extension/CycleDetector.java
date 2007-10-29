@@ -34,14 +34,18 @@ public class CycleDetector {
 	private DependencyParser parser;
 
 	public CycleDetector( TestClass testClass ) {
+		this( testClass, null );
+	}
 
+	public CycleDetector( TestClass testClass, Method testMethod ) {
 		this.testClass = testClass;
-		this.links = new ArrayList< Link>();
 		this.bottomNodes = new HashSet< Method>();
+		if(testMethod != null)
+			this.bottomNodes.add( testMethod );
+		this.links = new ArrayList< Link>();
 		this.visited = new ArrayList< Method>();
 
 		this.parser = new DependencyParser( this.testClass );
-
 	}
 
 	/**
@@ -60,10 +64,13 @@ public class CycleDetector {
 	 */
 	public List< Method> checkCyclesAndGetMethods() throws InitializationError, SecurityException,
 			ClassNotFoundException, NoSuchMethodException {
-		try {
-			this.bottomNodes = this.getBottomNodes( testClass.getAnnotatedMethods( MyTest.class ) );
-		} catch ( Exception e ) {
-			throw new InitializationError( e );
+
+		if ( this.bottomNodes.isEmpty() ) {
+			try {
+				this.bottomNodes = this.getBottomNodes( testClass.getAnnotatedMethods( MyTest.class ) );
+			} catch ( Exception e ) {
+				throw new InitializationError( e );
+			}
 		}
 
 		if ( this.bottomNodes.isEmpty() ) {
@@ -101,7 +108,7 @@ public class CycleDetector {
 		if ( childMethod != null ) {
 			Link newLink = new Link( testMethod, childMethod );
 
-			if ( this.links.contains( newLink ) ) {
+			if ( this.links.contains( newLink ) && this.isRealCycle( childMethod ) ) {
 				return true;
 			} else {
 				this.links.add( newLink );
@@ -122,6 +129,16 @@ public class CycleDetector {
 			}
 		}
 
+		return false;
+	}
+
+	private boolean isRealCycle( Method testMethod ) {
+		CycleDetector detector = new CycleDetector( this.testClass, testMethod );
+		try {
+			detector.checkCyclesAndGetMethods();
+		} catch ( Throwable e ) {
+			return true;
+		}
 		return false;
 	}
 
