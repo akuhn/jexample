@@ -60,3 +60,10 @@ have a default constructor that it is possible to invoke clone() with Reflection
 
 DependencyValidator: it might make sense, that a testmethod returns something, but a testmethod that depends on this method 
 doesn't take an argument because it doesn't need it. => this is also a valid dependency
+
+CycleDetector: had to modifiy the cycle detection. if an already existing link is discovered a new cycle detection is made 
+from the child of that link.
+
+1.11.2007:
+MyTest: added value 'expected'
+TestMethod: changed the catch-statement in the invokeMethod()-Method. it checks, if the thrown exception was expected.
