@@ -74,7 +74,7 @@ public class TestGraph {
 
 	
 	/**
-	 * The {@link Description}'s for the {@link Method}'s of this class are added as childs to the class description.
+	 * The {@link Description}'s for the {@link Method}'s of this class are added as children to the class description.
 	 * If there are dependencies from {@link TestMethod}'s which are not declared in a {@link TestClass} that
 	 * is run in this turn, the {@link Description} of the declaring {@link Class} is also added as a child.
 	 * 
@@ -205,5 +205,55 @@ public class TestGraph {
 	public Set<TestClass> getClasses() {
 		return this.classesUnderTest;
 	}
+	
+//	/**
+//	 * The {@link Description}'s for the {@link Method}'s of this class are added as children to the class description.
+//	 * If there are dependencies from {@link TestMethod}'s which are not declared in a {@link TestClass} that
+//	 * is run in this turn, the {@link Description} of the declaring {@link Class} is also added as a child.
+//	 * 
+//	 * @param testClass the {@link TestClass} to get the {@link Description} from
+//	 * @return the <code>description</code> for <code>testClass</code>;
+//	 */
+//	public Description descriptionForClass( TestClass testClass ) {
+//		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
+//		Description methodDescription;
+//		Set< TestMethod> rootTests = this.getRootTests();
+//		for ( TestMethod testMethod : rootTests ) {
+//			methodDescription = testMethod.createDescription();
+//			description.addChild( methodDescription );
+//			this.addChildDescription( methodDescription, testMethod );
+//		}
+//		return description;
+//	}
+//	private void addChildDescription( Description description, TestMethod testMethod ) {
+//	Set<TestMethod> children = this.getChildTests(testMethod);
+//	Description methodDescription;
+//	
+//	for ( TestMethod childTest : children ) {
+//		methodDescription = childTest.createDescription();
+//		description.addChild( methodDescription );
+//		this.addChildDescription( methodDescription, childTest );
+//	}
+//}
+//
+//private Set< TestMethod> getChildTests( TestMethod testMethod ) {
+//	Set< TestMethod> children = new HashSet< TestMethod>();;
+//	for ( TestMethod test : this.testMethods.values() ) {
+//		if(test.isChildOf(testMethod)){
+//			children.add(test);
+//		}
+//	}
+//	return children;
+//}
+//
+//private Set< TestMethod> getRootTests() {
+//	Set< TestMethod> roots = new HashSet< TestMethod>();;
+//	for ( TestMethod test : this.testMethods.values() ) {
+//		if(test.isRoot()){
+//			roots.add(test);
+//		}
+//	}
+//	return roots;
+//}
 
 }

@@ -10,6 +10,8 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
+import extension.annotations.MyTest;
+
 enum TestResult {
 	NOT_YET_RUN, GREEN, RED, IGNORED
 }
@@ -143,12 +145,11 @@ public class TestMethod {
 	private Object[] getArguments() {
 		Class< ?>[] paramTypes = this.javaMethod.getParameterTypes();
 		Object[] arguments = new Object[paramTypes.length];
+		Class<?> implementsClone;
 		for ( int i = 0; i < paramTypes.length; i++ ) {
 			if ( this.dependencies.get( i ).returnValue != null ) {
 				if ( this.typeIsCloneable( paramTypes[i] ) ) {
-					// TODO: Oct 17, 2007,5:09:57 PM: should somehow invoke
-					// clone() on the returnValue
-					arguments[i] = this.cloneReturnValue(this.dependencies.get( i ).returnValue);
+					arguments[i] = this.cloneReturnValue( this.dependencies.get( i ).returnValue, paramTypes[i]);
 				} else {
 					arguments[i] = this.dependencies.get( i ).returnValue;
 				}
@@ -159,23 +160,26 @@ public class TestMethod {
 	}
 
 	// really ugly method, but java leaves no alternative, i think
-	private Object cloneReturnValue( Object returnValue ) {
+	private Object cloneReturnValue( Object returnValue, Class< ?> clazz ) {
 		Object cloned = null;
 		try {
-			Method cloneMethod = returnValue.getClass().getMethod( "clone");
+			Method cloneMethod = clazz.getMethod( "clone" );
 			cloneMethod.setAccessible( true );
-			cloned = cloneMethod.invoke( returnValue.getClass().getConstructor().newInstance() );
+			cloned = cloneMethod.invoke( clazz.getConstructor().newInstance() );
 		} catch ( Exception e ) {
-			return null;
+			return returnValue;
 		}
 		return cloned;
 	}
 
 	/**
-	 * Checks if <code>clazz</code> implements {@link Cloneable}, declares a {@link Method} 
-	 * <code>clone()</code> and has a default constructor, so you can instantiate the {@link Class}
-	 * to be able to invoke <code>clone()</code> with Reflection.
-	 * @param clazz the {@link Class} to check, if it is cloneable
+	 * Checks if <code>clazz</code> implements {@link Cloneable}, declares a
+	 * {@link Method} <code>clone()</code> and has a default constructor, so
+	 * you can instantiate the {@link Class} to be able to invoke
+	 * <code>clone()</code> with Reflection.
+	 * 
+	 * @param clazz
+	 *            the {@link Class} to check, if it is cloneable
 	 * @return true, if all this conditions are fulfilled, false otherwise
 	 */
 	private boolean typeIsCloneable( Class< ?> clazz ) {
@@ -190,6 +194,11 @@ public class TestMethod {
 				return true;
 			}
 		}
+//		if ( clazz.getSuperclass() != null ) {
+//			return this.typeIsCloneable( clazz.getSuperclass() );
+//		} else {
+//			return false;
+//		}
 		return false;
 	}
 
@@ -199,12 +208,35 @@ public class TestMethod {
 			this.returnValue = this.javaMethod.invoke( test, args );
 			this.setGreen();
 		} catch ( InvocationTargetException e ) {
-			this.addFailure( e.getTargetException(), notifier, description );
+			Throwable actual = e.getTargetException();
+			if ( !this.expectsException() ) {
+				this.addFailure( actual, notifier, description );
+			} else if ( this.isUnexpectedException( actual ) ) {
+				String message = "Unexpected exception, expected<" + this.getExpectedException().getName()
+						+ "> but was<" + actual.getClass().getName() + ">";
+				this.addFailure( new Exception( message, actual ), notifier, description );
+			}
 		} catch ( Throwable e ) {
 			this.addFailure( e, notifier, description );
 		} finally {
 			notifier.fireTestFinished( description );
 		}
+	}
+
+	private boolean isUnexpectedException( Throwable actual ) {
+		return this.getExpectedException() != actual.getClass();
+	}
+
+	private boolean expectsException() {
+		return this.getExpectedException() != null;
+	}
+
+	private Class< ? extends Throwable> getExpectedException() {
+		MyTest annotation = this.javaMethod.getAnnotation( MyTest.class );
+		if ( annotation != null && annotation.expected() != extension.annotations.MyTest.None.class ) {
+			return annotation.expected();
+		}
+		return null;
 	}
 
 	private void addFailure( Throwable e, RunNotifier notifier, Description description ) {
@@ -235,5 +267,13 @@ public class TestMethod {
 	private boolean hasBeenRun() {
 		return state != TestResult.NOT_YET_RUN;
 	}
+
+	// public boolean isRoot() {
+	// return this.dependencies.isEmpty();
+	// }
+	//
+	// public boolean isChildOf( TestMethod testMethod ) {
+	// return this.dependencies.contains( testMethod );
+	// }
 
 }

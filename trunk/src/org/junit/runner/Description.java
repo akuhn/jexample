@@ -76,7 +76,7 @@ public class Description {
 	
 	private final Annotation[] fAnnotations;
 	
-	private Description(final String displayName, Annotation... annotations) {
+	protected Description(final String displayName, Annotation... annotations) {
 		fDisplayName= displayName;
 		fAnnotations= annotations;
 	}

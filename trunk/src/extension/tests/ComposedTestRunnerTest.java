@@ -337,6 +337,26 @@ public class ComposedTestRunnerTest {
 		public void second( Clone aClone ) {
 			assertEquals( "clone", aClone.getName() );
 		}
+		
+		static public class Clone implements Cloneable {
+			private final String name;
+			
+			public Clone(){
+				this.name = "";
+			}
+			
+			public Clone(String name){
+				this.name = name;
+			}
+			
+			public Object clone(){
+				return new Clone("clone");
+			}
+			
+			public String getName(){
+				return this.name;
+			}
+		}
 	}
 	
 	@Test
@@ -347,23 +367,4 @@ public class ComposedTestRunnerTest {
 		assertEquals( 2, result.getRunCount() );
 	}
 	
-	static public class Clone implements Cloneable {
-		private final String name;
-
-		public Clone(){
-			this.name = "";
-		}
-		
-		public Clone(String name){
-			this.name = name;
-		}
-		
-		public Object clone(){
-			return new Clone("clone");
-		}
-		
-		public String getName(){
-			return this.name;
-		}
-	}
 }
