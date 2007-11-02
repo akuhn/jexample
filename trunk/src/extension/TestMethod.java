@@ -145,7 +145,6 @@ public class TestMethod {
 	private Object[] getArguments() {
 		Class< ?>[] paramTypes = this.javaMethod.getParameterTypes();
 		Object[] arguments = new Object[paramTypes.length];
-		Class<?> implementsClone;
 		for ( int i = 0; i < paramTypes.length; i++ ) {
 			if ( this.dependencies.get( i ).returnValue != null ) {
 				if ( this.typeIsCloneable( paramTypes[i] ) ) {
