@@ -63,6 +63,7 @@ public class ComposedTestUllman {
 	@DependsOnBefore
 	public DirectedSparseGraph testAddVerticesNotIsomorph( DirectedSparseGraph g ) {
 //		g = ( DirectedSparseGraph ) g.copy();
+		//fails, because cloning is not implemented correctly
 		Vertex v1 = g.addVertex( new DirectedSparseVertex() );
 		Vertex v2 = g.addVertex( new DirectedSparseVertex() );
 		g.addEdge( new DirectedSparseEdge( v1, v2 ) );
@@ -111,6 +112,7 @@ public class ComposedTestUllman {
 			+ "testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
 	public DirectedSparseGraph testNotIsomorphWithSelfLoop( DirectedSparseGraph g, DirectedSparseGraph gj ) {
 //		g = ( DirectedSparseGraph ) gj.copy();
+		//fails, because cloning is not implemented correctly
 		Set< Vertex> vertices = gj.getVertices();
 		for ( Vertex vertex : vertices ) {
 			gj.addEdge( new DirectedSparseEdge( vertex, vertex ) );
@@ -135,6 +137,7 @@ public class ComposedTestUllman {
 			"testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
 	public DirectedSparseGraph testSubgraphIsomorphismChainCircle( DirectedSparseGraph g, DirectedSparseGraph gj ) throws CloneNotSupportedException {
 //		g = ( DirectedSparseGraph ) g.copy();
+		//fails, because cloning is not implemented correctly
 		Vertex v3 = g.addVertex( new DirectedSparseVertex() );
 		Vertex v4 = g.addVertex( new DirectedSparseVertex() );
 		Vertex v1 = null, v2 = null;
