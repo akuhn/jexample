@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.junit.runner.RunWith;
 
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
@@ -50,7 +51,7 @@ public class ComposedTestUllman {
 	@MyTest
 	@DependsOnBefore
 	public DirectedSparseGraph testEmptyGraphsAreSymmetricallyIsomorph( DirectedSparseGraph g ) {
-//		g = ( DirectedSparseGraph ) g.copy();
+		g = ( DirectedSparseGraph ) g.copy();
 		DirectedSparseGraph gi = new DirectedSparseGraph();
 
 		assertTrue( Ullman.areIsomorph( g, gi ) );
@@ -62,7 +63,7 @@ public class ComposedTestUllman {
 	@MyTest
 	@DependsOnBefore
 	public DirectedSparseGraph testAddVerticesNotIsomorph( DirectedSparseGraph g ) {
-//		g = ( DirectedSparseGraph ) g.copy();
+		g = ( DirectedSparseGraph ) g.copy();
 		//fails, because cloning is not implemented correctly
 		Vertex v1 = g.addVertex( new DirectedSparseVertex() );
 		Vertex v2 = g.addVertex( new DirectedSparseVertex() );
@@ -76,7 +77,7 @@ public class ComposedTestUllman {
 	@MyTest
 	@DependsOnBefore
 	public void testRemoveVertexAreIsomorph( DirectedSparseGraph g ) {
-//		g = ( DirectedSparseGraph ) g.copy();
+		g = ( DirectedSparseGraph ) g.copy();
 		Set< DirectedSparseEdge> edges = g.getEdges();
 		for ( DirectedSparseEdge edge : edges ) {
 			g.removeEdge( edge );
@@ -111,7 +112,7 @@ public class ComposedTestUllman {
 	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);"
 			+ "testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
 	public DirectedSparseGraph testNotIsomorphWithSelfLoop( DirectedSparseGraph g, DirectedSparseGraph gj ) {
-//		g = ( DirectedSparseGraph ) gj.copy();
+		gj = ( DirectedSparseGraph ) gj.copy();
 		//fails, because cloning is not implemented correctly
 		Set< Vertex> vertices = gj.getVertices();
 		for ( Vertex vertex : vertices ) {
@@ -136,7 +137,8 @@ public class ComposedTestUllman {
 	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);" +
 			"testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
 	public DirectedSparseGraph testSubgraphIsomorphismChainCircle( DirectedSparseGraph g, DirectedSparseGraph gj ) throws CloneNotSupportedException {
-//		g = ( DirectedSparseGraph ) g.copy();
+		g = ( DirectedSparseGraph ) g.copy();
+		gj = ( DirectedSparseGraph ) gj.copy();
 		//fails, because cloning is not implemented correctly
 		Vertex v3 = g.addVertex( new DirectedSparseVertex() );
 		Vertex v4 = g.addVertex( new DirectedSparseVertex() );
@@ -150,8 +152,16 @@ public class ComposedTestUllman {
 		g.addEdge( new DirectedSparseEdge( v3, v4 ) );
 		g.addEdge( new DirectedSparseEdge( v4, v1 ) );
 		
+		Vertex vZ = gj.addVertex(new DirectedSparseVertex());
+		for ( Object edge : gj.getEdges() ) {
+			gj.addEdge(new DirectedSparseEdge(( ( DirectedSparseEdge ) edge ).getDest(), vZ));
+		}
+		
 		List< Set<VertexPair>> subgraphs = Ullman.subgraphIsomorphism(gj, g);
 	    assertEquals(4, subgraphs.size());
+	    
+	    subgraphs = Ullman.subgraphIsomorphism(g, gj);
+	    assertEquals(0, subgraphs.size());
 
 		return g;
 	}
@@ -160,6 +170,60 @@ public class ComposedTestUllman {
 	@Depends( "testAddVerticesNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);" +
 			"testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
 	public void testModelLessEqualVertices(DirectedSparseGraph g, DirectedSparseGraph gj){
-		List< Set<VertexPair>> subgraphs = Ullman.subgraphIsomorphism(g, gj);
+		Ullman.subgraphIsomorphism(g, gj);
+	}
+	
+	@MyTest
+	@Depends( "testSubgraphIsomorphismChainCircle(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph);" +
+			"testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
+	public DirectedSparseGraph testSubgraphIsomorphismChainSingleEdge( DirectedSparseGraph g, DirectedSparseGraph gj ) throws CloneNotSupportedException {
+
+		List< Set<VertexPair>> subgraphs = Ullman.subgraphIsomorphism(gj, g);
+	    assertEquals(4, subgraphs.size());
+	    
+	    subgraphs = Ullman.subgraphIsomorphism(g, gj);
+	    assertEquals(0, subgraphs.size());
+
+		return g;
+	}
+	
+	@MyTest
+	@Depends( "testSubgraphIsomorphismChainCircle(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph);" +
+			"testSameStructureIsIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
+	public DirectedSparseGraph testSubgraphIsomorphismChainSingleVertex( DirectedSparseGraph g, DirectedSparseGraph gj ) throws CloneNotSupportedException {
+		gj = (DirectedSparseGraph) gj.copy();
+		for (Object edge : gj.getEdges()) {
+			Vertex v = ((DirectedSparseEdge) edge).getDest();
+			gj.removeEdge((Edge) edge);
+			gj.removeVertex(v);
+		}
+		
+		assertEquals(1, gj.getVertices().size());
+		
+		List< Set<VertexPair>> subgraphs = Ullman.subgraphIsomorphism(gj, g);
+	    assertEquals(4, subgraphs.size());
+	    
+	    subgraphs = Ullman.subgraphIsomorphism(g, gj);
+	    assertEquals(0, subgraphs.size());
+
+		return gj;
+	}
+	
+	@MyTest
+	@Depends( "testSubgraphIsomorphismChainCircle(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph);" +
+			"testSubgraphIsomorphismChainSingleVertex(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph)" )
+	public DirectedSparseGraph testSubgraphIsomorphismChainSingleVertexSelfLoop( DirectedSparseGraph g, DirectedSparseGraph gj ) throws CloneNotSupportedException {
+		gj = (DirectedSparseGraph) gj.copy();
+		for (Object vertex : gj.getVertices()) {
+			gj.addEdge(new DirectedSparseEdge((Vertex)vertex,(Vertex)vertex));
+		}
+		
+		List< Set<VertexPair>> subgraphs = Ullman.subgraphIsomorphism(gj, g);
+	    assertEquals(0, subgraphs.size());
+	    
+	    subgraphs = Ullman.subgraphIsomorphism(g, gj);
+	    assertEquals(0, subgraphs.size());
+
+		return gj;
 	}
 }

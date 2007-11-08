@@ -193,11 +193,12 @@ public class TestMethod {
 				return true;
 			}
 		}
-		if ( clazz.getSuperclass() != null ) {
-			return this.typeIsCloneable( clazz.getSuperclass() );
-		} else {
-			return false;
-		}
+		return false;
+//		if ( clazz.getSuperclass() != null ) {
+//			return this.typeIsCloneable( clazz.getSuperclass() );
+//		} else {
+//			return false;
+//		}
 	}
 
 	private void invokeMethod( Object test, Description description, RunNotifier notifier, Object... args ) {
