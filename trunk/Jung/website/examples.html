@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>JUNG - Java Universal Network/Graph Framework</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta name="keywords" content="jung, graph, visualization" />
+    <meta name="description" content="General framework for the modeling, analysis, and visualization of graphs" />
+    <link rel="stylesheet" href="default.css" type="text/css" media="screen" />
+    
+    <script language="Javascript"> 
+      function NewWindow(mypage, myname, w, h, scroll) { 
+        var winl = (screen.width - w) / 2; 
+        var wint = (screen.height - h) / 2; 
+        winprops = 'height='+h+',width='+w+',top='+wint+',left='+winl+',scrollbars='+scroll+',resizable' 
+        win = window.open(mypage, myname, winprops) 
+        if (parseInt(navigator.appVersion) >= 4) { win.window.focus(); } 
+      } 
+    </script> 
+  </head>
+  <body>
+    <!--#include virtual="pagehead.html" -->
+    <!--#include virtual="pagebar.html" -->
+    <div id="pagebody">
+      <h1>Examples</h1>
+      <p>
+        <p>
+        All examples require JDK 1.4.x or better; ensure you have a recent <a href="http://java.sun.com/products/plugin">Java plugin</a> installed.<br/><br/>
+		Note: If you have installed a new JRE version over an old one, make sure you update your plug-in settings so that your browser uses the correct JRE. In Windows XP/NT/2k/9x, go to Start&rarr;Control Panel&rarr;Java Plug-in&rarr;Advanced and choose the latest version of the JRE from the drop-down list.
+        </p>
+        <a href="applet/pluggablerendererdemo.html" target="applet"><code>PluggableRenderer</code> Demo</a>
+        <br/>
+        This example shows off many of the capabilities of <code>PluggableRenderer</code>, a renderer implementation that is designed to
+allow the programmer to change a number of different properties of the rendering
+of vertices and edges.  The source code (in <code>samples.graph</code>) is also intended to serve as an example of different ways to program using 
+<code>PluggableRenderer</code>.
+        <br/>
+        <br/>
+        <a href="applet/clusteringdemo.html" target="applet">Clustering Demo Applet</a>
+        <br />
+        This example demonstrates the ability to perform clustering on graphs, interactively in JUNG. The data set being used here is the Zachary karate club data set, the clustering algorithm being used is Mark Newman's edge betweenness clustering algorithm, and the layout algorithm is Fruchterman-Reingold.
+        <br /><br />
+        <a href="applet/southern.html" target="applet">Bipartite Graph Applet</a>
+		This page demonstrates JUNG's ability to create bipartite graphs, 
+	    to fold them into single-mode graphs, and to interactively visualize
+	    user changes to the data. It uses Davis, Gardner, and Garder's
+	    dataset from their 1941 <i>Deep South</i> (as reprinted in Freeman's 
+	    <a href="http://moreno.ss.uci.edu/dgg3a.pdf">2002 paper</a>, figure 1).
+ 	    <br/><br/>
+        <a href="applet/shortestpath.html" target="applet">Shortest Path Applet</a>
+	This demonstrates the shortest path algorithms in JUNG. When a user
+	selects two vertices, the system chooses one shortest path between
+	those two vertices and colors it. The graph is randomly generated 
+	by the EppsteinPowerLawGenerator.
+ 	    <br/><br/>
+        <a href="applet/rankingdemo.html" target="applet">Ranking Demo Applet</a>
+	This demonstrates several ranking algorithms within JUNG. The vertices
+	are laid out with the Fruchterman-Reingold layout. It is possible
+	to <b>filter out vertices</b> with the lower slider (nodes with low 
+	betweeness are removed first), and to <b>scale</b> the vertices with
+	the upper slider. 
+ 	    <br/><br/>
+        <a href="applet/showlayouts.html" target="applet">Layout Demo Applet</a>
+This applet demonstrates a series of different layout algorithms with the same renderers:
+<ul>
+<li/><b>KKLayout</b> - The Kamada-Kawai algorithm for node layout
+<li/><b>FRLayout</b> - The Fruchterman-Reingold algorithm
+<li/><b>SpringLayout</b> - A simple force-directed spring-embedder 
+<li/><b>ISOMLayout</b> - Meyer's "Self-Organizing Map" layout.
+<li/><b>CircleLayout</b> - A simple layout places vertices randomly on a circle
+</ul>
+        <a href="applet/prefusedemo.html" target="applet">Prefuse Demo Applet</a>	
+        This applet tests out the interface to the <a href="prefuse.sourceforege.net">prefuse</a>
+        visualization libraries.
+ 	    <br/><br/>
+        <a href="applet/addnodedemo.html" target="applet">Add-a-Node Demo Applet</a>	
+        This applet shows an example in which nodes are gradually added one-at-a-time
+        to a display.
+ 	    <br/><br/>
+        <a href="applet/crooked.html" target="applet">Crooked Edge Demo Applet</a>	
+    This applet previews support for edges that are 
+    <b>not</b> straight lines. Note that the clickable region around the 
+    edges follows the shape of the crooked line. The data is randomly
+    generated; the layout is a spring embedder.
+
+
+
+
+        
+      </p>
+    </div>
+  </body>
+</html>

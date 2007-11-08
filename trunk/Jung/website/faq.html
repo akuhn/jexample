@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>JUNG - Java Universal Network/Graph Framework</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta name="keywords" content="jung, graph, visualization" />
+    <meta name="description" content="General framework for the modeling, analysis, and visualization of graphs" />
+    <link rel="stylesheet" href="default.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <!--#include virtual="pagehead.html" -->
+    <!--#include virtual="pagebar.html" -->
+    <div id="pagebody">
+
+    <h1>JUNG Frequently Asked Questions</h1>
+    <h2> General questions</h2>
+    <ol>
+      <li><a href="#what">What is JUNG?</a></li>
+      <li><a href="#who">Who created JUNG?</a></li>
+      <li><a href="#license">I heard JUNG is open-source. What license does it use?</a></li>
+      <li><a href="#acronym">What does JUNG stand for?</a></li>
+      <li><a href="#whyjava">Why was JUNG written in Java?</a></li>
+      <li><a href="#use">How do I use JUNG?</a></li>
+      <li><a href="#contribute">Can I contribute to the Jung Project?</a></li>
+    </ol>
+  	<h2> Technical questions</h2>
+    <ol start="8">
+      <li><a href="#algorithms">What specific algorithms does JUNG provide?</a></li>
+      <li><a href="#dynamic">Does JUNG support dynamic graphs?</a></li>
+      <li><a href="#graphsize">Is there a limit to the size of graphs JUNG can handle?</a></li>
+      <li><a href="#datatypes">What kind of data types does JUNG support (e.g. labels, weights,etc.)?</a></li>
+      <li><a href="#specific">Is JUNG specific to Swing? Can I use JUNG with SWT, or other windowing toolkits?</a></li>
+      <li><a href="#libraries">What version of Java does JUNG use?
+                               What third-party libraries does JUNG use?</a>
+      </li>
+       <li><a href="#whyjung">Why did you create JUNG?  How does it differ from existing tools?</a></li>
+      <li><a href="#different">How is JUNG different from...?</a></li>
+      <li><a href="#bipartite">Does JUNG support bipartite graphs? How can I use them?</a></li>
+    </ol>
+
+    <ol>
+      <li>
+        <h2 id="what">What is JUNG?</h2>
+        <p>
+        JUNG is a Java-based open-source software library designed to support the modeling, analysis, and visualization of data that can be represented as graphs. Its focus is on mathematical and algorithmic graph applications pertaining to the fields of social network analysis, information visualization, knowledge discovery and data mining. However, it is not specific to these fields and can be used for many other applications pertaining to graphs and networks.
+        </p>
+      </li>
+
+      <li>
+        <h2 id="who">Who created JUNG?</h2>
+        <p>
+        JUNG was created by three Information and Computer Science PhD students at the University of California, Irvine:
+        <a href="http://www.ics.uci.edu/~scott/">Scott White</a>,
+        <a href="http://www.isr.uci.edu/~danyelf/">Danyel Fisher</a>, and
+        <a href="http://www.ics.uci.edu/~jmadden/">Joshua O'Madadhain</a>.
+        </p>
+      </li>
+
+      <li>
+        <h2 id="license">I heard JUNG is open-source. What license does it use?</h2>
+        <p>
+        JUNG is licensed and made freely available under the Berkeley Software Distribution (BSD) license.
+        </p>
+      </li>
+
+      <li>
+        <h2 id="acronym">What does JUNG stand for?</h2>
+    	  <p>
+        JUNG stands for the Java Universal Network/Graph Framework. If you find various references in the code such as ArchetypeGraph you can be sure that we did not forget about our dear friend Carl. :) (JUNG is not, however, associated with any of the various graph theorists named Jung, such as Heinz Jung or Hwan-Ok Jung.)
+    	  </p>
+      </li>
+
+    <li>
+      <h2 id="whyjava">Why was JUNG written in Java?</h2>
+      <p>
+      Java is a language that arguably has the most to offer people who want to analyze and visualize complex networks. It provides strong support for object-oriented design, excellent developer tools for writing code, and an extensive API for such tasks as database connectivity, writing GUIs and layout algorithms, and web support.  In addition, it is a  widely adopted programming language, so there are many third-party packages that can be leveraged for statistical analysis, data structures, visualization, etc.
+      </p>
+    </li>
+
+    <li>
+      <h2 id="use">How do I use JUNG?</h2>
+	    <p>
+    JUNG is a software library, so you write Java programs that call our routines.  Programs that use JUNG can be simple (snippets of code to test out algorithms or ideas) or sophisticated (applications with GUIs).
+      </p>
+    </li>
+
+    <li>
+      <h2 id="contribute">Can I contribute to the Jung Project?</h2>
+	    <p>
+	    Absolutely; we welcome contributions!  If you have some specific code you'd like to contribute, please send a package
+containing your code, documentation, and unit tests, to the mailing list jung-support@lists.sourceforge.net. (You can find examples of unit tests in our distribution, in the directory jung.src.test.)  Once we feel comfortable that your contributions are consistently of good quality, we may invite you to become an official developer.  We also have specific capabilities that we'd like to add to JUNG, so if you'd like to help us create them, please submit a resume (or paragraph) describing your background and a proposal of what area of the code you'd like to work on to the mailing list. Current areas where we could use help are:
+social network algorithms, 2D graph drawing algorithms, general graph theory algorithms, and general statistical
+routines for network analysis.
+  	  </p>
+    </li>
+
+
+    <li>
+      <h2 id="algorithms">What specific algorithms does JUNG provide?</h2>
+      <p>
+      JUNG provides a number of algorithms. Since new algorithms are constantly being added it's best to look at the Javadoc documentation. General algorithms are listed under the jung.algorithms package.
+      </p>
+    </li>
+
+    <li>
+      <h2 id="dynamic">Does JUNG support dynamic graphs?</h2>
+      <p>
+      Yes, JUNG supports dynamic graphs that can be changed both through a system of filters or by explicitly adding and removing nodes. Either way, it's easy to visualize the results, to apply graph algorithms to the results, and to manipulate those results further.
+      </p>
+    </li>
+
+    <li>
+      <h2 id="graphsize">Is there a limit to the size of graphs JUNG can handle?</h2>
+      <p>
+      No. The only limit to the size graphs JUNG can support is the hardware you are using to run the Java Virtual Machine. We have on many occasions used JUNG to analyze sparse graphs with more than 10,000 nodes.
+      </p>
+    </li>
+
+    <li>
+      <h2 id="datatypes">What kind of data can JUNG attach to graph elements (e.g. labels, weights, ...)?</h2>
+      <p>
+    One of JUNG's key strengths is that it can annotate graphs, vertices (entities), or edges (relations) with any Java data type.
+      </p>
+    </li>
+
+    <li>
+      <h2 id="specific">Is JUNG specific to Swing? Can I use JUNG with SWT, or other windowing toolkits?</h2>
+      <p>
+      The renderers that are currently available in the JUNG distribution use the Java Swing tools.  However, the renderer (the piece of the library that draws things on the screen) is decoupled from the layout algorithm (the piece of the library that determines where things get drawn), so you can use other renderers if you like.
+      </p>
+    </li>
+
+     <li>
+	    <h2 id="libraries">What version of Java does JUNG use? What third-party libraries does JUNG use?</h2>
+	    <p>
+        JUNG depends on the advanced functionality of the JDK version <a href="http://java.sun.com/j2se/1.4">1.4</a>. As of release 1.0, uses the following libraries:
+      <ul>
+	      <li><a href="http://jakarta.apache.org/commons/collections.html">Apache Jakarta Commons Collections</a></li>
+  	    <li><a href="http://hoschek.home.cern.ch/hoschek/colt/">Cern Colt scientific library</a></li>
+	      <li><a href="http://xml.apache.org/xerces2-j/index.html">Xerces</a></li>
+	      <li><a href="http://www.junit.org/index.htm">JUnit</a> (optional, needed for automated testing)</li>
+      </ul>
+      </p>
+    </li>
+
+    <li>
+      <h2 id="whyjung">Why did you create JUNG?  How does it differ from existing tools?</h2>
+      <p>
+      We created JUNG because we perceived a need for a general, flexible, and powerful API for manipulating, analyzing, and visualizing graphs and networks in Java.  However, there are other tools available for manipulating networks, which may be more appropriate for you, depending on your specific needs and abilities.
+      </p>
+      <p>
+      The following is a very brief summary of our understanding of the major distinctions between JUNG and a few of the more popular tools for network analysis and visualization. It is not intended to be a complete characterization of any of these tools; see the resources provided by the tool's developers for details.  (If you believe that we have misrepresented the capabilities of one of these tools, please contact us and we will edit this text accordingly.)
+      </p>
+    </li>
+
+    <li>
+      <h2 id="different">How is JUNG different from...</h2>
+      <ol>
+        <li>
+          <h3>... UCINET?</h3>
+          <p>
+          UCINET is a widely-used application among social networks researchers for performing standard social network analysis techniques to graphs.
+          <br />
+          However, UCINET cannot be embedded into applications: you can't call UCINET in an end-user display.
+          <br />
+          JUNG provides facilities to dynamically change graphs, to programatically call code, and to output the results as the program continues.
+          </p>
+        </li>
+
+        <li>
+          <h3>... PAJEK?</h3>
+          <p>
+          PAJEK is a stand-alone tool for visualizing and analyzing networks. JUNG provides many algorithms that PAJEK does not (and, currently vice versa), and--as noted for UCINET--is easily incorporated into network applications.
+          <br />
+          JUNG is capable of both reading and writing simple PAJEK-format files.  (JUNG's PAJEK file reader does not currently support the entire PAJEK file format.)
+          </p>
+        </li>
+
+        <li>
+          <h3>... R?	<a href="http://www.r-project.org/">http://www.r-project.org</a></h3>
+          <p>
+          R is a programming language geared primarily towards the statistics community. As such, it provides many advanced statistical routines. However, its community base is small, and it doesn't have access to the type of extensive API that Java does (e.g. database connectivity, Web support), therefore it is difficult to build real-world applications on top of R.
+          <br />
+          Furthermore, R, unlike JUNG, does not provide native sparse graph data structures which are necessary to write efficient algorithms on real-world data sets.
+          </p>
+        </li>
+
+        <li>
+          <h3>... GFC?  <a href="http://www.alphaworks.ibm.com/tech/gfc">http://www.alphaworks.ibm.com/tech/gfc</a></h3>
+          <p>
+          GFC is a graph drawing-oriented package released by IBM. It is specific to using Java's AWT/Swing, and contains few graph manipulation algorithms.
+          </p>
+        </li>
+      </ol>
+      JUNG is open-source, free, and has a wide variety of algorithms available. Better, it's easily extensible through a widely-documented API: if it's not there yet, you can add it yourself.
+    </li>
+
+    <li>
+      <h2 id="#bipartite">Does JUNG support bipartite graphs? How can I use them?</h2></li>
+
+<p>Funny you should ask... <br>
+<h3> On Hypergraphs and Affiliation Networks</h3>
+<p>
+In this brief discussion, I will point out that hypergraphs
+and affiliation networks can be represented as bipartite graphs,
+and will discuss how these are all mutually implemented
+in JUNG.
+</p>
+<p>
+The JUNG bipartite graph divides the world into two classes
+of vertices: type "A" and type "B". All these vertices
+maintain the constraint that "A" vertices may only point
+to "B" type vertices, and so on.
+</p>
+<p>
+This structure, then, can easily represent an affiliation
+network: let the "A"s be the events, and the "B"s be
+the people. This is explained in Wasserman & Faust (8.3),
+but generally means that one can view the graph as a
+series of connections between the events and the
+people.
+</p>
+<p>
+JUNG is beginning to support an increasing number of
+bipartite operations; the simplest include "folding"
+the bipartite graph (referred to as generating the
+"co-membership" diagram in W&F, it is equivalent
+to the matrix product of the event-by-event matrix
+by its transpose). A graph "folded" on B has an edge
+for each pair of A's that co-participated in a B,
+and vice-versa. Each edge is annotated by every B
+that contributed to that connection.
+</p>
+<p>
+Thus, if A1 and A2 both attended BX and BY, the
+edge from A1 to A2 would be labelled with both BX and
+BY in its user data. (The UserData flag to check is
+stored in BipartiteGraph).
+</p>
+<p>
+Another use of BipartiteGraphs is to consider
+them as Hypergraphs. A Hyperedge joins zero
+or more vertices; the set of hyperedges and
+vertices forms the graph.
+</p>
+<p>
+Again, the BipartieGraph supports this. If
+category "A" is considered as "hyperedges",
+and category "B" is considered as "vertices",
+then a BipartiteEdge from a vertex VA in A to
+a vertex VB in B is equivalent to saying that
+VB is a member of the hyperedge VA.
+</p>
+<p>
+In this manner, JUNG supports (as of the
+Halloween release) hyperedges and hypergraphs.
+</p>
+    </li>
+
+
+  </ol>
+  <p></p>
+  <p></p>
+  </div>
+  </body>
+</html>
+

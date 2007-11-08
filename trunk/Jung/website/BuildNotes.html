@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>JUNG Build Process</title>
+</head>
+<body>
+
+<h2>JUNG Build Process</h2>
+
+This file clarifies the method for running a build & 
+releasing the current software version, using Eclipse.
+
+<ol>
+<li/>Select the 1.4.2 JRE, and make sure that this JRE is used for the build process;
+also make sure that the compiler compliance level is set to 1.4.
+<li/>Run all unit tests and confirm that they all pass.
+<li/>Delete, if they are present, the /doc, /build2, /release, and /coverage directories.
+<li/>Go to build.xml (in project directory).
+<li/>In build.xml: make sure that links to other packages' documentation are up to date.
+<li/>Edit build.xml, go to the definition of the "version" property (near the top),
+and modify the value to reflect the current version. 
+<li/>Check any changes into the CVS repository.
+<li/>Tag the release with the new version number: Team->Tag As Version.
+<li/>Make sure that there are no old JUNG-related jars in the "jardir" directory (see below).
+Otherwise Javadoc will (for some obscure reason) try to get the package information from
+them (rather than from the source files) and fail.
+<li/>Right-click on build.xml, select "Run->Ant Build..." .
+<li/>Make sure that the following configuration elements are set up
+(this should only need to be done once for a given installation of Eclipse):
+  <ul>
+  <li/>classpath: junit.jar must be included (not there by default)
+  <li/>properties: "distdir" must be set to the location of the eclipse jcoverage plugin,
+    "jardir" must be set to the location of the jars used to build JUNG 
+    (remove old versions of jars to eliminate possible conflicts)
+  <li/>note that current build process works with jcoverage 1.0.5, but not with the
+    latest version (1.9.280, as of this writing)
+  </ul>
+<li/>Select "main (default target)" task, run; this builds the docs and the jcoverage
+<li/>Do this again: this time, select "jar-src" and "release", then run.
+<li/>Go to the workspace/jung directory.
+<li/>Create an archive of the doc directory, and name it jung-X-doc.zip (where X is the 
+current version number, as above).  Copy this file to the release directory.
+The release directory should now contain the following files:
+	<ul>
+	<li/>jung-X-src.jar
+	<li/>jung-X-doc.zip
+	<li/>jung-X.jar
+	<li/>jung-X.zip
+	</ul>
+<li/>Go to <a href="http://sourceforge.net/projects/jung/">http://sourceforge.net/projects/jung/</a>
+<li/>Go to Admin
+<li/>File Releases->Add Release
+<li/>Release name: jung-X
+<li/>Paste in release notes (excerpt from ReleaseNotes.html)
+<li/>click "submit" for this section (step 1)
+<li/>Follow directions for adding files listed under step 2:
+	<ul>
+	<li/>jung-X-src.jar
+	<li/>jung-X-doc.zip
+	<li/>jung-X.jar
+	<li/>jung-X.zip
+	</ul>
+<li/>Click "add files and/or Refresh View"
+<li/>Step 3: fill out form appropriately (specify Platform-Independent, 
+etc.)
+<li/>Select "send notice" when complete.
+<li/>ssh to shell.sourceforge.net, go to jung's htdocs directory
+(/home/groups/j/ju/jung/htdocs)
+	<ul>
+   <li/>add announcement to main page
+   <li>update documentation (in /doc directory):
+      <ol>
+      <li/>delete old javadoc in /doc/api
+      <li/>copy new javadoc files into this directory
+      <li/>update /doc/index.html to indicate new version of javadoc
+      <li/>upload new version of ReleaseNotes.html to this directory (/doc),
+        overwriting old one
+      </ol>
+    </li>
+    <li/>update other pages as appropriate (downloads, etc.)
+    <li/>upload new version of acknowledgements if appropriate
+    </ul>
+<li/>Replace jars in applet directory as necessary
+<li/>Test links to make sure that everything on site works and links to correct version
+<li/>Copy edited website files into CVS repository, if necessary.
+</ol>
