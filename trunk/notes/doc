@@ -67,3 +67,7 @@ from the child of that link.
 1.11.2007:
 MyTest: added value 'expected'
 TestMethod: changed the catch-statement in the invokeMethod()-Method. it checks, if the thrown exception was expected.
+
+CASE STUDY:
+i'm trying to put every test into a single method and order them, so it makes some sense. i think it would be quite nice
+to have a graphical representation of the dependencies because otherwise it is quite difficult to have an overview.
