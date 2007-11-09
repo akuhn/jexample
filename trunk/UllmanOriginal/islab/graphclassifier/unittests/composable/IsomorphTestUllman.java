@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import islab.graphclassifier.graph.algorithms.Ullman;
 
+import java.util.Set;
+
 import org.junit.runner.RunWith;
 
 import edu.uci.ics.jung.graph.Vertex;
@@ -72,12 +74,23 @@ public class IsomorphTestUllman {
 
 	@MyTest
 	@Depends( "testEmptyGraphIsIsomorphToItself" )
-	public void testAddVerticesNotIsomorph( DirectedSparseGraph g ) {
+	public DirectedSparseGraph testAddVertexNotIsomorph( DirectedSparseGraph g ) {
 		DirectedSparseGraph gi = ( DirectedSparseGraph ) g.copy();
 		gi.addVertex( new DirectedSparseVertex() );
 
 		assertFalse( Ullman.areIsomorph( g, gi ) );
 		assertFalse( Ullman.areIsomorph( gi, g ) );
+		
+		return gi;
+	}
+	
+	@MyTest
+	@Depends("testEmptyGraphIsIsomorphToItself;testAddVertexNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph)")
+	public void testRemoveVertexIsomorphAgain(DirectedSparseGraph g, DirectedSparseGraph gi){
+		gi.removeAllVertices();
+
+		assertTrue( Ullman.areIsomorph( g, gi ) );
+		assertTrue( Ullman.areIsomorph( gi, g ) );
 	}
 
 	@MyTest
@@ -176,5 +189,64 @@ public class IsomorphTestUllman {
 		assertTrue( Ullman.areIsomorph( g, gj ) );
 		assertTrue( Ullman.areIsomorph( gj, g ) );
 	}
-
+	
+	@MyTest
+	@Depends( "testSymmetricallyIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph);"
+			+ "testIsomorphWithItself" )
+	public void testAddRemoveVertex( DirectedSparseGraph g, DirectedSparseGraph gj ) {
+		g = ( DirectedSparseGraph ) g.copy();
+		
+		Vertex added = g.addVertex( new DirectedSparseVertex() );
+		
+		assertFalse( Ullman.areIsomorph( g, gj ) );
+		assertFalse( Ullman.areIsomorph( gj, g ) );
+		
+		g.removeVertex( added );
+		
+		assertTrue( Ullman.areIsomorph( g, gj ) );
+		assertTrue( Ullman.areIsomorph( gj, g ) );
+	}
+	
+	@MyTest
+	@Depends( "testSymmetricallyIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph);"
+			+ "testIsomorphWithItself" )
+	public void testAddRemoveVertexAndEdge( DirectedSparseGraph g, DirectedSparseGraph gj ) {
+		g = ( DirectedSparseGraph ) g.copy();
+		
+		Vertex added = g.addVertex( new DirectedSparseVertex() );
+		Vertex existing = ( Vertex ) g.getVertices().iterator().next();
+		
+		g.addEdge( new DirectedSparseEdge(existing, added) );
+		
+		assertFalse( Ullman.areIsomorph( g, gj ) );
+		assertFalse( Ullman.areIsomorph( gj, g ) );
+		
+		g.removeVertex( added );
+		
+		assertTrue( Ullman.areIsomorph( g, gj ) );
+		assertTrue( Ullman.areIsomorph( gj, g ) );
+	}
+	
+	@MyTest
+	@Depends( "testSymmetricallyIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph,edu.uci.ics.jung.graph.impl.DirectedSparseGraph);"
+			+ "testIsomorphWithItself" )
+	public void testRemoveRestoreVertex( DirectedSparseGraph g, DirectedSparseGraph gj ) {
+		g = ( DirectedSparseGraph ) g.copy();
+		
+		Vertex toRemove = ( Vertex ) g.getVertices().iterator().next();
+		Set<DirectedSparseEdge> toRestore = toRemove.getIncidentEdges();
+		
+		g.removeVertex( toRemove );
+		
+		assertFalse( Ullman.areIsomorph( g, gj ) );
+		assertFalse( Ullman.areIsomorph( gj, g ) );
+		
+		g.addVertex( toRemove );
+		for ( DirectedSparseEdge directedSparseEdge : toRestore ) {
+			g.addEdge( directedSparseEdge );
+		}
+		
+		assertTrue( Ullman.areIsomorph( g, gj ) );
+		assertTrue( Ullman.areIsomorph( gj, g ) );
+	}
 }
