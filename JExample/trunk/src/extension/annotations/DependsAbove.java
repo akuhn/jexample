@@ -10,13 +10,13 @@ import java.lang.annotation.Target;
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  * 
  * 
- * <p>The {@link DependsOnBefore} Annotation is used to define a dependency to the
- * testmethod that is implemented in the java-File right before the method annotated with {@link DependsOnBefore}</p>
+ * <p>The {@link DependsAbove} Annotation is used to define a dependency to the
+ * testmethod that is implemented in the java-File right before the method annotated with {@link DependsAbove}</p>
  */
 
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.METHOD )
 @Documented
-public @interface DependsOnBefore {
+public @interface DependsAbove {
 
 }

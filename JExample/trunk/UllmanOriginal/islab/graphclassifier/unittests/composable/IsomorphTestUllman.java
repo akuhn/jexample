@@ -15,7 +15,7 @@ import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
-import extension.annotations.DependsOnBefore;
+import extension.annotations.DependsAbove;
 import extension.annotations.MyTest;
 
 @RunWith( ComposedTestRunner.class )
@@ -41,7 +41,7 @@ public class IsomorphTestUllman {
 	}
 
 	@MyTest
-	@DependsOnBefore
+	@DependsAbove
 	public DirectedSparseGraph testGraphWithSelfEdgeIsIsomorphToItself( DirectedSparseGraph gj ) {
 		DirectedSparseGraph gi = ( DirectedSparseGraph ) gj.copy();
 
@@ -64,7 +64,7 @@ public class IsomorphTestUllman {
 	}
 
 	@MyTest
-	@DependsOnBefore
+	@DependsAbove
 	public void testEmptyGraphsAreSymmetricallyIsomorph( DirectedSparseGraph g ) {
 		DirectedSparseGraph gi = new DirectedSparseGraph();
 

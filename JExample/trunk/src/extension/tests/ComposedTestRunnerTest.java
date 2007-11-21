@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
-import extension.annotations.DependsOnBefore;
+import extension.annotations.DependsAbove;
 import extension.annotations.MyTest;
 
 /**
@@ -300,14 +300,14 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@DependsOnBefore
+		@DependsAbove
 		public String second( int i ) {
 			assertEquals( 2, i );
 			return "bla";
 		}
 
 		@MyTest
-		@DependsOnBefore
+		@DependsAbove
 		public void third( String aString ) {
 			assertEquals( "bla", aString );
 		}
@@ -333,7 +333,7 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@DependsOnBefore
+		@DependsAbove
 		public void second( Clone aClone ) {
 			assertEquals( "clone", aClone.getName() );
 		}

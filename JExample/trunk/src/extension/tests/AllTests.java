@@ -16,7 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	CycleDetectorTest.class,
 	DependencyParserTest.class,
 	DependencyValidatorTest.class,
-	GraphTest.class,
+	GraphTest.class
 })
 public class AllTests {
 	public static Test suite() {

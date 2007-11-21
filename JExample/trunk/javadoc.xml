@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="javadoc">
     <target name="javadoc">
-        <javadoc access="public" author="true" classpath="hamcrest-core-1.1.jar:jmock-2.2.0-RC1.jar:cglib-nodep-2.2_beta1.jar:objenesis-1.0.jar" destdir="javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="extension.tests,extension.annotations,org.junit,org.junit.experimental.results,org.junit.matchers,extension,org.junit.samples,org.junit.runner,org.junit.runner.notification,org.junit.samples.money,org.junit.internal.requests,org.junit.internal,org.junit.runners,org.junit.internal.runners,org.junit.runner.manipulation" source="1.6" sourcepath="src:temp" splitindex="true" use="true" version="true"/>
+        <javadoc access="private" author="true" classpath="cglib-nodep-2.2_beta1.jar;jmock-2.2.0-RC1.jar;hamcrest-core-1.1.jar;objenesis-1.0.jar;C:\Program Files\Eclipse\eclipse-SDK-3.3.1-win32\eclipse\plugins\org.junit4_4.3.1\junit.jar;lib/commons-collections-3.2.jar;lib/jung-1.7.5.jar;lib/concurrent.jar" destdir="javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="extension.annotations,extension" source="1.6" sourcepath="src;UllmanOriginal" splitindex="true" use="true" version="true"/>
     </target>
 </project>

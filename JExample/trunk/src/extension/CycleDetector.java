@@ -96,7 +96,6 @@ public class CycleDetector {
 
 	/**
 	 * @param testMethod
-	 * @param level
 	 * @return true, if a cycle was detected, false otherwise
 	 * @throws NoSuchMethodException
 	 * @throws ClassNotFoundException
