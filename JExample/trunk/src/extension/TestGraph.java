@@ -26,7 +26,7 @@ public class TestGraph {
 
 	private Map<Method, TestMethod> testMethods;
 
-	private TestGraph() {
+	public TestGraph() {
 		this.classesUnderTest = new HashSet<TestClass>();
 		this.testMethods = new HashMap<Method, TestMethod>();
 	}
@@ -38,7 +38,7 @@ public class TestGraph {
 
 		return graph;
 	}
-
+	
 	/**
 	 * All the {@link Method}'s of the {@link TestClass} are checked for cycles in the dependencies
 	 * and are validated. If erverything is ok, the {@link Method}'s are wrapped and added to the graph.

@@ -17,11 +17,11 @@ import extension.annotations.MyTest;
 
 public class GraphTest {
 
-	private static TestGraph graph;
+	private TestGraph graph;
 
 	@Before
 	public void setUp() throws Exception {
-		graph = TestGraph.getInstance();
+		graph = new TestGraph();
 	}
 
 	@Test
