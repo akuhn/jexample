@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import extension.DependencyParser;
@@ -68,7 +67,6 @@ public class DependencyParserTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testGetDependenciesOnBefore() throws SecurityException, NoSuchMethodException {
 		List<Method> methods = this.parser.getDependencies( this.getClass().getMethod( "annotatedMethod", String.class ) );
 		assertEquals( 1, methods.size() );

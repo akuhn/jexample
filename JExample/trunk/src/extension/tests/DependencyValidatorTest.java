@@ -8,11 +8,10 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.Method;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import extension.annotations.MyTest;
 import extension.DependencyValidator;
+import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -71,9 +70,9 @@ public class DependencyValidatorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testReturnTypeNotVoid() throws SecurityException, NoSuchMethodException {
-		assertEquals( 1, this.validator.dependencyIsValid( this.voidReturnType, this.returnsString ).size() );
+		// it's ok, if a method returns something but the dependent method doesn't use this object
+		assertEquals( 0, this.validator.dependencyIsValid( this.voidReturnType, this.returnsString ).size() );
 	}
 
 	@Test
