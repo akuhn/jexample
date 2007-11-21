@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import islab.graphclassifier.graph.algorithms.Ullman;
 import islab.graphclassifier.graph.algorithms.Ullman.VertexPair;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
