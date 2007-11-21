@@ -116,8 +116,8 @@ public class TestMethod {
 	 * @return the testdescription of this {@link TestMethod}
 	 */
 	public Description createDescription() {
-		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName(),
-				this.javaMethod.getAnnotations() );
+		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName());
+				//this.javaMethod.getAnnotations() );
 	}
 
 	/**
