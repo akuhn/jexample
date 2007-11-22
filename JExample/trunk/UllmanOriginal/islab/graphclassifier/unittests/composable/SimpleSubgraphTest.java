@@ -55,10 +55,34 @@ public class SimpleSubgraphTest {
 
 		return g;
 	}
-	
-	@MyTest(expected=AssertionError.class)
-	@Depends("testInputMoreVertices(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);testSingleEdgeSubgraphIsomorphism")
-	public void testModelMoreVertices(DirectedSparseGraph g, DirectedSparseGraph gj){
+
+	@MyTest( expected = AssertionError.class )
+	@Depends( "testInputMoreVertices(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);testSingleEdgeSubgraphIsomorphism" )
+	public void testModelMoreVertices( DirectedSparseGraph g, DirectedSparseGraph gj ) {
 		Ullman.subgraphIsomorphism( g, gj );
+	}
+
+	@MyTest
+	@Depends( "testSingleEdgeSubgraphIsomorphism" )
+	public DirectedSparseGraph testInputSelfEdgeSubgraphIsomorphism( DirectedSparseGraph g ) {
+		DirectedSparseGraph gj = ( DirectedSparseGraph ) g.copy();
+		g = ( DirectedSparseGraph ) g.copy();
+
+		for ( Object vertex : g.getVertices() ) {
+			g.addEdge( new DirectedSparseEdge( ( Vertex ) vertex, ( Vertex ) vertex ) );
+			break;
+		}
+		
+		List< Set<VertexPair>> subgraph = Ullman.subgraphIsomorphism( gj, g );
+		assertEquals( 1, subgraph.size() );
+		
+		return g;
+	}
+	
+	@MyTest
+	@Depends("testInputSelfEdgeSubgraphIsomorphism(edu.uci.ics.jung.graph.impl.DirectedSparseGraph);testSingleEdgeSubgraphIsomorphism")
+	public void testModelSelfEdgeNoSubgraphIsomorphism(DirectedSparseGraph g, DirectedSparseGraph gj){
+		List< Set< VertexPair>> subgraphs = Ullman.subgraphIsomorphism( g, gj );
+		assertEquals( 0, subgraphs.size() );
 	}
 }
