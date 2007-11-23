@@ -87,6 +87,7 @@ public class IsomorphTestUllman {
 	@MyTest
 	@Depends("testEmptyGraphIsIsomorphToItself;testAddVertexNotIsomorph(edu.uci.ics.jung.graph.impl.DirectedSparseGraph)")
 	public void testRemoveVertexIsomorphAgain(DirectedSparseGraph g, DirectedSparseGraph gi){
+		gi = ( DirectedSparseGraph ) gi.copy();
 		gi.removeAllVertices();
 
 		assertTrue( Ullman.areIsomorph( g, gi ) );
