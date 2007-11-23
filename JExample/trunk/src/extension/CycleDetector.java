@@ -159,7 +159,7 @@ public class CycleDetector {
 		for ( Method methodToCheck : methods ) {
 			Depends annotation = methodToCheck.getAnnotation( Depends.class );
 			if ( annotation != null ) {
-				deps = this.parser.getDependencies( annotation.value() );
+				deps = this.parser.getDependencies( annotation.value(), method );
 				if ( deps.contains( method ) ) {
 					return true;
 				}

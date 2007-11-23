@@ -162,7 +162,7 @@ public class TestClass {
 		Annotation annotation = this.getDependencyAnnotationFor( testMethod );
 		if ( annotation != null ) {
 			if ( this.annotationHasValue( annotation ) ) {
-				deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+				deps = parser.getDependencies( ( ( Depends ) annotation ).value(), testMethod );
 			} else {
 				deps = parser.getDependencies( testMethod );
 			}

@@ -39,6 +39,8 @@ public class DependencyParser {
 
 	private List< Method> dependencies;
 
+	private Method method;
+
 	public DependencyParser( TestClass myTestClass ) {
 		this.annotationValue = "";
 		this.testClass = myTestClass;
@@ -49,6 +51,7 @@ public class DependencyParser {
 	 * extracts method names and the parameters of this method, if there are
 	 * overloaded methods. With the extracted information it creates
 	 * <code>Method</code> Objects.
+	 * @param method 
 	 * 
 	 * @return a <code>List</code> of <code>Method</code> Objects which are
 	 *         created from the <code>String value</code>.
@@ -57,8 +60,9 @@ public class DependencyParser {
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 */
-	public List< Method> getDependencies( String value ) throws ClassNotFoundException, SecurityException,
+	public List< Method> getDependencies( String value, Method method ) throws ClassNotFoundException, SecurityException,
 			NoSuchMethodException {
+		this.method = method;
 		this.annotationValue = value;
 		this.dependencies = new ArrayList< Method>();
 
@@ -101,7 +105,8 @@ public class DependencyParser {
 				throw new ClassNotFoundException( "The class " + className + " was not found." );
 			}
 		} else {
-			clazz = this.testClass.getJavaClass();
+//			clazz = this.testClass.getJavaClass();
+			clazz = this.method.getDeclaringClass();
 		}
 
 		return clazz;
