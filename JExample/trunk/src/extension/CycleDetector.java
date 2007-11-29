@@ -15,9 +15,8 @@ import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
 /**
- * This class checks the dependencies for cycles. If there are now cycles it
- * returns the {@link List} of all {@link Method}'s that will be run for
- * <code>testClass</code>.
+ * The <code>CycleDetector</code> class checks the test dependencies for cycles and collects the test methods 
+ * to be run.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
@@ -50,10 +49,11 @@ public class CycleDetector {
 
 	/**
 	 * The bottom nodes are searched. For all bottom nodes a depth-first search
-	 * is made and every passed {@link Method} is added to the {@link List} of
-	 * visited {@link Method}'s. Per traversation, the edges of the dependency
-	 * graph are saved and if you find an edge which you already passed, there
-	 * is a cycle and an {@link InitializationError} is thrown.
+	 * is made and every visited {@link Method} is added to the {@link List} of
+	 * visited {@link Method}'s. While traversing an arch, the edges of the dependency
+	 * graph are saved and if you find an edge which you already passed a cycle detection 
+	 * is made from that point on. If you find an already visited edge a {@link InitializationError} 
+	 * is thrown, else the List of Methods is returned.
 	 * 
 	 * @return the {@link List} of all {@link Method}'s to be run
 	 * @throws InitializationError
@@ -94,15 +94,17 @@ public class CycleDetector {
 		return false;
 	}
 
+	
 	/**
 	 * @param testMethod
-	 * @return true, if a cycle was detected, false otherwise
-	 * @throws NoSuchMethodException
-	 * @throws ClassNotFoundException
+	 * @param childMethod
+	 * @return
 	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
 	 */
 	private boolean checkNode( Method testMethod, Method childMethod ) throws SecurityException,
-			ClassNotFoundException, NoSuchMethodException {
+	ClassNotFoundException, NoSuchMethodException {
 
 		if ( childMethod != null ) {
 			Link newLink = new Link( testMethod, childMethod );
