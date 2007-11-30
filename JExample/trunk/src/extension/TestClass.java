@@ -15,27 +15,27 @@ import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
 public class TestClass {
-	private final Class< ?> fClass;
+	private final Class<?> fClass;
 
-	public TestClass( Class< ?> klass ) {
+	public TestClass( Class<?> klass ) {
 		fClass = klass;
 	}
 
-	public List< Method> getTestMethods() {
+	public List<Method> getTestMethods() {
 		return getAnnotatedMethods( MyTest.class );
 	}
 
-	List< Method> getBefores() {
+	List<Method> getBefores() {
 		return getAnnotatedMethods( BeforeClass.class );
 	}
 
-	List< Method> getAfters() {
+	List<Method> getAfters() {
 		return getAnnotatedMethods( AfterClass.class );
 	}
 
-	public List< Method> getAnnotatedMethods( Class< ? extends Annotation> annotationClass ) {
-		List< Method> results = new ArrayList< Method>();
-		for ( Class< ?> eachClass : getSuperClasses( fClass ) ) {
+	public List<Method> getAnnotatedMethods( Class<? extends Annotation> annotationClass ) {
+		List<Method> results = new ArrayList<Method>();
+		for ( Class<?> eachClass : getSuperClasses( fClass ) ) {
 			Method[] methods = eachClass.getDeclaredMethods();
 			for ( Method eachMethod : methods ) {
 				Annotation annotation = eachMethod.getAnnotation( annotationClass );
@@ -54,14 +54,14 @@ public class TestClass {
 		return results;
 	}
 
-	public List< Method> getAnnotatedMethods( List< Class< ? extends Annotation>> annotationClasses ) {
-		List< Method> results = new ArrayList< Method>();
+	public List<Method> getAnnotatedMethods( List<Class<? extends Annotation>> annotationClasses ) {
+		List<Method> results = new ArrayList<Method>();
 		Annotation annotation;
-		for ( Class< ?> eachClass : getSuperClasses( fClass ) ) {
+		for ( Class<?> eachClass : getSuperClasses( fClass ) ) {
 			Method[] methods = eachClass.getDeclaredMethods();
 			for ( Method eachMethod : methods ) {
 				boolean nullAnnotation = false;
-				for ( Class< ? extends Annotation> annotationClass : annotationClasses ) {
+				for ( Class<? extends Annotation> annotationClass : annotationClasses ) {
 					annotation = eachMethod.getAnnotation( annotationClass );
 					if ( annotation == null ) {
 						nullAnnotation = true;
@@ -83,11 +83,11 @@ public class TestClass {
 		return results;
 	}
 
-	private boolean runsTopToBottom( Class< ? extends Annotation> annotation ) {
+	private boolean runsTopToBottom( Class<? extends Annotation> annotation ) {
 		return annotation.equals( Before.class ) || annotation.equals( BeforeClass.class );
 	}
 
-	private boolean isShadowed( Method method, List< Method> results ) {
+	private boolean isShadowed( Method method, List<Method> results ) {
 		for ( Method each : results ) {
 			if ( isShadowed( method, each ) )
 				return true;
@@ -107,9 +107,9 @@ public class TestClass {
 		return true;
 	}
 
-	private List< Class< ?>> getSuperClasses( Class< ?> testClass ) {
-		ArrayList< Class< ?>> results = new ArrayList< Class< ?>>();
-		Class< ?> current = testClass;
+	private List<Class<?>> getSuperClasses( Class<?> testClass ) {
+		ArrayList<Class<?>> results = new ArrayList<Class<?>>();
+		Class<?> current = testClass;
 		while ( current != null ) {
 			results.add( current );
 			current = current.getSuperclass();
@@ -117,11 +117,11 @@ public class TestClass {
 		return results;
 	}
 
-	public Constructor< ?> getConstructor() throws SecurityException, NoSuchMethodException {
+	public Constructor<?> getConstructor() throws SecurityException, NoSuchMethodException {
 		return fClass.getConstructor();
 	}
 
-	public Class< ?> getJavaClass() {
+	public Class<?> getJavaClass() {
 		return fClass;
 	}
 
@@ -143,7 +143,7 @@ public class TestClass {
 	 * @return the {@link Method} declared before <code>javaMethod</code>
 	 */
 	public Method getMethodBefore( Method javaMethod ) {
-		List< Method> methods = this.getTestMethods();
+		List<Method> methods = this.getTestMethods();
 		Method before = null;
 		for ( Method method : methods ) {
 			if ( method.equals( javaMethod ) && before != null ) {
@@ -154,10 +154,10 @@ public class TestClass {
 		return null;
 	}
 
-	public List< Method> getDependenciesFor( Method testMethod ) throws NoSuchMethodException, SecurityException,
+	public List<Method> getDependenciesFor( Method testMethod ) throws NoSuchMethodException, SecurityException,
 			ClassNotFoundException {
 		DependencyParser parser = new DependencyParser( this );
-		List< Method> deps = new ArrayList< Method>();
+		List<Method> deps = new ArrayList<Method>();
 		Annotation annotation = this.getDependencyAnnotationFor( testMethod );
 		if ( annotation != null ) {
 			if ( this.annotationHasValue( annotation ) ) {

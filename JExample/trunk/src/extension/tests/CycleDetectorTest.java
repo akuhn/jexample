@@ -42,7 +42,8 @@ public class CycleDetectorTest {
 	@Test
 	public void testHasNoCycles() throws SecurityException, InitializationError, ClassNotFoundException,
 			NoSuchMethodException {
-		MethodCollector collector = new MethodCollector( new TestClass( WithoutCycles.class ), new HashMap<Method, TestMethod>()  );
+		MethodCollector collector = new MethodCollector( new TestClass( WithoutCycles.class ),
+				new HashMap<Method,TestMethod>() );
 		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
 		assertFalse( detector.hasCycle() );
 	}
@@ -56,7 +57,8 @@ public class CycleDetectorTest {
 	@Test
 	public void testHasNoCyclesComplex() throws SecurityException, InitializationError, ClassNotFoundException,
 			NoSuchMethodException {
-		MethodCollector collector = new MethodCollector( new TestClass( WithoutCyclesComplex.class ), new HashMap<Method, TestMethod>()  );
+		MethodCollector collector = new MethodCollector( new TestClass( WithoutCyclesComplex.class ),
+				new HashMap<Method,TestMethod>() );
 		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
 		assertFalse( detector.hasCycle() );
 	}
@@ -70,9 +72,10 @@ public class CycleDetectorTest {
 	@Test
 	public void testHasCycles() throws SecurityException, InitializationError, ClassNotFoundException,
 			NoSuchMethodException {
-		MethodCollector collector = new MethodCollector( new TestClass( WithCycles.class ), new HashMap<Method, TestMethod>()  );
+		MethodCollector collector = new MethodCollector( new TestClass( WithCycles.class ),
+				new HashMap<Method,TestMethod>() );
 		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
-		
+
 		assertTrue( detector.hasCycle() );
 	}
 
@@ -85,8 +88,9 @@ public class CycleDetectorTest {
 	@Test
 	public void testHasCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException,
 			NoSuchMethodException {
-		MethodCollector collector = new MethodCollector( new TestClass( WithCycleOverClasses.class ), new HashMap<Method, TestMethod>()  );
-		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );	
+		MethodCollector collector = new MethodCollector( new TestClass( WithCycleOverClasses.class ),
+				new HashMap<Method,TestMethod>() );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
 		assertTrue( detector.hasCycle() );
 	}
 
@@ -99,8 +103,9 @@ public class CycleDetectorTest {
 	@Test
 	public void testHasNoCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException,
 			NoSuchMethodException {
-		MethodCollector collector = new MethodCollector( new TestClass( WithoutCycleOverClasses.class ), new HashMap<Method, TestMethod>()  );
-		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );	
+		MethodCollector collector = new MethodCollector( new TestClass( WithoutCycleOverClasses.class ),
+				new HashMap<Method,TestMethod>() );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
 		assertFalse( detector.hasCycle() );
 	}
 

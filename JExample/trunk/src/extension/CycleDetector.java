@@ -8,26 +8,26 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * The <code>CycleDetector</code> class checks the test dependencies for cycles and collects the test methods 
- * to be run.
+ * The <code>CycleDetector</code> class checks the test dependencies for
+ * cycles and collects the test methods to be run.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class CycleDetector {
 
-	private List< TestMethod> notVisited, visited, done;
+	private List<TestMethod> notVisited, visited, done;
 
 	public CycleDetector( Collection<TestMethod> testMethods ) {
-		this.notVisited = new ArrayList<TestMethod>(testMethods);
+		this.notVisited = new ArrayList<TestMethod>( testMethods );
 		this.visited = new ArrayList<TestMethod>();
 		this.done = new ArrayList<TestMethod>();
 	}
-	
-	public boolean hasCycle(){
+
+	public boolean hasCycle() {
 		List<TestMethod> nodes = new ArrayList<TestMethod>();
 		nodes.addAll( this.notVisited );
-		for ( TestMethod method : nodes) {
-			if(this.isNotVisisted(method) && !this.processNode(method)){
+		for ( TestMethod method : nodes ) {
+			if ( this.isNotVisisted( method ) && !this.processNode( method ) ) {
 				return true;
 			}
 		}
@@ -35,19 +35,19 @@ public class CycleDetector {
 	}
 
 	private boolean processNode( TestMethod method ) {
-		if(this.isVisited( method )){
+		if ( this.isVisited( method ) ) {
 			return false;
 		}
-		if(this.isNotVisisted( method )){
-			this.addToVisited(method);
+		if ( this.isNotVisisted( method ) ) {
+			this.addToVisited( method );
 		}
-		
+
 		for ( TestMethod dep : method.getDependencies() ) {
-			if(!this.processNode( dep )){
+			if ( !this.processNode( dep ) ) {
 				return false;
 			}
 		}
-		this.addToDone(method);
+		this.addToDone( method );
 		return true;
 	}
 

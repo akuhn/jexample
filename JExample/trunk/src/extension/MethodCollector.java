@@ -78,5 +78,5 @@ public class MethodCollector {
 			this.methods.put( depMethod, this.alreadyCollectedMethods.get( depMethod ) );
 		}
 	}
-	
+
 }

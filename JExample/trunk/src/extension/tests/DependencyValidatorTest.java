@@ -71,22 +71,24 @@ public class DependencyValidatorTest {
 
 	@Test
 	public void testReturnTypeNotVoid() throws SecurityException, NoSuchMethodException {
-		// it's ok, if a method returns something but the dependent method doesn't use this object
+		// it's ok, if a method returns something but the dependent method
+		// doesn't use this object
 		assertEquals( 0, this.validator.dependencyIsValid( this.voidReturnType, this.returnsString ).size() );
 	}
 
 	@Test
 	public void testNumberOfTypes() throws SecurityException, NoSuchMethodException {
-		assertEquals( 1, this.validator.dependencyIsValid( this.stringAsParam, this.returnsString, this.voidReturnType ).size() );
+		assertEquals( 1, this.validator.dependencyIsValid( this.stringAsParam, this.returnsString, this.voidReturnType )
+				.size() );
 	}
-	
+
 	@Test
-	public void testDependencyHasToBeTestMethod(){
+	public void testDependencyHasToBeTestMethod() {
 		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.noTestMethod ).size() );
 	}
-	
+
 	@Test
-	public void testDependencyCannotBeItself(){
+	public void testDependencyCannotBeItself() {
 		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.returnsInt ).size() );
 	}
 
@@ -114,8 +116,8 @@ public class DependencyValidatorTest {
 	public void twoParams( String string, int integer ) {
 
 	}
-	
-	public void noTestMethod(){
-		
+
+	public void noTestMethod() {
+
 	}
 }

@@ -299,27 +299,27 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@Depends("root")
+		@Depends( "root" )
 		public String second( int i ) {
 			assertEquals( 2, i );
 			return "bla";
 		}
 
 		@MyTest
-		@Depends("second(int)")
+		@Depends( "second(int)" )
 		public void third( String aString ) {
 			assertEquals( "bla", aString );
 		}
 	}
-	
+
 	@Test
-	public void testDependsOnBefore(){
+	public void testDependsOnBefore() {
 		Result result = JUnitCore.runClasses( DependsOnBeforeTest.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
-	
+
 	@RunWith( ComposedTestRunner.class )
 	static public class CloneRetVal {
 
@@ -328,42 +328,42 @@ public class ComposedTestRunnerTest {
 
 		@MyTest
 		public Clone root() {
-			return new Clone("original");
+			return new Clone( "original" );
 		}
 
 		@MyTest
-		@Depends("root")
+		@Depends( "root" )
 		public void second( Clone aClone ) {
 			assertEquals( "clone", aClone.getName() );
 		}
-		
+
 		static public class Clone implements Cloneable {
 			private final String name;
-			
-			public Clone(){
+
+			public Clone() {
 				this.name = "";
 			}
-			
-			public Clone(String name){
+
+			public Clone( String name ) {
 				this.name = name;
 			}
-			
-			public Object clone(){
-				return new Clone("clone");
+
+			public Object clone() {
+				return new Clone( "clone" );
 			}
-			
-			public String getName(){
+
+			public String getName() {
 				return this.name;
 			}
 		}
 	}
-	
+
 	@Test
-	public void testCloneRetVal(){
+	public void testCloneRetVal() {
 		Result result = JUnitCore.runClasses( CloneRetVal.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
 	}
-	
+
 }

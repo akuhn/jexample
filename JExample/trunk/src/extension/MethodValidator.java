@@ -13,7 +13,7 @@ import extension.annotations.MyTest;
 
 public class MethodValidator {
 
-	private final List< Throwable> fErrors = new ArrayList< Throwable>();
+	private final List<Throwable> fErrors = new ArrayList<Throwable>();
 
 	private Set<Method> testMethods;
 
@@ -32,7 +32,7 @@ public class MethodValidator {
 			fErrors.add( new Exception( "No runnable methods" ) );
 	}
 
-	public List< Throwable> validateMethodsForDefaultRunner() {
+	public List<Throwable> validateMethodsForDefaultRunner() {
 		validateNoArgConstructor();
 		validateInstanceMethods();
 		validateDependencies();
@@ -67,9 +67,9 @@ public class MethodValidator {
 	private void validateDependencies() {
 		DependencyValidator depValidator = new DependencyValidator();
 
-		List< Method> methods = this.getAnnotatedMethodsWithDependencies();
-		List< Method> dependencies = new ArrayList< Method>();
-		List< Throwable> errors = new ArrayList< Throwable>();
+		List<Method> methods = this.getAnnotatedMethodsWithDependencies();
+		List<Method> dependencies = new ArrayList<Method>();
+		List<Throwable> errors = new ArrayList<Throwable>();
 		for ( Method each : methods ) {
 			try {
 				dependencies = this.testClass.getDependenciesFor( each );
@@ -81,8 +81,8 @@ public class MethodValidator {
 		}
 	}
 
-	private List< Method> getAnnotatedMethodsWithDependencies() {
-		List< Method> results = new ArrayList< Method>();
+	private List<Method> getAnnotatedMethodsWithDependencies() {
+		List<Method> results = new ArrayList<Method>();
 		Annotation depAnnotation, testAnnotation;
 		for ( Method eachMethod : this.testMethods ) {
 			depAnnotation = this.testClass.getDependencyAnnotationFor( eachMethod );

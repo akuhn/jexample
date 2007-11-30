@@ -6,21 +6,21 @@ import extension.ComposedTestRunner;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
-@RunWith(ComposedTestRunner.class)
+@RunWith( ComposedTestRunner.class )
 public class A {
 
-	public A(){
-		
+	public A() {
+
 	}
-	
+
 	@MyTest
-	public void test(){
-		
+	public void test() {
+
 	}
-	
+
 	@MyTest
-	@Depends("MethodCollectorTest$ExternalDepsWithCycle.test1")
-	public void test4(){
-		
+	@Depends( "MethodCollectorTest$ExternalDepsWithCycle.test1" )
+	public void test4() {
+
 	}
 }

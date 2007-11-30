@@ -21,7 +21,7 @@ public class TestMethod {
 	private Method javaMethod;
 
 	// has to be a list, because the order is important
-	private List< TestMethod> dependencies;
+	private List<TestMethod> dependencies;
 
 	private TestResult state;
 
@@ -29,7 +29,7 @@ public class TestMethod {
 
 	public TestMethod( Method method ) {
 		this.javaMethod = method;
-		this.dependencies = new ArrayList< TestMethod>();
+		this.dependencies = new ArrayList<TestMethod>();
 		this.state = TestResult.NOT_YET_RUN;
 	}
 
@@ -42,7 +42,7 @@ public class TestMethod {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchMethodException
 	 */
-	public List< Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
+	public List<Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
 
 		return testClass.getDependenciesFor( this.javaMethod );
@@ -90,8 +90,8 @@ public class TestMethod {
 	public boolean equals( Object obj ) {
 		return this.javaMethod.equals( ( ( TestMethod ) obj ).javaMethod );
 	}
-	
-	public int hashCode(){
+
+	public int hashCode() {
 		return this.javaMethod.getName().hashCode();
 	}
 
@@ -112,7 +112,7 @@ public class TestMethod {
 	/**
 	 * @return a {@link List} of {@link TestMethod}'s, being the dependencies
 	 */
-	public List< TestMethod> getDependencies() {
+	public List<TestMethod> getDependencies() {
 		return this.dependencies;
 	}
 
@@ -120,14 +120,14 @@ public class TestMethod {
 	 * @return the testdescription of this {@link TestMethod}
 	 */
 	public Description createDescription() {
-		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName());
-				//this.javaMethod.getAnnotations() );
+		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName() );
+		// this.javaMethod.getAnnotations() );
 	}
 
 	/**
 	 * @return the declaring {@link Class} of <code>javaMethod</code>
 	 */
-	public Class< ?> getDeclaringClass() {
+	public Class<?> getDeclaringClass() {
 		return this.javaMethod.getDeclaringClass();
 	}
 
@@ -147,12 +147,12 @@ public class TestMethod {
 	}
 
 	private Object[] getArguments() {
-		Class< ?>[] paramTypes = this.javaMethod.getParameterTypes();
+		Class<?>[] paramTypes = this.javaMethod.getParameterTypes();
 		Object[] arguments = new Object[paramTypes.length];
 		for ( int i = 0; i < paramTypes.length; i++ ) {
 			if ( this.dependencies.get( i ).returnValue != null ) {
 				if ( this.typeIsCloneable( paramTypes[i] ) ) {
-					arguments[i] = this.cloneReturnValue( this.dependencies.get( i ).returnValue, paramTypes[i]);
+					arguments[i] = this.cloneReturnValue( this.dependencies.get( i ).returnValue, paramTypes[i] );
 				} else {
 					arguments[i] = this.dependencies.get( i ).returnValue;
 				}
@@ -163,7 +163,7 @@ public class TestMethod {
 	}
 
 	// really ugly method, but java leaves no alternative, i think
-	private Object cloneReturnValue( Object returnValue, Class< ?> clazz ) {
+	private Object cloneReturnValue( Object returnValue, Class<?> clazz ) {
 		Object cloned = null;
 		try {
 			Method cloneMethod = clazz.getMethod( "clone" );
@@ -185,8 +185,8 @@ public class TestMethod {
 	 *            the {@link Class} to check, if it is cloneable
 	 * @return true, if all this conditions are fulfilled, false otherwise
 	 */
-	private boolean typeIsCloneable( Class< ?> clazz ) {
-		for ( Class< ?> iface : clazz.getInterfaces() ) {
+	private boolean typeIsCloneable( Class<?> clazz ) {
+		for ( Class<?> iface : clazz.getInterfaces() ) {
 			if ( iface.equals( Cloneable.class ) ) {
 				try {
 					clazz.getMethod( "clone" );
@@ -233,7 +233,7 @@ public class TestMethod {
 		return this.getExpectedException() != null;
 	}
 
-	private Class< ? extends Throwable> getExpectedException() {
+	private Class<? extends Throwable> getExpectedException() {
 		MyTest annotation = this.javaMethod.getAnnotation( MyTest.class );
 		if ( annotation != null && annotation.expected() != extension.annotations.MyTest.None.class ) {
 			return annotation.expected();

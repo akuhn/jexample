@@ -3,7 +3,6 @@
  */
 package experimental.demo;
 
-
 import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
@@ -16,7 +15,8 @@ import extension.annotations.MyTest;
 @RunWith( ComposedTestRunner.class )
 public class ClassToBeRun {
 
-	public ClassToBeRun() {}
+	public ClassToBeRun() {
+	}
 
 	@MyTest
 	public void rootMethod() {

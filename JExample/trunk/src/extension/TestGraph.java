@@ -52,26 +52,26 @@ public class TestGraph {
 	 */
 	public void addClass( TestClass testClass ) throws InitializationError {
 
-		Map<Method,TestMethod> methods = this.collectMethods( testClass ); 
-		
-		this.detectCycles(methods.values());
+		Map<Method,TestMethod> methods = this.collectMethods( testClass );
+
+		this.detectCycles( methods.values() );
 
 		this.validate( methods.keySet(), testClass ); // validate the methods
-														// of the testClass
+		// of the testClass
 		this.classesUnderTest.add( testClass );
-		
+
 		for ( Method method : methods.keySet() ) {
-			if(!this.testMethods.containsKey( method )){
+			if ( !this.testMethods.containsKey( method ) ) {
 				this.testMethods.put( method, methods.get( method ) );
 			}
 		}
 	}
 
-	private void detectCycles(Collection<TestMethod> methods) throws InitializationError {
+	private void detectCycles( Collection<TestMethod> methods ) throws InitializationError {
 		CycleDetector detector = new CycleDetector( methods );
-		
-		if(detector.hasCycle()){
-			throw new InitializationError("The dependencies are cyclic.");
+
+		if ( detector.hasCycle() ) {
+			throw new InitializationError( "The dependencies are cyclic." );
 		}
 	}
 

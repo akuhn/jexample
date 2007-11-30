@@ -6,8 +6,8 @@ import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
 /**
- * The <code>ComposedTestRunner</code> class is the Runner for composed JUnit Tests. It delegates
- * everything to the Singleton {@link TestGraph}. 
+ * The <code>ComposedTestRunner</code> class is the Runner for composed JUnit
+ * Tests. It delegates everything to the Singleton {@link TestGraph}.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
@@ -22,7 +22,9 @@ public class ComposedTestRunner extends Runner {
 		graph.addClass( this.underTest );
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.junit.runner.Runner#getDescription()
 	 */
 	@Override
@@ -30,7 +32,9 @@ public class ComposedTestRunner extends Runner {
 		return graph.descriptionForClass( this.underTest );
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.junit.runner.Runner#run(org.junit.runner.notification.RunNotifier)
 	 */
 	@Override
