@@ -2,6 +2,7 @@ package extension;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,27 +52,29 @@ public class TestGraph {
 	 */
 	public void addClass( TestClass testClass ) throws InitializationError {
 
-		this.collectMethods( testClass ); 
+		Map<Method,TestMethod> methods = this.collectMethods( testClass ); 
 		
-		this.detectCycles();
+		this.detectCycles(methods.values());
 
-		this.validate( this.testMethods.keySet(), testClass ); // validate the methods
+		this.validate( methods.keySet(), testClass ); // validate the methods
 														// of the testClass
 		this.classesUnderTest.add( testClass );
+		
+		this.testMethods.putAll( methods );
 	}
 
-	private void detectCycles() throws InitializationError {
-		CycleDetector detector = new CycleDetector( this.testMethods.values() );
+	private void detectCycles(Collection<TestMethod> methods) throws InitializationError {
+		CycleDetector detector = new CycleDetector( methods );
 		
 		if(detector.hasCycle()){
 			throw new InitializationError("The dependencies are cyclic.");
 		}
 	}
 
-	private void collectMethods( TestClass testClass ) throws InitializationError {
+	private Map<Method,TestMethod> collectMethods( TestClass testClass ) throws InitializationError {
 		MethodCollector collector = new MethodCollector( testClass );
 		try {
-			this.testMethods = collector.collectTestMethods();
+			return collector.collectTestMethods();
 		} catch ( Throwable e1 ) {
 			throw new InitializationError( e1 );
 		}

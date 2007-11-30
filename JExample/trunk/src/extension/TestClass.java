@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 import extension.annotations.Depends;
-import extension.annotations.DependsAbove;
 import extension.annotations.MyTest;
 
 public class TestClass {
@@ -190,8 +189,7 @@ public class TestClass {
 	}
 
 	private boolean isDependencyAnnotation( Annotation annotation ) {
-		return annotation.annotationType().equals( Depends.class )
-				|| annotation.annotationType().equals( DependsAbove.class );
+		return annotation.annotationType().equals( Depends.class );
 	}
 
 	private boolean annotationHasValue( Annotation annotation ) {
