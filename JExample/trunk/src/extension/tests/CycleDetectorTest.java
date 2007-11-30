@@ -3,13 +3,15 @@
  */
 package extension.tests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
 import extension.CycleDetector;
+import extension.MethodCollector;
 import extension.TestClass;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
@@ -27,66 +29,75 @@ public class CycleDetectorTest {
 
 	}
 
-
 	/**
-	 * @throws NoSuchMethodException 
-	 * @throws ClassNotFoundException 
-	 * @throws InitializationError 
-	 * @throws SecurityException 
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws InitializationError
+	 * @throws SecurityException
 	 */
 	@Test
-	public void testHasNoCycles() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
-		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycles.class ) );
-		assertEquals( 3, detector.checkCyclesAndGetMethods().size() );
-	}
-	
-	/**
-	 * @throws NoSuchMethodException 
-	 * @throws ClassNotFoundException 
-	 * @throws InitializationError 
-	 * @throws SecurityException 
-	 */
-	@Test
-	public void testHasNoCyclesComplex() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
-		CycleDetector detector = new CycleDetector( new TestClass( WithoutCyclesComplex.class ) );
-		assertEquals( 4, detector.checkCyclesAndGetMethods().size() );
+	public void testHasNoCycles() throws SecurityException, InitializationError, ClassNotFoundException,
+			NoSuchMethodException {
+		MethodCollector collector = new MethodCollector( new TestClass( WithoutCycles.class ) );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
+		assertFalse( detector.hasCycle() );
 	}
 
 	/**
-	 * @throws NoSuchMethodException 
-	 * @throws ClassNotFoundException 
-	 * @throws InitializationError 
-	 * @throws SecurityException 
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws InitializationError
+	 * @throws SecurityException
 	 */
-	@Test(expected = InitializationError.class)
-	public void testHasCycles() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
-		CycleDetector detector = new CycleDetector( new TestClass( WithCycles.class ) );
-		detector.checkCyclesAndGetMethods();
+	@Test
+	public void testHasNoCyclesComplex() throws SecurityException, InitializationError, ClassNotFoundException,
+			NoSuchMethodException {
+		MethodCollector collector = new MethodCollector( new TestClass( WithoutCyclesComplex.class ) );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
+		assertFalse( detector.hasCycle() );
 	}
 
 	/**
-	 * @throws NoSuchMethodException 
-	 * @throws ClassNotFoundException 
-	 * @throws InitializationError 
-	 * @throws SecurityException 
-	 */
-	@Test(expected = InitializationError.class)
-	public void testHasCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
-		CycleDetector detector = new CycleDetector( new TestClass( WithCycleOverClasses.class ) );
-		detector.checkCyclesAndGetMethods();
-	}
-	
-	/**
-	 * @throws NoSuchMethodException 
-	 * @throws ClassNotFoundException 
-	 * @throws InitializationError 
-	 * @throws SecurityException 
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws InitializationError
+	 * @throws SecurityException
 	 */
 	@Test
-	public void testHasNoCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException, NoSuchMethodException {
-		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycleOverClasses.class ) );
-		assertEquals( 4, detector.checkCyclesAndGetMethods().size() );
+	public void testHasCycles() throws SecurityException, InitializationError, ClassNotFoundException,
+			NoSuchMethodException {
+		MethodCollector collector = new MethodCollector( new TestClass( WithCycles.class ) );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );
+		
+		assertTrue( detector.hasCycle() );
 	}
+
+	/**
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws InitializationError
+	 * @throws SecurityException
+	 */
+	@Test
+	public void testHasCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException,
+			NoSuchMethodException {
+		MethodCollector collector = new MethodCollector( new TestClass( WithCycleOverClasses.class ) );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );	
+		assertTrue( detector.hasCycle() );
+	}
+
+//	/**
+//	 * @throws NoSuchMethodException
+//	 * @throws ClassNotFoundException
+//	 * @throws InitializationError
+//	 * @throws SecurityException
+//	 */
+//	@Test
+//	public void testHasNoCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException,
+//			NoSuchMethodException {
+//		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycleOverClasses.class ) );
+//		assertEquals( 4, detector.checkCyclesAndGetMethods().size() );
+//	}
 
 	private class WithoutCycles {
 		@MyTest
@@ -106,14 +117,14 @@ public class CycleDetectorTest {
 
 		}
 	}
-	
+
 	private class WithoutCyclesComplex {
-		
+
 		@MyTest
-		public void realRootMethod(){
-			
+		public void realRootMethod() {
+
 		}
-		
+
 		@MyTest
 		@Depends( "realRootMethod" )
 		public void rootMethod() {
@@ -189,7 +200,7 @@ public class CycleDetectorTest {
 
 		}
 	}
-	
+
 	private class WithoutCycleOverClasses {
 		// with cycle over classes
 		@MyTest

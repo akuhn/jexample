@@ -22,7 +22,7 @@ public class TestClass {
 		fClass = klass;
 	}
 
-	List< Method> getTestMethods() {
+	public List< Method> getTestMethods() {
 		return getAnnotatedMethods( MyTest.class );
 	}
 

@@ -90,6 +90,10 @@ public class TestMethod {
 	public boolean equals( Object obj ) {
 		return this.javaMethod.equals( ( ( TestMethod ) obj ).javaMethod );
 	}
+	
+	public int hashCode(){
+		return this.javaMethod.getName().hashCode();
+	}
 
 	/**
 	 * If the TestMethod doesn't already have the dependency

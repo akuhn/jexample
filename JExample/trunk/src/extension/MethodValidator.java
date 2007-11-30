@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.internal.runners.InitializationError;
 
@@ -14,19 +15,19 @@ public class MethodValidator {
 
 	private final List< Throwable> fErrors = new ArrayList< Throwable>();
 
-	private List< Method> testMethods;
+	private Set<Method> testMethods;
 
 	private final TestClass testClass;
 
-	public MethodValidator( List< Method> methodsUnderTest, TestClass testClass ) {
-		testMethods = methodsUnderTest;
+	public MethodValidator( Set<Method> methodUnderTest, TestClass testClass ) {
+		testMethods = methodUnderTest;
 		this.testClass = testClass;
 	}
 
 	public void validateInstanceMethods() {
 		validateTestMethods();
 
-		List< Method> methods = testMethods;
+		Set<Method> methods = testMethods;
 		if ( methods.size() == 0 )
 			fErrors.add( new Exception( "No runnable methods" ) );
 	}
@@ -52,7 +53,7 @@ public class MethodValidator {
 	}
 
 	private void validateTestMethods() {
-		List< Method> methods = testMethods;
+		Set<Method> methods = testMethods;
 
 		for ( Method each : methods ) {
 			if ( !Modifier.isPublic( each.getDeclaringClass().getModifiers() ) )

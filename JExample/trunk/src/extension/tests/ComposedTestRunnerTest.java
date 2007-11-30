@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
-import extension.annotations.DependsAbove;
 import extension.annotations.MyTest;
 
 /**
@@ -121,8 +120,8 @@ public class ComposedTestRunnerTest {
 	@Test
 	public void badDependencies() {
 		Result result = JUnitCore.runClasses( BadDependencies.class );
-		assertEquals( 1, result.getFailureCount() );
-		assertEquals( 1, result.getRunCount() );
+		assertEquals( 2, result.getFailureCount() );
+		assertEquals( 2, result.getRunCount() );
 		assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
 	}
 
@@ -300,14 +299,14 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@DependsAbove
+		@Depends("root")
 		public String second( int i ) {
 			assertEquals( 2, i );
 			return "bla";
 		}
 
 		@MyTest
-		@DependsAbove
+		@Depends("second(int)")
 		public void third( String aString ) {
 			assertEquals( "bla", aString );
 		}
@@ -333,7 +332,7 @@ public class ComposedTestRunnerTest {
 		}
 
 		@MyTest
-		@DependsAbove
+		@Depends("root")
 		public void second( Clone aClone ) {
 			assertEquals( "clone", aClone.getName() );
 		}
