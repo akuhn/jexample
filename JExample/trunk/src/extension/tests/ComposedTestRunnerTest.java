@@ -187,7 +187,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testGoodTests() {
-		Result result = JUnitCore.runClasses( FirstGoodTest.class );
+		Result result = JUnitCore.runClasses( FirstGoodTest.class, SecondGoodTest.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );

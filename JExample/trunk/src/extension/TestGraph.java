@@ -60,7 +60,11 @@ public class TestGraph {
 														// of the testClass
 		this.classesUnderTest.add( testClass );
 		
-		this.testMethods.putAll( methods );
+		for ( Method method : methods.keySet() ) {
+			if(!this.testMethods.containsKey( method )){
+				this.testMethods.put( method, methods.get( method ) );
+			}
+		}
 	}
 
 	private void detectCycles(Collection<TestMethod> methods) throws InitializationError {
@@ -72,7 +76,7 @@ public class TestGraph {
 	}
 
 	private Map<Method,TestMethod> collectMethods( TestClass testClass ) throws InitializationError {
-		MethodCollector collector = new MethodCollector( testClass );
+		MethodCollector collector = new MethodCollector( testClass, this.testMethods );
 		try {
 			return collector.collectTestMethods();
 		} catch ( Throwable e1 ) {

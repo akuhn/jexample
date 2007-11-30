@@ -6,11 +6,13 @@ package extension.tests;
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 import org.junit.Test;
 
 import extension.MethodCollector;
 import extension.TestClass;
+import extension.TestMethod;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
@@ -24,7 +26,7 @@ public class MethodCollectorTest {
 
 	@Test
 	public void testInternalDeps() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
-		MethodCollector coll = new MethodCollector( new TestClass( InternalDeps.class ) );
+		MethodCollector coll = new MethodCollector( new TestClass( InternalDeps.class ), new HashMap<Method, TestMethod>() );
 		assertEquals( 3, coll.collectTestMethods().size() );
 		
 		Method method1 = InternalDeps.class.getMethod( "test1");
@@ -61,7 +63,7 @@ public class MethodCollectorTest {
 
 	@Test
 	public void testInternalDepsWithCycle() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
-		MethodCollector coll = new MethodCollector( new TestClass( InternalDepsWithCycle.class ) );
+		MethodCollector coll = new MethodCollector( new TestClass( InternalDepsWithCycle.class ), new HashMap<Method, TestMethod>()  );
 		assertEquals( 4, coll.collectTestMethods().size() );
 
 		Method method0 = InternalDepsWithCycle.class.getMethod( "test0");
@@ -106,7 +108,7 @@ public class MethodCollectorTest {
 
 	@Test
 	public void testExternalDeps() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
-		MethodCollector coll = new MethodCollector( new TestClass( ExternalDeps.class ) );
+		MethodCollector coll = new MethodCollector( new TestClass( ExternalDeps.class ), new HashMap<Method, TestMethod>()  );
 		assertEquals( 5, coll.collectTestMethods().size() );
 
 		Method method1 = ExternalDeps.class.getMethod( "test1");
@@ -143,7 +145,7 @@ public class MethodCollectorTest {
 	
 	@Test
 	public void testExternalDepsWithCycle() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
-		MethodCollector coll = new MethodCollector( new TestClass( ExternalDepsWithCycle.class ) );
+		MethodCollector coll = new MethodCollector( new TestClass( ExternalDepsWithCycle.class ), new HashMap<Method, TestMethod>()  );
 		assertEquals( 4, coll.collectTestMethods().size() );
 
 		Method method1 = ExternalDepsWithCycle.class.getMethod( "test1");
