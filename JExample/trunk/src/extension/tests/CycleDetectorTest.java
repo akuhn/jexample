@@ -86,18 +86,19 @@ public class CycleDetectorTest {
 		assertTrue( detector.hasCycle() );
 	}
 
-//	/**
-//	 * @throws NoSuchMethodException
-//	 * @throws ClassNotFoundException
-//	 * @throws InitializationError
-//	 * @throws SecurityException
-//	 */
-//	@Test
-//	public void testHasNoCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException,
-//			NoSuchMethodException {
-//		CycleDetector detector = new CycleDetector( new TestClass( WithoutCycleOverClasses.class ) );
-//		assertEquals( 4, detector.checkCyclesAndGetMethods().size() );
-//	}
+	/**
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 * @throws InitializationError
+	 * @throws SecurityException
+	 */
+	@Test
+	public void testHasNoCyclesOverClasses() throws SecurityException, InitializationError, ClassNotFoundException,
+			NoSuchMethodException {
+		MethodCollector collector = new MethodCollector( new TestClass( WithoutCycleOverClasses.class ) );
+		CycleDetector detector = new CycleDetector( collector.collectTestMethods().values() );	
+		assertFalse( detector.hasCycle() );
+	}
 
 	private class WithoutCycles {
 		@MyTest
