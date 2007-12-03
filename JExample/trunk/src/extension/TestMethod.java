@@ -1,5 +1,6 @@
 package extension;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,10 +13,20 @@ import org.junit.runner.notification.RunNotifier;
 
 import extension.annotations.MyTest;
 
+/**
+ * The states, a {@link TestMethod} can have.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ */
 enum TestResult {
 	NOT_YET_RUN, GREEN, RED, IGNORED
 }
 
+/**
+ * The wrapper for the {@link Method}'s to be run.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ */
 public class TestMethod {
 
 	private Method javaMethod;
@@ -27,6 +38,10 @@ public class TestMethod {
 
 	private Object returnValue;
 
+	/**
+	 * @param method
+	 *            the {@link Method} to be run
+	 */
 	public TestMethod( Method method ) {
 		this.javaMethod = method;
 		this.dependencies = new ArrayList<TestMethod>();
@@ -91,10 +106,6 @@ public class TestMethod {
 		return this.javaMethod.equals( ( ( TestMethod ) obj ).javaMethod );
 	}
 
-	public int hashCode() {
-		return this.javaMethod.getName().hashCode();
-	}
-
 	/**
 	 * If the TestMethod doesn't already have the dependency
 	 * <code>testMethod</code>, <code>testMethod</code> is added as a
@@ -117,7 +128,7 @@ public class TestMethod {
 	}
 
 	/**
-	 * @return the testdescription of this {@link TestMethod}
+	 * @return the test {@link Description} of this {@link TestMethod}
 	 */
 	public Description createDescription() {
 		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName() );
@@ -146,6 +157,13 @@ public class TestMethod {
 		this.invokeMethod( test, description, notifier, this.getArguments() );
 	}
 
+	/**
+	 * Collects all the arguments taken by the test method. If
+	 * <code>clone</code> is implemented, the arguments are cloned.
+	 * 
+	 * @return an {@link Array} of arguments to be passed to the test method
+	 *         when invoking it.
+	 */
 	private Object[] getArguments() {
 		Class<?>[] paramTypes = this.javaMethod.getParameterTypes();
 		Object[] arguments = new Object[paramTypes.length];
@@ -176,10 +194,8 @@ public class TestMethod {
 	}
 
 	/**
-	 * Checks if <code>clazz</code> implements {@link Cloneable}, declares a
-	 * {@link Method} <code>clone()</code> and has a default constructor, so
-	 * you can instantiate the {@link Class} to be able to invoke
-	 * <code>clone()</code> with Reflection.
+	 * Checks if <code>clazz</code> or one of its superlcasses implements {@link Cloneable} and declares a
+	 * {@link Method} <code>clone()</code>.
 	 * 
 	 * @param clazz
 	 *            the {@link Class} to check, if it is cloneable
@@ -190,7 +206,6 @@ public class TestMethod {
 			if ( iface.equals( Cloneable.class ) ) {
 				try {
 					clazz.getMethod( "clone" );
-					clazz.getConstructor();
 				} catch ( Exception e ) {
 					return false;
 				}
@@ -269,13 +284,4 @@ public class TestMethod {
 	private boolean hasBeenRun() {
 		return state != TestResult.NOT_YET_RUN;
 	}
-
-	// public boolean isRoot() {
-	// return this.dependencies.isEmpty();
-	// }
-	//
-	// public boolean isChildOf( TestMethod testMethod ) {
-	// return this.dependencies.contains( testMethod );
-	// }
-
 }

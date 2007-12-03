@@ -14,13 +14,24 @@ import org.junit.BeforeClass;
 import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
+/**
+ * A wrapper for the {@link Class} under test.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ */
 public class TestClass {
 	private final Class<?> fClass;
 
+	/**
+	 * @param klass the {@link Class} under test
+	 */
 	public TestClass( Class<?> klass ) {
 		fClass = klass;
 	}
 
+	/**
+	 * @return a {@link List} of all {@link Method}'s annotated with {@link MyTest}
+	 */
 	public List<Method> getTestMethods() {
 		return getAnnotatedMethods( MyTest.class );
 	}
@@ -33,7 +44,55 @@ public class TestClass {
 		return getAnnotatedMethods( AfterClass.class );
 	}
 
-	public List<Method> getAnnotatedMethods( Class<? extends Annotation> annotationClass ) {
+	/**
+	 * @return the {@link Constructor} of <code>fClass</code>
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
+	public Constructor<?> getConstructor() throws SecurityException, NoSuchMethodException {
+		return fClass.getConstructor();
+	}
+
+	/**
+	 * @return the {@link Class} object of <code>fClass</code>
+	 */
+	public Class<?> getJavaClass() {
+		return fClass;
+	}
+
+	/**
+	 * @return the name of <code>fClass</code>
+	 */
+	public String getName() {
+		return fClass.getName();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals( Object obj ) {
+		return this.fClass.equals( ( ( TestClass ) obj ).fClass );
+	}
+
+	/**
+	 * @param testMethod the {@link Method} whos dependencies have to be returned
+	 * @return a {@link List} of {@link Method}'s <code>testMethod</code> depends on
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 */
+	public List<Method> getDependenciesFor( Method testMethod ) throws NoSuchMethodException, SecurityException,
+			ClassNotFoundException {
+		DependencyParser parser = new DependencyParser( this );
+		List<Method> deps = new ArrayList<Method>();
+		Depends annotation = testMethod.getAnnotation( Depends.class );
+		if ( annotation != null ) {
+			deps = parser.getDependencies( ( ( Depends ) annotation ).value(), testMethod );
+		}
+		return deps;
+	}
+
+	private List<Method> getAnnotatedMethods( Class<? extends Annotation> annotationClass ) {
 		List<Method> results = new ArrayList<Method>();
 		for ( Class<?> eachClass : getSuperClasses( fClass ) ) {
 			Method[] methods = eachClass.getDeclaredMethods();
@@ -51,35 +110,6 @@ public class TestClass {
 		}
 		if ( runsTopToBottom( annotationClass ) )
 			Collections.reverse( results );
-		return results;
-	}
-
-	public List<Method> getAnnotatedMethods( List<Class<? extends Annotation>> annotationClasses ) {
-		List<Method> results = new ArrayList<Method>();
-		Annotation annotation;
-		for ( Class<?> eachClass : getSuperClasses( fClass ) ) {
-			Method[] methods = eachClass.getDeclaredMethods();
-			for ( Method eachMethod : methods ) {
-				boolean nullAnnotation = false;
-				for ( Class<? extends Annotation> annotationClass : annotationClasses ) {
-					annotation = eachMethod.getAnnotation( annotationClass );
-					if ( annotation == null ) {
-						nullAnnotation = true;
-						break;
-					}
-				}
-				// if there are superclasses, whose testmethods are overwritten,
-				// isShadowed()
-				// checks, if there
-				// are overwritten methods, those are not added to the results
-				// list, so only
-				// the "lowest" submethod is added
-				if ( !nullAnnotation && !isShadowed( eachMethod, results ) )
-					results.add( eachMethod );
-			}
-		}
-		// if ( runsTopToBottom( annotationClass ) )
-		// Collections.reverse( results );
 		return results;
 	}
 
@@ -116,84 +146,4 @@ public class TestClass {
 		}
 		return results;
 	}
-
-	public Constructor<?> getConstructor() throws SecurityException, NoSuchMethodException {
-		return fClass.getConstructor();
-	}
-
-	public Class<?> getJavaClass() {
-		return fClass;
-	}
-
-	public String getName() {
-		return fClass.getName();
-	}
-
-	public boolean equals( Object obj ) {
-		return this.fClass.equals( ( ( TestClass ) obj ).fClass );
-	}
-
-	/**
-	 * Iterates over all <code>methods</code> annotated with {@link MyTest}
-	 * and gets the method declared before <code>javaMethod</code>.
-	 * 
-	 * @param javaMethod
-	 *            the {@link Method} which depends on the {@link Method}
-	 *            declared before it
-	 * @return the {@link Method} declared before <code>javaMethod</code>
-	 */
-	public Method getMethodBefore( Method javaMethod ) {
-		List<Method> methods = this.getTestMethods();
-		Method before = null;
-		for ( Method method : methods ) {
-			if ( method.equals( javaMethod ) && before != null ) {
-				return before;
-			}
-			before = method;
-		}
-		return null;
-	}
-
-	public List<Method> getDependenciesFor( Method testMethod ) throws NoSuchMethodException, SecurityException,
-			ClassNotFoundException {
-		DependencyParser parser = new DependencyParser( this );
-		List<Method> deps = new ArrayList<Method>();
-		Annotation annotation = this.getDependencyAnnotationFor( testMethod );
-		if ( annotation != null ) {
-			if ( this.annotationHasValue( annotation ) ) {
-				deps = parser.getDependencies( ( ( Depends ) annotation ).value(), testMethod );
-			} else {
-				deps = parser.getDependencies( testMethod );
-			}
-		}
-		return deps;
-	}
-
-	/**
-	 * Checks if there is an {@link Annotation} that defines a dependency. If
-	 * yes, this {@link Annotation} is returned.
-	 * 
-	 * @param testMethod
-	 * 
-	 * @return <code>annotation</code> if it defines a depency and
-	 *         <code>null</code> otherwise
-	 */
-	public Annotation getDependencyAnnotationFor( Method testMethod ) {
-		Annotation[] annotations = testMethod.getAnnotations();
-		for ( Annotation annotation : annotations ) {
-			if ( this.isDependencyAnnotation( annotation ) ) {
-				return annotation;
-			}
-		}
-		return null;
-	}
-
-	private boolean isDependencyAnnotation( Annotation annotation ) {
-		return annotation.annotationType().equals( Depends.class );
-	}
-
-	private boolean annotationHasValue( Annotation annotation ) {
-		return annotation.annotationType().equals( Depends.class );
-	}
-
 }

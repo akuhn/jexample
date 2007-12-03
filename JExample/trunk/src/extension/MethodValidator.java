@@ -9,8 +9,15 @@ import java.util.Set;
 
 import org.junit.internal.runners.InitializationError;
 
+import extension.annotations.Depends;
 import extension.annotations.MyTest;
 
+/**
+ * The <code>MethodValidator</code> class validates all test methods in
+ * <code>testClass</code>.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ */
 public class MethodValidator {
 
 	private final List<Throwable> fErrors = new ArrayList<Throwable>();
@@ -19,12 +26,18 @@ public class MethodValidator {
 
 	private final TestClass testClass;
 
+	/**
+	 * @param methodUnderTest
+	 *            a {@link Set} of {@link Method} under test
+	 * @param testClass
+	 *            the {@link TestClass} to be run
+	 */
 	public MethodValidator( Set<Method> methodUnderTest, TestClass testClass ) {
 		testMethods = methodUnderTest;
 		this.testClass = testClass;
 	}
 
-	public void validateInstanceMethods() {
+	private void validateInstanceMethods() {
 		validateTestMethods();
 
 		Set<Method> methods = testMethods;
@@ -32,6 +45,13 @@ public class MethodValidator {
 			fErrors.add( new Exception( "No runnable methods" ) );
 	}
 
+	/**
+	 * Checks, if there is a default constructor, if there are test methods and
+	 * if they are all public and if their delcaring classes are also public.
+	 * In the end the declared dependencies are validated. 
+	 * 
+	 * @return a {@link List} of all encountered errors
+	 */
 	public List<Throwable> validateMethodsForDefaultRunner() {
 		validateNoArgConstructor();
 		validateInstanceMethods();
@@ -39,12 +59,16 @@ public class MethodValidator {
 		return fErrors;
 	}
 
+	/**
+	 * Checks if the list of errors is empty, if not, an {@link InitializationError} is thrown
+	 * @throws InitializationError
+	 */
 	public void assertValid() throws InitializationError {
 		if ( !fErrors.isEmpty() )
 			throw new InitializationError( fErrors );
 	}
 
-	public void validateNoArgConstructor() {
+	private void validateNoArgConstructor() {
 		try {
 			this.testClass.getConstructor();
 		} catch ( Exception e ) {
@@ -85,7 +109,7 @@ public class MethodValidator {
 		List<Method> results = new ArrayList<Method>();
 		Annotation depAnnotation, testAnnotation;
 		for ( Method eachMethod : this.testMethods ) {
-			depAnnotation = this.testClass.getDependencyAnnotationFor( eachMethod );
+			depAnnotation = eachMethod.getAnnotation( Depends.class );
 			testAnnotation = eachMethod.getAnnotation( MyTest.class );
 			if ( depAnnotation != null && testAnnotation != null ) {
 				results.add( eachMethod );

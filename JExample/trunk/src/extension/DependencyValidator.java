@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.internal.runners.InitializationError;
-
 import extension.annotations.MyTest;
 
 /**
- * This class validates the specified dependencies between tests.
+ * The <code>DependencyValidator</code> class validates the specified dependencies between tests.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
@@ -19,10 +17,11 @@ public class DependencyValidator {
 	private final List<Throwable> fErrors = new ArrayList<Throwable>();
 
 	/**
-	 * If the number of parameters of <code>method</code> is greater than 0
-	 * the number of parameters and the number of <code>dependencies</code>
-	 * have to be the same. If <code>method</code> has no parameters all the
-	 * <code>dependencies</code> have to have return type void.
+	 * The following checks are made and have to be passed:
+	 * - all the dependencies have to be test methods
+	 * - a {@link Method} cannot have itself as a dependency
+	 * - if <code>method</code> takes arguments, the number of dependencies have to be
+	 *   the same and all the dependencies have to return the appropriate object
 	 * 
 	 * @param method
 	 *            the <code>Method</code> that has dependencies
@@ -30,7 +29,6 @@ public class DependencyValidator {
 	 *            the dependencies of <code>method</code>
 	 * @return <code>true</code>, if all the dependencies are valid,
 	 *         <code>false</code> otherwise
-	 * @throws InitializationError
 	 */
 	public List<Throwable> dependencyIsValid( Method method, Method... dependencies ) {
 		this.validateDependencies( method, dependencies );

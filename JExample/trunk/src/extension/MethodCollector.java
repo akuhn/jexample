@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * The <code>MethodCollector</code> class collects all {@link Method}'s
+ * involved in a test run.
+ * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class MethodCollector {
@@ -22,6 +25,14 @@ public class MethodCollector {
 	private Set<Method> newMethods;
 	private final Map<Method,TestMethod> alreadyCollectedMethods;
 
+	/**
+	 * @param testClass
+	 *            the {@link TestClass} the {@link Method}'s have to be
+	 *            collected from
+	 * @param alreadyCollectedMethods
+	 *            a {@link Map} of already collected {@link Method}'s, e.g.
+	 *            when a TestSuite is run
+	 */
 	public MethodCollector( TestClass testClass, Map<Method,TestMethod> alreadyCollectedMethods ) {
 		this.testClass = testClass;
 		this.alreadyCollectedMethods = alreadyCollectedMethods;
@@ -30,12 +41,19 @@ public class MethodCollector {
 		this.newMethods = new HashSet<Method>();
 	}
 
-	private void addMethodsToMap( Collection<Method> methodsToAdd ) {
-		for ( Method method : methodsToAdd ) {
-			this.addTestMethod( method );
-		}
-	}
-
+	/**
+	 * All {@link Method}'s are collected in a non-recursive way, so no
+	 * endless-loop is risked. For all {@link Method}'s of
+	 * <code>this.testClass</code> is checked, whether the dependencies are
+	 * already collected. If not, they are processed in a second loop and so on,
+	 * until there are no new {@link Method}'s to process anymore.
+	 * 
+	 * @return a {@link Map} with all the collected {@link Method}'s as keys
+	 *         and {@link TestMethod}'s as values in it
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws ClassNotFoundException
+	 */
 	public Map<Method,TestMethod> collectTestMethods() throws SecurityException, NoSuchMethodException,
 			ClassNotFoundException {
 		this.newMethods.addAll( this.methods.keySet() );
@@ -49,6 +67,12 @@ public class MethodCollector {
 		} while ( !this.newMethods.isEmpty() );
 
 		return this.methods;
+	}
+
+	private void addMethodsToMap( Collection<Method> methodsToAdd ) {
+		for ( Method method : methodsToAdd ) {
+			this.addTestMethod( method );
+		}
 	}
 
 	private void processMethods( Set<Method> set ) throws SecurityException, NoSuchMethodException,

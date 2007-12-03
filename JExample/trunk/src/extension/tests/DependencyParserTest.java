@@ -69,14 +69,6 @@ public class DependencyParserTest {
 		assertEquals( 1, methods.size() );
 	}
 
-	@Test
-	public void testGetDependenciesOnBefore() throws SecurityException, NoSuchMethodException {
-		List<Method> methods = this.parser
-				.getDependencies( this.getClass().getMethod( "annotatedMethod", String.class ) );
-		assertEquals( 1, methods.size() );
-		assertEquals( this.getClass().getMethod( "annotatedMethod" ), methods.get( 0 ) );
-	}
-
 	@MyTest
 	public void annotatedMethod() {
 

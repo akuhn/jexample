@@ -17,6 +17,10 @@ public class ComposedTestRunner extends Runner {
 
 	private final TestClass underTest;
 
+	/**
+	 * @param underTest the {@link Class} to be run as a test
+	 * @throws InitializationError
+	 */
 	public ComposedTestRunner( Class<?> underTest ) throws InitializationError {
 		this.underTest = new TestClass( underTest );
 		graph.addClass( this.underTest );

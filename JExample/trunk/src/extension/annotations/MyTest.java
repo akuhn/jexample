@@ -6,15 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import extension.ComposedTestRunner;
+
 /**
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
- * 
- * 
  * <p>
- * The <code>MyTest</code> Annotation is only for testing purposes and will
- * eventually become an Annotation that will allow a test to have dependencies
- * on other tests
+ * The <code>MyTest</code> Annotation marks tests to be run with the {@link ComposedTestRunner}.
  * </p>
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 
 @Retention( RetentionPolicy.RUNTIME )
@@ -34,7 +33,7 @@ public @interface MyTest {
 
 	/**
 	 * Optionally specify <code>expected</code>, a Throwable, to cause a test
-	 * method to succeed iff an exception of the specified class is thrown by
+	 * method to succeed if an exception of the specified class is thrown by
 	 * the method.
 	 */
 	Class<? extends Throwable> expected() default None.class;

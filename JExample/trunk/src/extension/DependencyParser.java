@@ -3,31 +3,16 @@
  */
 package extension;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-// enum PrimitiveDataTypes {
-// INT( int.class ), LONG( long.class ), DOUBLE( double.class ), FLOAT(
-// float.class ), CHAR( char.class ), BOOLEAN(
-// boolean.class );
-//
-// private final Class< ?> clazz;
-//
-// private PrimitiveDataTypes( Class< ?> clazz ) {
-// this.clazz = clazz;
-// }
-//
-// public Class< ?> getClazz() {
-// return this.clazz;
-// }
-// }
+import extension.annotations.Depends;
 
 /**
- * This class gets the value from the <code>Annotation Depends</code> and
- * extracts method names and parameters. with this information it creates a
- * <code>List</code> of <code>Method Objects</code> which represent the
- * dependencies of the current test method.
+ * The <code>DependencyParser</code> class parses a String for the {@link Method}'s it
+ * represents.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
@@ -41,22 +26,22 @@ public class DependencyParser {
 
 	private Method method;
 
+	/**
+	 * @param myTestClass the {@link TestClass} that is to be run
+	 */
 	public DependencyParser( TestClass myTestClass ) {
 		this.annotationValue = "";
 		this.testClass = myTestClass;
 	}
 
+
 	/**
-	 * This methods parses the <code>String annotationValue</code> and
-	 * extracts method names and the parameters of this method, if there are
-	 * overloaded methods. With the extracted information it creates
-	 * <code>Method</code> Objects.
+	 * Name and arguments of the {@link Method}'s defined in <code>value</code> are extracted and used
+	 * to get the {@link Method} object from it's declaring class.
 	 * 
-	 * @param method
-	 * 
-	 * @return a <code>List</code> of <code>Method</code> Objects which are
-	 *         created from the <code>String value</code>.
-	 * 
+	 * @param value the value from the {@link Annotation} {@link Depends}.
+	 * @param method the {@link Method} that depends on the {@link Method}'s to return.
+	 * @return a {@link List} of the {@link Method}'s <code>method</code> depends on.
 	 * @throws ClassNotFoundException
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
@@ -74,17 +59,6 @@ public class DependencyParser {
 		}
 
 		return dependencies;
-	}
-
-	public List<Method> getDependencies( Method javaMethod ) throws NoSuchMethodException {
-		this.dependencies = new ArrayList<Method>();
-		Method methodBefore = this.testClass.getMethodBefore( javaMethod );
-		if ( methodBefore != null ) {
-			this.dependencies.add( methodBefore );
-		} else {
-			throw new NoSuchMethodException( "There is no method declared before " + javaMethod.getName() );
-		}
-		return this.dependencies;
 	}
 
 	private Class<?> getDeclaringClass( String dependency ) throws ClassNotFoundException {
@@ -106,7 +80,6 @@ public class DependencyParser {
 				throw new ClassNotFoundException( "The class " + className + " was not found." );
 			}
 		} else {
-			// clazz = this.testClass.getJavaClass();
 			clazz = this.method.getDeclaringClass();
 		}
 

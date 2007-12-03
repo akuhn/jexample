@@ -1,11 +1,9 @@
 package extension;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,8 +12,9 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
 /**
- * This class knows all TestClasses that are run. It checks the dependencies for
- * cycles and runs all the TestMethods of a class.
+ * The <code>TestGraph</code> class takes the responsibility delegated from
+ * {@link ComposedTestRunner}: validating {@link Method}'s, running tests and
+ * returning {@link Description}'s.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
@@ -41,10 +40,8 @@ public class TestGraph {
 	}
 
 	/**
-	 * All the {@link Method}'s of the {@link TestClass} are checked for cycles
-	 * in the dependencies and are validated. If erverything is ok, the
-	 * {@link Method}'s are wrapped and added to the graph. After that, the
-	 * dependencies are added to the {@link TestMethod}'s.
+	 * All {@link Method}'s are collected, checked for cycles, validated and
+	 * then added to {@link Map} of all the {@link Method}'s to be run.
 	 * 
 	 * @param testClass
 	 *            the {@link TestClass} to be added
@@ -64,23 +61,6 @@ public class TestGraph {
 			if ( !this.testMethods.containsKey( method ) ) {
 				this.testMethods.put( method, methods.get( method ) );
 			}
-		}
-	}
-
-	private void detectCycles( Collection<TestMethod> methods ) throws InitializationError {
-		CycleDetector detector = new CycleDetector( methods );
-
-		if ( detector.hasCycle() ) {
-			throw new InitializationError( "The dependencies are cyclic." );
-		}
-	}
-
-	private Map<Method,TestMethod> collectMethods( TestClass testClass ) throws InitializationError {
-		MethodCollector collector = new MethodCollector( testClass, this.testMethods );
-		try {
-			return collector.collectTestMethods();
-		} catch ( Throwable e1 ) {
-			throw new InitializationError( e1 );
 		}
 	}
 
@@ -104,7 +84,7 @@ public class TestGraph {
 			} else if ( this.methodBelongsToNoClass( method ) ) {
 				subDescriptions = this.addChildDescription( subDescriptions, method );
 			}
-
+	
 		}
 		for ( Description subDescription : subDescriptions ) {
 			description.addChild( subDescription );
@@ -113,7 +93,7 @@ public class TestGraph {
 	}
 
 	/**
-	 * All {@link TestMethod}'s of <code>testClass</code> are run, incl.
+	 * All {@link TestMethod}'s of <code>testClass</code> are run, inclusive
 	 * their dependencies.
 	 * 
 	 * @param testClass
@@ -126,6 +106,23 @@ public class TestGraph {
 			if ( method.belongsToClass( testClass ) ) {
 				method.run( notifier );
 			}
+		}
+	}
+
+	private void detectCycles( Collection<TestMethod> methods ) throws InitializationError {
+		CycleDetector detector = new CycleDetector( methods );
+
+		if ( detector.hasCycle() ) {
+			throw new InitializationError( "The dependencies are cyclic." );
+		}
+	}
+
+	private Map<Method,TestMethod> collectMethods( TestClass testClass ) throws InitializationError {
+		MethodCollector collector = new MethodCollector( testClass, this.testMethods );
+		try {
+			return collector.collectTestMethods();
+		} catch ( Throwable e1 ) {
+			throw new InitializationError( e1 );
 		}
 	}
 
@@ -166,47 +163,6 @@ public class TestGraph {
 		validator.assertValid();
 	}
 
-	private void addTestMethods( List<Method> methodsUnderTest, TestClass testClass ) throws InitializationError {
-		TestMethod testMethod;
-		for ( Method method : methodsUnderTest ) {
-			testMethod = this.addTestMethod( method );
-			try {
-				this.addTestMethods( testMethod.extractDependencies( testClass ), testClass );
-			} catch ( Exception e ) {
-				throw new InitializationError( e.getMessage() );
-			}
-		}
-	}
-
-	private TestMethod addTestMethod( Method method ) {
-		TestMethod testMethod;
-		if ( !this.testMethods.containsKey( method ) ) {
-			testMethod = new TestMethod( method );
-			this.testMethods.put( method, testMethod );
-		} else {
-			testMethod = this.testMethods.get( method );
-		}
-
-		return testMethod;
-	}
-
-	private void addDependencies( Set<Method> methods, TestClass testClass ) throws InitializationError {
-		List<Method> deps = new ArrayList<Method>();
-		TestMethod testMethod;
-		for ( Method method : methods ) {
-			testMethod = this.testMethods.get( method );
-			try {
-				deps = testMethod.extractDependencies( testClass );
-			} catch ( Exception e ) {
-				throw new InitializationError( e );
-			}
-
-			for ( Method dep : deps ) {
-				testMethod.addDependency( this.testMethods.get( dep ) );
-			}
-		}
-	}
-
 	/**
 	 * Only for testing purposes
 	 * 
@@ -225,61 +181,4 @@ public class TestGraph {
 	public Set<TestClass> getClasses() {
 		return this.classesUnderTest;
 	}
-
-	// /**
-	// * The {@link Description}'s for the {@link Method}'s of this class are
-	// added as children to the class description.
-	// * If there are dependencies from {@link TestMethod}'s which are not
-	// declared in a {@link TestClass} that
-	// * is run in this turn, the {@link Description} of the declaring {@link
-	// Class} is also added as a child.
-	// *
-	// * @param testClass the {@link TestClass} to get the {@link Description}
-	// from
-	// * @return the <code>description</code> for <code>testClass</code>;
-	// */
-	// public Description descriptionForClass( TestClass testClass ) {
-	// Description description = Description.createSuiteDescription(
-	// testClass.getJavaClass() );
-	// Description methodDescription;
-	// Set< TestMethod> rootTests = this.getRootTests();
-	// for ( TestMethod testMethod : rootTests ) {
-	// methodDescription = testMethod.createDescription();
-	// description.addChild( methodDescription );
-	// this.addChildDescription( methodDescription, testMethod );
-	// }
-	// return description;
-	// }
-	// private void addChildDescription( Description description, TestMethod
-	// testMethod ) {
-	// Set<TestMethod> children = this.getChildTests(testMethod);
-	// Description methodDescription;
-	//	
-	// for ( TestMethod childTest : children ) {
-	// methodDescription = childTest.createDescription();
-	// description.addChild( methodDescription );
-	// this.addChildDescription( methodDescription, childTest );
-	// }
-	// }
-	//
-	// private Set< TestMethod> getChildTests( TestMethod testMethod ) {
-	// Set< TestMethod> children = new HashSet< TestMethod>();;
-	// for ( TestMethod test : this.testMethods.values() ) {
-	// if(test.isChildOf(testMethod)){
-	// children.add(test);
-	// }
-	// }
-	// return children;
-	// }
-	//
-	// private Set< TestMethod> getRootTests() {
-	// Set< TestMethod> roots = new HashSet< TestMethod>();;
-	// for ( TestMethod test : this.testMethods.values() ) {
-	// if(test.isRoot()){
-	// roots.add(test);
-	// }
-	// }
-	// return roots;
-	// }
-
 }
