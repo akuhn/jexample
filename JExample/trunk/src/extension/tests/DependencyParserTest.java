@@ -23,7 +23,6 @@ public class DependencyParserTest {
 	private DependencyParser parser;
 	private TestClass myClass;
 	private Method annotatedMethod;
-	private Method annotatedMethodString;
 
 	/**
 	 * @throws java.lang.Exception

@@ -48,9 +48,6 @@ public class DependencyValidator {
 				this.compareTypes( dependencies, params );
 			}
 		}
-		// else {
-		// this.assertVoidReturnTypes( dependencies );
-		// }
 	}
 
 	private void assertHasNotItselfAsDependency( Method method, Method[] dependencies ) {
@@ -65,15 +62,6 @@ public class DependencyValidator {
 			annotation = method.getAnnotation( MyTest.class );
 			if ( annotation == null ) {
 				this.fErrors.add( new Exception( "Dependency " + method.getName() + " is not a test method." ) );
-			}
-		}
-	}
-
-	private void assertVoidReturnTypes( Method[] dependencies ) {
-		for ( Method method : dependencies ) {
-			if ( method.getReturnType() != Void.TYPE ) {
-				this.fErrors
-						.add( new Exception( "Method " + method.getName() + " has a return type other than void." ) );
 			}
 		}
 	}
