@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -27,19 +26,19 @@ public class ComposedTestRunnerTest {
 		public CycleMethods() {
 		}
 
-		@MyTest
+		@Test
 		@Depends( "thirdMethod" )
 		public void firstMethod() {
 			assertTrue( true );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "firstMethod" )
 		public void secondMethod() {
 			assertTrue( true );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
@@ -59,27 +58,27 @@ public class ComposedTestRunnerTest {
 		public SkipMethods() {
 		}
 
-		@MyTest
+		@Test
 		public void firstMethod() {
 			assertTrue( true );
 		}
 
 		// test is supposed to fail
-		@MyTest
+		@Test
 		@Depends( "firstMethod" )
 		public void secondMethod() {
 			assertTrue( false );
 		}
 
 		// this test is ignored, because secondMethod failed
-		@MyTest
+		@Test
 		@Depends( "secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
 		}
 
 		// this test is ignored, because secondMethod failed
-		@MyTest
+		@Test
 		@Depends( "secondMethod" )
 		public void fourthMethod() {
 			assertTrue( true );
@@ -104,13 +103,13 @@ public class ComposedTestRunnerTest {
 			assertTrue( true );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "firstMethod" )
 		public void secondMethod() {
 			assertTrue( false );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
@@ -130,18 +129,18 @@ public class ComposedTestRunnerTest {
 		public GoodTest() {
 		}
 
-		@MyTest
+		@Test
 		public void firstMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "firstMethod" )
 		public void secondMethod() {
 			assertTrue( true );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
@@ -161,12 +160,12 @@ public class ComposedTestRunnerTest {
 		public FirstGoodTest() {
 		}
 
-		@MyTest
+		@Test
 		public void firstMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "ComposedTestRunnerTest$SecondGoodTest.secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
@@ -178,7 +177,7 @@ public class ComposedTestRunnerTest {
 		public SecondGoodTest() {
 		}
 
-		@MyTest
+		@Test
 		@Depends( "ComposedTestRunnerTest$FirstGoodTest.firstMethod" )
 		public void secondMethod() {
 			assertTrue( true );
@@ -198,18 +197,18 @@ public class ComposedTestRunnerTest {
 		public FirstBadTest() {
 		}
 
-		@MyTest
+		@Test
 		public void firstMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "ComposedTestRunnerTest$SecondBadTest.secondMethod" )
 		public void secondMethod() {
 			assertTrue( true );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
@@ -221,7 +220,7 @@ public class ComposedTestRunnerTest {
 		public SecondBadTest() {
 		}
 
-		@MyTest
+		@Test
 		@Depends( "ComposedTestRunnerTest$FirstBadTest.secondMethod" )
 		public void secondMethod() {
 			assertTrue( true );
@@ -242,29 +241,29 @@ public class ComposedTestRunnerTest {
 
 		}
 
-		@MyTest
+		@Test
 		public String rootMethod() {
 			return "Hello, I'm a string.";
 		}
 
-		@MyTest
+		@Test
 		public int returnInteger() {
 			return 2;
 		}
 
-		@MyTest
+		@Test
 		public void noReturn() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "rootMethod" )
 		public String getsString( String aString ) {
 			assertEquals( "Hello, I'm a string.", aString );
 			return aString;
 		}
 
-		@MyTest
+		@Test
 		@Depends( "getsString(java.lang.String);returnInteger" )
 		public boolean getsStringAndInteger( String aString, int aInteger ) {
 			assertEquals( "Hello, I'm a string.", aString );
@@ -272,7 +271,7 @@ public class ComposedTestRunnerTest {
 			return true;
 		}
 
-		@MyTest
+		@Test
 		@Depends( "getsStringAndInteger(java.lang.String,int)" )
 		public void findsDep( boolean aBool ) {
 			assertTrue( aBool );
@@ -293,19 +292,19 @@ public class ComposedTestRunnerTest {
 		public DependsOnBeforeTest() {
 		}
 
-		@MyTest
+		@Test
 		public int root() {
 			return 2;
 		}
 
-		@MyTest
+		@Test
 		@Depends( "root" )
 		public String second( int i ) {
 			assertEquals( 2, i );
 			return "bla";
 		}
 
-		@MyTest
+		@Test
 		@Depends( "second(int)" )
 		public void third( String aString ) {
 			assertEquals( "bla", aString );
@@ -326,12 +325,12 @@ public class ComposedTestRunnerTest {
 		public CloneRetVal() {
 		}
 
-		@MyTest
+		@Test
 		public Clone root() {
 			return new Clone( "original" );
 		}
 
-		@MyTest
+		@Test
 		@Depends( "root" )
 		public void second( Clone aClone ) {
 			assertEquals( "clone", aClone.getName() );

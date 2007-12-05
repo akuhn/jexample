@@ -10,9 +10,9 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 /**
  * A wrapper for the {@link Class} under test.
@@ -30,10 +30,10 @@ public class TestClass {
 	}
 
 	/**
-	 * @return a {@link List} of all {@link Method}'s annotated with {@link MyTest}
+	 * @return a {@link List} of all {@link Method}'s annotated with {@link Test}
 	 */
 	public List<Method> getTestMethods() {
-		return getAnnotatedMethods( MyTest.class );
+		return getAnnotatedMethods( Test.class );
 	}
 
 	List<Method> getBefores() {

@@ -18,7 +18,6 @@ import extension.MethodCollector;
 import extension.TestClass;
 import extension.TestMethod;
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -110,18 +109,18 @@ public class CycleDetectorTest {
 	}
 
 	private class WithoutCycles {
-		@MyTest
+		@Test
 		public void rootMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "rootMethod" )
 		public void middleMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "middleMethod;rootMethod" )
 		public void bottomMethod() {
 
@@ -130,24 +129,24 @@ public class CycleDetectorTest {
 
 	private class WithoutCyclesComplex {
 
-		@MyTest
+		@Test
 		public void realRootMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "realRootMethod" )
 		public void rootMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "rootMethod" )
 		public void middleMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "middleMethod;rootMethod" )
 		public void bottomMethod() {
 
@@ -155,30 +154,30 @@ public class CycleDetectorTest {
 	}
 
 	private class WithCycles {
-		@MyTest
+		@Test
 		public void rootMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "bottomCyclicMethod" )
 		public void cyclicMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "rootMethod;cyclicMethod" )
 		public void middleCyclicMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "middleCyclicMethod;rootMethod" )
 		public void bottomCyclicMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "bottomCyclicMethod" )
 		public void bottomBottomMethod() {
 
@@ -187,24 +186,24 @@ public class CycleDetectorTest {
 
 	private class WithCycleOverClasses {
 		// with cycle over classes
-		@MyTest
+		@Test
 		public void rootMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "rootMethod;extension.tests.B.cyclicMethod" )
 		public void middleCyclicMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "middleCyclicMethod;rootMethod" )
 		public void bottomCyclicMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "bottomCyclicMethod" )
 		public void bottomBottomMethod() {
 
@@ -213,18 +212,18 @@ public class CycleDetectorTest {
 
 	private class WithoutCycleOverClasses {
 		// with cycle over classes
-		@MyTest
+		@Test
 		public void rootMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "rootMethod" )
 		public void middleMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "middleMethod;B.middleMethod" )
 		public void bottomCyclicMethod() {
 

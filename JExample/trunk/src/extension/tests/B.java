@@ -1,10 +1,10 @@
 package extension.tests;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 @RunWith( ComposedTestRunner.class )
 public class B {
@@ -13,24 +13,24 @@ public class B {
 
 	}
 
-	@MyTest
+	@Test
 	public void otherTest() {
 
 	}
 
-	@MyTest
+	@Test
 	@Depends( "GraphTest$CyclicOverClasses.depOnOtherTest" )
 	public void otherTestCyclic() {
 
 	}
 
-	@MyTest
+	@Test
 	@Depends( "CycleDetectorTest$WithCycleOverClasses.bottomCyclicMethod" )
 	public void cyclicMethod() {
 
 	}
 
-	@MyTest
+	@Test
 	@Depends( "CycleDetectorTest$WithoutCycleOverClasses.rootMethod" )
 	public void middleMethod() {
 

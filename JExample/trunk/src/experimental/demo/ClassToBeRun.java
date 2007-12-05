@@ -3,11 +3,11 @@
  */
 package experimental.demo;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import extension.ComposedTestRunner;
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -18,24 +18,24 @@ public class ClassToBeRun {
 	public ClassToBeRun() {
 	}
 
-	@MyTest
+	@Test
 	public void rootMethod() {
 		System.out.println( "I have to be run first." );
 	}
 
-	@MyTest
+	@Test
 	@Depends( "middleMethod" )
 	public void bottomMethod() {
 		System.out.println( "I have to be run as a leaf of the graph." );
 	}
 
-	@MyTest
+	@Test
 	@Depends( "SomeDependencies.middleMethodDeps" )
 	public void secondBottomMethod() {
 		System.out.println( "I have to be run as a leaf of the graph, too." );
 	}
 
-	@MyTest
+	@Test
 	@Depends( "rootMethod" )
 	public void middleMethod() {
 		System.out.println( "I'm run in the middle, I'm in ClassToBeRun." );

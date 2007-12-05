@@ -13,7 +13,6 @@ import extension.TestClass;
 import extension.TestGraph;
 import extension.TestMethod;
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 public class GraphTest {
 
@@ -58,18 +57,18 @@ public class GraphTest {
 
 		}
 
-		@MyTest
+		@Test
 		public void testMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "testMethod" )
 		public void anotherTestMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "B.otherTest" )
 		public void depOnOtherTest() {
 
@@ -81,18 +80,18 @@ public class GraphTest {
 
 		}
 
-		@MyTest
+		@Test
 		public void testMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "testMethod;depOnOtherTest" )
 		public void anotherTestMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "anotherTestMethod" )
 		public void depOnOtherTest() {
 
@@ -104,18 +103,18 @@ public class GraphTest {
 
 		}
 
-		@MyTest
+		@Test
 		public void testMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "testMethod" )
 		public void anotherTestMethod() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "B.otherTestCyclic" )
 		public void depOnOtherTest() {
 

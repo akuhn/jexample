@@ -9,9 +9,10 @@ import java.lang.reflect.Method;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import extension.ComposedTestRunner;
 import extension.DependencyValidator;
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -39,12 +40,12 @@ public class DependencyValidatorTest {
 	public void setUp() throws Exception {
 		this.validator = new DependencyValidator();
 
-		this.stringAsParam = this.getClass().getMethod( "stringAsParam", java.lang.String.class );
-		this.twoParams = this.getClass().getMethod( "twoParams", java.lang.String.class, int.class );
-		this.voidReturnType = this.getClass().getMethod( "voidReturnType" );
-		this.returnsString = this.getClass().getMethod( "returnsString" );
-		this.returnsInt = this.getClass().getMethod( "returnsInt" );
-		this.noTestMethod = this.getClass().getMethod( "noTestMethod" );
+		this.stringAsParam = TestTestClass.class.getMethod( "stringAsParam", java.lang.String.class );
+		this.twoParams = TestTestClass.class.getMethod( "twoParams", java.lang.String.class, int.class );
+		this.voidReturnType = TestTestClass.class.getMethod( "voidReturnType" );
+		this.returnsString = TestTestClass.class.getMethod( "returnsString" );
+		this.returnsInt = TestTestClass.class.getMethod( "returnsInt" );
+		this.noTestMethod = TestTestClass.class.getMethod( "noTestMethod" );
 	}
 
 	@Test
@@ -92,32 +93,36 @@ public class DependencyValidatorTest {
 		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.returnsInt ).size() );
 	}
 
-	@MyTest
-	public void voidReturnType() {
+	@RunWith(ComposedTestRunner.class)
+	private class TestTestClass {
 
-	}
+		@Test
+		public void voidReturnType() {
 
-	@MyTest
-	public String returnsString() {
-		return "";
-	}
+		}
 
-	@MyTest
-	public int returnsInt() {
-		return 1;
-	}
+		@Test
+		public String returnsString() {
+			return "";
+		}
 
-	@MyTest
-	public void stringAsParam( String string ) {
+		@Test
+		public int returnsInt() {
+			return 1;
+		}
 
-	}
+		@Test
+		public void stringAsParam( String string ) {
 
-	@MyTest
-	public void twoParams( String string, int integer ) {
+		}
 
-	}
+		@Test
+		public void twoParams( String string, int integer ) {
 
-	public void noTestMethod() {
+		}
 
+		public void noTestMethod() {
+
+		}
 	}
 }

@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 /**
  * The <code>MethodValidator</code> class validates all test methods in
@@ -110,7 +110,7 @@ public class MethodValidator {
 		Annotation depAnnotation, testAnnotation;
 		for ( Method eachMethod : this.testMethods ) {
 			depAnnotation = eachMethod.getAnnotation( Depends.class );
-			testAnnotation = eachMethod.getAnnotation( MyTest.class );
+			testAnnotation = eachMethod.getAnnotation( Test.class );
 			if ( depAnnotation != null && testAnnotation != null ) {
 				results.add( eachMethod );
 			}

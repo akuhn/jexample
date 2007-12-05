@@ -10,10 +10,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import extension.ComposedTestRunner;
 import extension.DependencyParser;
 import extension.TestClass;
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -31,7 +32,7 @@ public class DependencyParserTest {
 	public void setUp() throws Exception {
 		this.myClass = new TestClass( this.getClass() );
 		parser = new DependencyParser( myClass );
-		annotatedMethod = this.getClass().getMethod( "annotatedMethod" );
+		annotatedMethod = TestTestClass.class.getMethod( "annotatedMethod" );
 	}
 
 	@Test
@@ -68,19 +69,22 @@ public class DependencyParserTest {
 		assertEquals( 1, methods.size() );
 	}
 
-	@MyTest
-	public void annotatedMethod() {
+	@RunWith( ComposedTestRunner.class )
+	private class TestTestClass {
+		@Test
+		public void annotatedMethod() {
 
-	}
+		}
 
-	@MyTest
-	public void annotatedMethod( String string ) {
+		@Test
+		public void annotatedMethod( String string ) {
 
-	}
+		}
 
-	@MyTest
-	public void annotatedMethod( int i ) {
+		@Test
+		public void annotatedMethod( int i ) {
 
+		}
 	}
 
 }

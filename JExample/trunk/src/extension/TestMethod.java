@@ -7,11 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
-
-import extension.annotations.MyTest;
 
 /**
  * The states, a {@link TestMethod} can have.
@@ -249,8 +248,8 @@ public class TestMethod {
 	}
 
 	private Class<? extends Throwable> getExpectedException() {
-		MyTest annotation = this.javaMethod.getAnnotation( MyTest.class );
-		if ( annotation != null && annotation.expected() != extension.annotations.MyTest.None.class ) {
+		Test annotation = this.javaMethod.getAnnotation( Test.class );
+		if ( annotation != null && annotation.expected() != org.junit.Test.None.class ) {
 			return annotation.expected();
 		}
 		return null;

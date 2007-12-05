@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import extension.annotations.MyTest;
+import org.junit.Test;
 
 /**
  * The <code>DependencyValidator</code> class validates the specified dependencies between tests.
@@ -57,9 +57,9 @@ public class DependencyValidator {
 	}
 
 	private void assertDependenciesAreTestMethods( Method[] dependencies ) {
-		MyTest annotation;
+		Test annotation;
 		for ( Method method : dependencies ) {
-			annotation = method.getAnnotation( MyTest.class );
+			annotation = method.getAnnotation( Test.class );
 			if ( annotation == null ) {
 				this.fErrors.add( new Exception( "Dependency " + method.getName() + " is not a test method." ) );
 			}

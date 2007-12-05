@@ -14,7 +14,6 @@ import extension.MethodCollector;
 import extension.TestClass;
 import extension.TestMethod;
 import extension.annotations.Depends;
-import extension.annotations.MyTest;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -44,18 +43,18 @@ public class MethodCollectorTest {
 
 		}
 
-		@MyTest
+		@Test
 		public void test1() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1" )
 		public void test2() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1" )
 		public void test3() {
 
@@ -84,24 +83,24 @@ public class MethodCollectorTest {
 
 		}
 
-		@MyTest
+		@Test
 		public void test0() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test0;test3" )
 		public void test1() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1" )
 		public void test2() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test2" )
 		public void test3() {
 
@@ -128,18 +127,18 @@ public class MethodCollectorTest {
 
 		}
 
-		@MyTest
+		@Test
 		public void test1() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1" )
 		public void test2() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1;B.middleMethod" )
 		public void test3() {
 
@@ -166,19 +165,19 @@ public class MethodCollectorTest {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test3" )
 		public void test1() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1" )
 		public void test2() {
 
 		}
 
-		@MyTest
+		@Test
 		@Depends( "test1;A.test4" )
 		public void test3() {
 
