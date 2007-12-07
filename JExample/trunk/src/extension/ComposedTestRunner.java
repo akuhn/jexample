@@ -13,7 +13,7 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class ComposedTestRunner extends Runner {
 
-	public static TestGraph graph = TestGraph.getInstance();
+	private static TestGraph graph = TestGraph.getInstance();
 
 	private final TestClass underTest;
 
