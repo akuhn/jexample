@@ -1,0 +1,192 @@
+\documentclass[pagenumbers]{article}
+
+\usepackage{bold-extra}
+\usepackage{graphicx}
+\usepackage{alltt}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{ifthen}
+\usepackage{xspace}
+\usepackage{amsfonts}
+\usepackage{subfigure}
+\usepackage{paralist}
+\usepackage{authblk}
+\graphicspath{{pictures/}}
+
+\lstset{
+	basicstyle=\ttfamily\scriptsize,
+	columns=fullflexible,
+	morekeywords={\@Test,\@Depends, \@Before, void, return},
+	frame=lines,
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newboolean{showcomments}
+\setboolean{showcomments}{true}
+\ifthenelse{\boolean{showcomments}}
+  {\newcommand{\nb}[2]{
+    \fbox{\bfseries\sffamily\scriptsize#1}
+    {\sf\small$\blacktriangleright$\textit{#2}$\blacktriangleleft$}
+   }
+   \newcommand{\version}{\emph{\scriptsize$-$Id: main.tex 14628 2007-12-23 12:18:52Z haense $-$}}
+  }
+  {\newcommand{\nb}[2]{}
+   \newcommand{\version}{}
+  }
+
+\newcommand\AK[1]{\nb{akuhn}{#1}}
+\newcommand\LH[1]{\nb{haense}{#1}}
+\newcommand\weasel[1]{\nb{smell}{weasel words}}
+\newcommand\todo[1]{\nb{TODO}{#1}}
+\newcommand{\here}{\nb{***}{CONTINUE HERE}}
+
+%\newcommand{\ie}{\textit{i.e.,}\xspace}
+%\newcommand{\eg}{\textit{e.g.,}\xspace}
+\newcommand{\ie}{that is\xspace}
+\newcommand{\eg}{for example\xspace}
+\newcommand{\etal}{\textit{et al.}\xspace}
+\newcommand{\etc}{\textit{etc.}\xspace}
+
+\newcommand{\secref}[1]{Section~\ref{#1}\xspace}
+\newcommand{\figref}[1]{Figure~\ref{#1}\xspace}
+\newcommand{\tabref}[1]{Table~\ref{#1}\xspace}
+
+\newcommand{\feat}[1]{{\sf\small{#1}\xspace}}
+\newcommand{\dt}{composed tests\xspace} % how do you want to call it?
+\newcommand{\aff}[1]{{\normalsize\textit{#1}}}
+
+\newcommand{\ttt}[1]{\texttt{#1}}
+\newcommand{\JUnit}{\textsc{JUnit}\xspace}
+\newcommand{\JExample}{\textsc{JExample}\xspace}
+
+\newcommand{\red}{\emph{red}\xspace}
+\newcommand{\green}{\emph{green}\xspace}
+\newcommand{\white}{\emph{white}\xspace}
+
+\newcommand{\setup}{\texttt{setup}\xspace}
+\newcommand{\testPush}{\texttt{testPush}\xspace}
+\newcommand{\testPop}{\texttt{testPop}\xspace}
+\newcommand{\testPushAll}{\texttt{testPushAll}\xspace}
+\newcommand{\testPopFails}{\texttt{testPopFails}\xspace}
+
+\newcommand{\SPOF}{``single point of failure''\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\title{JExample}
+
+\author[1]{Lea H\"ansenberger}
+\author[1]{Adrian Kuhn}
+\affil[1]{\aff{Software Composition Group, University of Bern, Switzerland -- \{akuhn, etal\}@iam.unibe.ch}}
+\maketitle
+
+\newpage
+\begin{abstract}
+
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}\label{intro}
+ 
+\section{Related Work}\label{relatedwork}
+
+\section{Example}
+
+\section{Implementation}
+
+\section{Case Study}
+
+\section{Lesson learned}
+
+
+
+\end{document}
+
+The JUnit Extension allows to define dependencies between test methods. The test methods can return Objects, which can be taken as argument by the dependent methods.
+
+
+See Figure \ref{fig:classDiag} for the important classes of the extension.
+
+\begin{figure}[htbp]
+ \includegraphics[width=\linewidth]{figures/class_diagram.png}
+ \caption{Class Diagram}
+ \label{fig:classDiag}
+\end{figure}
+
+\subsubsection{The Runner}
+
+The Runner is the main connection to the JUnit Framework, in this case this is the \verb|ComposedTestRunner|. It extends the abstract class \verb|org.junit.runner.Runner| and implements two methods \verb|Runner.run()| and \verb|Runner.getDescription()|. A test run consists of three steps:
+\begin{enumerate}
+ \item initializing the Runner, this includes collecting and validating methods and test dependencies
+ \item running the methods
+ \item getting the description of the run
+\end{enumerate}
+
+\subsubsection{The TestGraph}
+
+The actual Runner in the extension is the \verb|TestGraph|. The reason for delegating this responsibility to another class is that we wanted the Runner to be a singleton. A singleton is necessary because a method can depend on a method from another class. It makes sure, that every method is collected and run only once in a test run and therefore only counted once so the run count correpsonds to the number of methods.
+
+The \verb|TestGraph| reflects the three steps in its three public methods \verb|addClass()| for the initialization, \verb|runClass()| for running the methods and \verb|getDescriptionForClass()| for getting the description of all the run methods. If methods declare dependencies to methods of other classes, those dependencies are added and run as they were part of the class under test. When getting the description, however, we make clear, which method belongs to which class.
+
+\subsubsection{The TestClass}
+
+\verb|TestClass| is a wrapper for the class under test. It returns all the test methods by filtering those who are annotated with \verb|@Test|. In addition it gets the list of dependencies for methods annotated with \verb|@Depends| by getting the methods represented by the String value of the annotation.
+
+\subsubsection{The TestMethod}
+
+\verb|TestMethod| is the wrapper for the methods to be run. The \verb|TestMethod| knows its dependencies, its \verb|TestResult| and its return value after it was run. Possible test results are
+
+\begin{description}
+ \item[NOT\_YET\_RUN] the method has not been run yet
+ \item[GREEN] the method was run and finished successfully
+ \item[RED] the method was run but failed
+ \item[IGNORED] the method is either annotated with \verb|@Ignore| or one of its dependencies has the result RED or IGNORED
+ \end{description}
+
+It makes sure, that all of its dependencies have been run before it's run itself. It also checks the results of its dependencies. If one of the dependencies failed or was ignored, either because of the annotation \verb|@Ignore| or because one of its dependencies failed or was ignored, it informs the \verb|RunNotifier| that it is ignored, too.
+
+If a method takes arguments \verb|TestMethod| gets the return values from the dependencies and passes them to the method to be run. The return value is cloned before it is passed to the method if its class or one of its superclasses implements \verb|Cloneable| and overrides \verb|Object.clone()|.
+
+\subsection{Running a test}
+
+When running a test first thing happening is the initialization of the Runner assigned to your test. Assigning a specific Runner to your tests is done with the class annotation \verb|@RunWith| by passing it the class of the Runner, e.g. \verb|@RunWith(ComposedTestRunner.class)|.
+The \verb|ComposedTestRunner| gets the instance of \verb|TestGraph| and calls \verb|TestGraph.addClass()|.
+
+%The connection to the JUnit Framework is a runner class, \verb|ComposedTestRunner|, that extends the abstract class \verb|Runner| from the framework. Specific Runners can be assigned with the class annotation \verb|@RunWith| that takes the runner class as value, e.g. \verb|@RunWith(ComposedTestRunner.class)|. When running a test the assigned runner is initialized. The initialization consists of getting test methods from the class under test and validating methods and dependencies. The class under test is wrapped into a \verb|TestClass|, which has the responsibility to get all its methods annotated with \verb|@Test|.
+
+%In the extension the responsibility for initializing the run, running the tests and returning the descriptions of the tests is delegated to the singleton \verb|TestGraph|. The reason for the singleton is the possibility of declaring dependencies to methods in other classes. It makes sure, every method is run only once, e.g. when you run a Test Suite. The collecting of all the test methods is done by the \verb|MethodCollector|. It makes sure that every method is collected only once and wraps the methods in a \verb|TestMethod| which knows it's dependencies. The \verb|CycleDetector| then runs a cycle detection algorithm and throws an \verb|InitializationError| if the dependencies are cyclic. The \verb|MethodValidator| makes sure there is a zero-argument constructor and the methods are all \verb|public| and the \verb|DependencyValidator| checks the validity of the dependencies.
+
+%After the initialization of the test run the framework calls the method \verb|Runner.run()|. \verb|TestGraph| runs all test methods of the class under test. Every \verb|TestMethod| makes sure that all of its dependencies have been run and were green. If one of the dependencies failed or was ignored also the current test method is ignored. Return values of dependencies are cloned before they are passed as argument to the dependent method, if the return value's class or one of its superclasses implement \verb|Object.clone()|.
+
+%AIn the end the framework calls \verb|Runner.getDescription()| for all the classes under test. The \verb|Description| contains information about all the classes and methods that were run.
+
+%Methods have to be \verb|public| and their declaring class has to be \verb|public|. The conditions for dependencies are:
+%\begin{itemize}
+% \item all methods declared as dependencies have to be test methods
+% \item a method cannot have itself as a dependency
+% \item a method must have the same number of arguments as the number of dependencies
+% \item the return types of the dependencies have to match the types of the arguments
+%\end{itemize}
+%If one of these conditions fail an \verb|InitializationError| is thrown and the test is not run.
+
+\begin{figure}[htbp]
+	\begin{verbatim}
+	@Test
+	public Player testAddPlayer(){}
+
+	@Test
+	@Depends("testAddPlayer")
+	public void testPlay(Player player){}
+
+	@Test
+	@Depends("testPlay(package.Player)")
+	public void testPlay(Player player){}
+	\end{verbatim}
+\caption{test dependencies}
+\label{fig:exampleCode}
+\end{figure}
+
+
