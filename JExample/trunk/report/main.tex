@@ -4,6 +4,7 @@
 \usepackage{glossary}
 \usepackage{url}
 \usepackage{xspace}
+\usepackage{bold-extra}
 
 \graphicspath{{figures/}}
 
@@ -12,6 +13,12 @@
 \newcommand{\JExample}{\textsc{JExample}\xspace}
 
 \newcommand{\ttt}[1]{\texttt{#1}}
+
+\newcommand{\nb}[2]{
+    \fbox{\bfseries\sffamily\scriptsize#1: #2}
+    }
+
+\newcommand{\todo}[1]{\nb{TODO}{#1}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -38,6 +45,8 @@
 
 \section{Example}
 
+In this section I will show how to write tests with \JExample.
+
 \section{Implementation}
 
 To extend the \JUnit Framework mainly one class is needed. The Runner. This class consists of three parts corresponding to the three steps of a test run.
@@ -47,10 +56,8 @@ To extend the \JUnit Framework mainly one class is needed. The Runner. This clas
  \item a method \verb|Runner.run()| to run the test methods
  \item a method \verb|Runner.getDescription()| to get information about the run
 \end{enumerate}
-For \JExample also wrapper classes and validators needed to be adapted. \JUnit only allows methods without parameters and with return type void. As methods in \JExample need to be allowed to take arguments and return objects, the validation of the methods needed to be adapted.
-In \JUnit a separat class was responsible for the running of the test methods
-
-See Figure \ref{fig:classDiag} for the important classes of \JExample.
+In \JExample \verb|ComposedTestRunner| is only a delegator. It passes the responsibilities to the \verb|TestGraph|. The reason will be explained later on.\\
+See figure \ref{fig:classDiag} for the important classes of \JExample.
 
 \begin{figure}[htbp]
  \includegraphics[width=24.0cm]{classdiagram.pdf}
@@ -58,17 +65,21 @@ See Figure \ref{fig:classDiag} for the important classes of \JExample.
  \label{fig:classDiag}
 \end{figure}
 
+For \JExample also wrapper classes and validators needed to be adapted. \JUnit only allows methods without parameters and with return type void. As methods in \JExample need to be allowed to take arguments and return objects, the validation of the methods needed to be adapted. See figure \ref{fig:classDiagInit} for the classes responsible for the initialization and validation of a test run.
 
 \begin{figure}[htbp]
  \includegraphics[width=20.0cm]{classdiagramInit.pdf}
- \caption{Class Diagram}
+ \caption{Initialization Test Run}
  \label{fig:classDiagInit}
 \end{figure}
 
+In \JUnit a separate class is responsible for running the test methods. In \JExample \verb|TestMethod| is responsible for running its wrapped method. A \verb|TestMethod| knows its dependencies and its return value. Therefore it can simply ask its dependencies if they passed and get possible return values.
 
-\subsubsection{The Runner}
+In the following section I will go into more detail for the single, most important classes of \JExample
 
-The Runner is the main connection to the \JUnit Framework, in this case this is the \verb|ComposedTestRunner|. It extends the abstract class \verb|org.junit.runner.Runner| and implements two methods \verb|Runner.run()| and \verb|Runner.getDescription()|. A test run consists of three steps:
+\subsubsection{The ComposedTestRunner}
+
+The Runner is the main connection to the \JUnit Framework. It extends the abstract class \verb|org.junit.runner.Runner| and implements two methods \verb|Runner.run()| and \verb|Runner.getDescription()|. A test run consists of three steps:
 \begin{enumerate}
  \item initializing the Runner, this includes collecting and validating methods and test dependencies
  \item running the methods
@@ -77,9 +88,11 @@ The Runner is the main connection to the \JUnit Framework, in this case this is 
 
 \subsubsection{The TestGraph}
 
-The actual Runner in the extension is the \verb|TestGraph|. The reason for delegating this responsibility to another class is that we wanted the Runner to be a singleton. A singleton is necessary because a method can depend on a method from another class. It makes sure, that every method is collected and run only once in a test run and therefore only counted once so the run count correpsonds to the number of methods.
+The real Runner in \JExample is the \verb|TestGraph|. The reason for delegating this responsibility to another class is that we wanted the Runner to be a singleton. A singleton is necessary because a method can depend on a method from another class. When running a test suite, this makes sure that every method is collected and run only once. Therefore, every method is counted only once and the run count correpsonds to the number of methods. This is possible because of the behaviour of \JUnit when running multiple classes at once. First, a Runner per class is initialized, then all the classes are run and in the end, the description for every class is collected.
 
-The \verb|TestGraph| reflects the three steps in its three public methods \verb|addClass()| for the initialization, \verb|runClass()| for running the methods and \verb|getDescriptionForClass()| for getting the description of all the run methods. If methods declare dependencies to methods of other classes, those dependencies are added and run as they were part of the class under test. When getting the description, however, we make clear, which method belongs to which class.
+\todo{ev. insert sequence diagram for the three steps of a test run with two or more classes}
+
+The \verb|TestGraph| reflects the three steps of a test run in its three public methods \verb|addClass()| for the initialization, \verb|runClass()| for running the methods and \verb|getDescriptionForClass()| for getting the description of all the run methods. If methods declare dependencies to methods of other classes, those dependencies are added and run as they were part of the class under test. When getting the description, however, it is made clear which method belongs to which class.
 
 \subsubsection{The TestClass}
 
@@ -99,11 +112,6 @@ The \verb|TestGraph| reflects the three steps in its three public methods \verb|
 It makes sure, that all of its dependencies have been run before it's run itself. It also checks the results of its dependencies. If one of the dependencies failed or was ignored, either because of the annotation \verb|@Ignore| or because one of its dependencies failed or was ignored, it informs the \verb|RunNotifier| that it is ignored, too.
 
 If a method takes arguments \verb|TestMethod| gets the return values from the dependencies and passes them to the method to be run. The return value is cloned before it is passed to the method if its class or one of its superclasses implements \verb|Cloneable| and overrides \verb|Object.clone()|.
-
-\subsection{Running a test}
-
-When running a test first thing happening is the initialization of the Runner assigned to your test. Assigning a specific Runner to your tests is done with the class annotation \verb|@RunWith| by passing it the class of the Runner, e.g. \verb|@RunWith(ComposedTestRunner.class)|.
-The \verb|ComposedTestRunner| gets the instance of \verb|TestGraph| and calls \verb|TestGraph.addClass()|.
 
 \section{Lesson learned}
 
