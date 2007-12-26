@@ -47,16 +47,22 @@ To extend the \JUnit Framework mainly one class is needed. The Runner. This clas
  \item a method \verb|Runner.run()| to run the test methods
  \item a method \verb|Runner.getDescription()| to get information about the run
 \end{enumerate}
-
 For \JExample also wrapper classes and validators needed to be adapted. \JUnit only allows methods without parameters and with return type void. As methods in \JExample need to be allowed to take arguments and return objects, the validation of the methods needed to be adapted.
+In \JUnit a separat class was responsible for the running of the test methods
 
-See Figure \ref{fig:classDiag} for the important classes of the extension.
-
+See Figure \ref{fig:classDiag} for the important classes of \JExample.
 
 \begin{figure}[htbp]
  \includegraphics[width=24.0cm]{classdiagram.pdf}
  \caption{Class Diagram}
  \label{fig:classDiag}
+\end{figure}
+
+
+\begin{figure}[htbp]
+ \includegraphics[width=20.0cm]{classdiagramInit.pdf}
+ \caption{Class Diagram}
+ \label{fig:classDiagInit}
 \end{figure}
 
 
