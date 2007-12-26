@@ -5,6 +5,7 @@
 \usepackage{url}
 \usepackage{xspace}
 \usepackage{bold-extra}
+\usepackage{listings}
 
 \graphicspath{{figures/}}
 
@@ -19,6 +20,12 @@
     }
 
 \newcommand{\todo}[1]{\nb{TODO}{#1}}
+
+\newcommand{\setup}{\ttt{setup()}}
+\newcommand{\testPush}{\ttt{testPush()}}
+\newcommand{\testPushAll}{\ttt{testPushAll()}}
+\newcommand{\testPop}{\ttt{testPop()}}
+\newcommand{\testPopFails}{\ttt{testPopFails()}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,7 +52,119 @@
 
 \section{Example}
 
-In this section I will show how to write tests with \JExample.
+In this section I will illustrate the difference between composed and conventional test methods by exercising a sample test case. Unit under test is a simple Stack implementation. A convention test case would go as follows:
+
+\begin{lstlisting}[label=lst:junit,caption=Conventional \JUnit test case.]
+public class StackTest {
+
+    private Stack stack;
+
+    @Before
+    public void setup() {
+        stack = new Stack();
+    }
+
+    @Test
+    public void testPush() {
+        stack.push("Foo");
+        assertFalse(stack.isEmpty());
+        assertEquals("Foo", stack.top());
+    }
+
+    @Test
+    public void testPop() {
+        stack.push("Foo");
+        Object top = stack.pop();
+        assertTrue(stack.isEmpty());
+        assertEquals("Foo", top);
+    }
+
+    @Test(expected=IllegaleStateException.class)
+    public void testPopFails() {
+        stack.pop();
+    }
+
+    @Test
+    public void testPushAll() {
+        List list = Arrays.asList(new String[] { ... });
+        last = list.get(list.size() - 1);
+        stack.pushAll(list);
+        assertEquals(last, stack.top());
+    }
+
+}
+\end{lstlisting}
+
+When running Listing \ref{lst:junit} \setup is executed before every test method and the test fixture is passed as class attribute. We could say, that all the test methods depend on \setup. In \JExample \setup would be a normal test method returning an instance of a Stack.
+
+\begin{lstlisting}[label=lst:setup,caption=Promote fixture to test with return value.]
+    @Test
+    public Stack setup() {
+        Stack empty = new Stack();
+        assertTrue(empty.isEmpty());
+        assertEquals(null, empty.top()));
+        return empty;
+    }
+\end{lstlisting}
+
+Please note, that by setting up the fixture in a test method instead of a setup method, the initialization of the fixture can be tested, too.
+\testPush and \testPopFails need to define \setup as their dependency because they need an empty stack. This is done by annotating them with \ttt{@Depends}. Furthermore, they need to take a Stack as an argument.
+
+\begin{lstlisting}[label=lst:testpush,caption=Take another test's result as input value.]
+    @Test
+    @Depends("setup")
+    public Stack testPush(Stack stack) {
+        stack.push("Foo");
+        assertFalse(empty.isEmpty());
+        assert("Foo", empty.top());
+        return stack;
+    }
+
+    @Test(expected= IllegalStateException.class)
+    @Depends("setup")
+    public Stack testPopFails(Stack empty) {
+        stack.pop();
+    }
+\end{lstlisting}
+
+When running Listing \ref{lst:testPush} \JExample runs first \setup, as it is the root of the dependency hierarchy. If \setup run successfully \testPush and \testPopFails are run with the return value from \setup as argument (if \setup fails, \testPush and \testPopFails are ignored).
+In order to have the same state of the stack for both the dependents the return value needs to be cloned. Of course this can only be accomplished if the return value's class or one of its superclasses implements \verb|Object.clone()|.
+Let's now reconsider Listing \ref{lst:junit} to find deeper levels of dependencies in order to get a real graph of composed test methods.
+Indeed, we find two methods that depend on \testPush: \testPop cannot be executed without pushing an element on the stack first and \testPushAll will probably also fail if pushing a single element fails.
+
+The new implementation of \testPop needs to depend on \testPush's return value. This also avoids the duplicate call to \ttt{push}.
+
+\begin{lstlisting}[label=lst:testpop,caption=Avoid code duplication using dependencies.]
+    @Test
+    @Depends("testPush")
+    public Stack testPop(Stack stack) {
+        Object top = stack.pop();
+        assertEquals(true, empty.isEmpty());
+        assertEquals("Foo", top);
+        return stack;
+    }
+\end{lstlisting}
+
+\testPushAll needs a list of elements as a second argument. Let's assume we have a class \ttt{ListTest} with a method \ttt{testAddAll()}. The refactored \testPushAll looks as follows. Note that a test may have more than one dependency that can also refer to methods in other test case files.
+
+\begin{lstlisting}[label=lst:testpushall,caption=A test may have multiple dependencies.]
+    @Test
+    @Depends("testPush;ListTest.testAddAll")
+    public stack testPushAll(Stack stack, List list) {
+        stack.pushAll(list);
+        last = list.get(list.size() - 1);
+        assertEquals(last, stack.top());
+        return stack;
+    }
+\end{lstlisting}
+
+With \ttt{Stack}'s \ttt{push} method failing, the test result would be two green, one red and two white tests (see Figure \ref{fig:testPush}).
+
+\begin{figure}[htbp]
+ \includegraphics[width=15.0cm]{testPush.pdf}
+ \caption{}
+ \label{fig:testPush}
+\end{figure}
 
 \section{Implementation}
 
@@ -57,7 +176,7 @@ To extend the \JUnit Framework mainly one class is needed. The Runner. This clas
  \item a method \verb|Runner.getDescription()| to get information about the run
 \end{enumerate}
 In \JExample \verb|ComposedTestRunner| is only a delegator. It passes the responsibilities to the \verb|TestGraph|. The reason will be explained later on.\\
-See figure \ref{fig:classDiag} for the important classes of \JExample.
+See Figure \ref{fig:classDiag} for the important classes of \JExample.
 
 \begin{figure}[htbp]
  \includegraphics[width=24.0cm]{classdiagram.pdf}
@@ -65,7 +184,7 @@ See figure \ref{fig:classDiag} for the important classes of \JExample.
  \label{fig:classDiag}
 \end{figure}
 
-For \JExample also wrapper classes and validators needed to be adapted. \JUnit only allows methods without parameters and with return type void. As methods in \JExample need to be allowed to take arguments and return objects, the validation of the methods needed to be adapted. See figure \ref{fig:classDiagInit} for the classes responsible for the initialization and validation of a test run.
+For \JExample also wrapper classes and validators needed to be adapted. \JUnit only allows methods without parameters and with return type void. As methods in \JExample need to be allowed to take arguments and return objects, the validation of the methods needed to be adapted. See Figure \ref{fig:classDiagInit} for the classes responsible for the initialization and validation of a test run.
 
 \begin{figure}[htbp]
  \includegraphics[width=20.0cm]{classdiagramInit.pdf}
