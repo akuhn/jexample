@@ -52,7 +52,7 @@ public class MethodValidator {
 	 * 
 	 * @return a {@link List} of all encountered errors
 	 */
-	public List<Throwable> validateMethodsForDefaultRunner() {
+	public List<Throwable> validateMethodsForComposedRunner() {
 		validateNoArgConstructor();
 		validateInstanceMethods();
 		validateDependencies();

@@ -159,7 +159,7 @@ public class TestGraph {
 
 	private void validate( Set<Method> methodUnderTest, TestClass testClass ) throws InitializationError {
 		MethodValidator validator = new MethodValidator( methodUnderTest, testClass );
-		validator.validateMethodsForDefaultRunner();
+		validator.validateMethodsForComposedRunner();
 		validator.assertValid();
 	}
 
