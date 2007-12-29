@@ -1,0 +1,30 @@
+
+The pdfpages Package
+--------------------
+
+This package simplifies the insertion of external multi-page PDF
+documents into LaTeX documents. Pages can be freely selected and
+similar to psnup it is possible to put several logical pages onto
+each sheet of paper. Furthermore a lot of hypertext features like
+hyperlinks and article threads are provided. This package supports
+pdfTeX (pdflatex) and VTeX. With VTeX it is even possible to use
+this package to insert PostScript files, in addition to PDF files.
+
+
+Run `latex pdfpages.ins' to produce pdfpages.sty and the
+driver files pppdftex.def, ppvtex.def and ppnull.def.
+Move these files into a directory searched by LaTeX.
+
+Run `latex pdfpages.dtx' to produce the documentation.
+
+Run `pdflatex pdf-ex.tex', `pdflatex pdf-hyp.tex',
+and `pdflatex pdf-toc.tex' to produce some examples.
+
+This program may be distributed and/or modified under the
+conditions of the LaTeX Project Public License, either version 1.3c
+of this license or (at your option) any later version.
+See <http://www.latex-project.org/lppl/>.
+
+
+                                Andreas MATTHIAS
+                                amat@kabsi.at

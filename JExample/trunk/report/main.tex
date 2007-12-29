@@ -6,6 +6,7 @@
 \usepackage{xspace}
 \usepackage{bold-extra}
 \usepackage{listings}
+\usepackage[final]{pdfpages}
 
 \graphicspath{{figures/}}
 
@@ -27,7 +28,6 @@
 \newcommand{\testPop}{\ttt{testPop()}}
 \newcommand{\testPopFails}{\ttt{testPopFails()}}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
@@ -47,6 +47,10 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
+
+\todo{why software testing}\\\\
+\todo{what we gain from JUnit}\\\\
+\todo{why dependencies}\\\\
  
 \section{Related Work}
 
@@ -236,7 +240,8 @@ If a method takes arguments \verb|TestMethod| gets the return values from the de
 
 \begin{appendix}
 \section{Javadoc}
-\dots
+\todo{modify docs.tex to good format}
+\includepdf[pages=1-13]{figures/docs.pdf}
 
 \section{Ullman Original}
 \dots
