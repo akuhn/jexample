@@ -56,6 +56,8 @@
 
 \section{Example}
 
+\lstset{language=Java}
+
 In this section I will illustrate the difference between composed and conventional test methods by exercising a sample test case. Unit under test is a simple Stack implementation. A convention test case would go as follows:
 
 \begin{lstlisting}[label=lst:junit,caption=Conventional \JUnit test case.]
@@ -244,13 +246,13 @@ If a method takes arguments \verb|TestMethod| gets the return values from the de
 \includepdf[pages=1-13]{figures/docs.pdf}
 
 \section{Ullman Original}
-\lstinputlisting[label=lst:ullmanorig,caption=TestUllman.java]{tests/TestUllman.java}
+\lstinputlisting[label=lst:ullmanorig,breaklines=true,caption=TestUllman.java]{tests/TestUllman.java}
 
 \section{Ullman refactored}
-\lstinputlisting[label=lst:ullmancomp,caption=IsomorphTestUllman.java]{tests/IsomorphTestUllman.java}
-\lstinputlisting[label=lst:ullmancomp,caption= SimpleSubgraphTest.java]{tests/SimpleSubgraphTest.java}
-\lstinputlisting[label=lst:ullmancomp,caption= SpecialSubgraphTest.java]{tests/SpecialSubgraphTest.java}
-\lstinputlisting[label=lst:ullmancomp,caption= VertexPairTest.java]{tests/VertexPairTest.java}
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption=IsomorphTestUllman.java]{tests/IsomorphTestUllman.java}
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption= SimpleSubgraphTest.java]{tests/SimpleSubgraphTest.java}
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption= SpecialSubgraphTest.java]{tests/SpecialSubgraphTest.java}
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption= VertexPairTest.java]{tests/VertexPairTest.java}
 
 \end{appendix}
 
