@@ -64,7 +64,7 @@ Besides \JUnit there are several other frameworks for Java unit testing like \JT
  \item etc
 \end{itemize}
 
-Most of these disadvantages disappeared with \JUnit 4.0 because of the usage of annotations. Test methods are labelled with the annotation \attest and for the single initialization the annotation \ttt{@BeforeClass} replaces the class \ttt{TestSetup}.
+Most of these disadvantages disappeared with \JUnit 4.0 because of the usage of annotations. Test methods are labelled with the annotation \attest and for the single initialization the annotation \ttt{@BeforeClass} replaces the class \ttt{TestSetup}. The method annotated with \ttt{@BeforeClass} still needs to be static.
 
 \JTiger adds some features like categories, so you can run only a subset of test methods, and more detailed results like ''Failure (Set Up)'', ''Failure'', or ''Failure (Tear Down)''.
 
@@ -87,9 +87,10 @@ public class ATest {
 
 \end{lstlisting}
 
+%not sure, if this example is ok, because in TestNG you still need the setup method
 Considering the dependencies in Listing \ref{lst:testng} if \ttt{a()} fails \ttt{b()} is marked as skipped and not failed. If in a conventional \JUnit test case the setup fails all the test methods are marked as failed. This can be quite confusing as \JUnit doesn't tell you, that the problem is actually in the setup method and not in the test methods themselves. When marking dependent methods as skipped if a dependency failed, you see at once where the actual error occurred.
 
-A method can also depend on a group of methods, so you don't have to list all the methods of a group for all the dependent methods. To make things even easier to write, class annotations are applied to all the methods inside a class and methods can depend on methods in a superclass. This gives you the possibility to put different parts of tests in different classes, like the initialization of an environment in one class and the tests depending on that initialization in another.
+A method can also depend on a group of methods, so you don't have to list all the methods of a group for all the dependent methods. To make things even easier to write, class annotations are applied to all the methods inside a class and methods can depend on methods in a superclass. This gives you the possibility to put different parts of tests in different classes, like the initialization of an environment in one class and the tests depending on that initialization in a subclass of this class.
 
 What \TestNG doesn't provide is the possibility to return objects and take them as arguments. You still need the setup method to set up the test fixture.
 
