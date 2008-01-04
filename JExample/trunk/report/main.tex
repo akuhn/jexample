@@ -27,6 +27,7 @@
 \newcommand{\testPushAll}{\ttt{testPushAll()}}
 \newcommand{\testPop}{\ttt{testPop()}}
 \newcommand{\testPopFails}{\ttt{testPopFails()}}
+\newcommand{\attest}{\ttt{@Test}\xspace}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -52,6 +53,39 @@
 \todo{why dependencies}
  
 \section{Related Work}
+
+Besides \JUnit there are several other frameworks for Java unit testing like JTiger and TestNG. They both emerged because of some disadvantages of \JUnit 3. For example
+
+\begin{itemize}
+ \item naming conventions for test methods (they need to start with ''test'')
+ \item in order to initialize some state only once during a test run, you need to call a static method in the class \ttt{TestSetup}
+ \item etc
+\end{itemize}
+
+Most of these disadvantages disappeared with \JUnit 4.0 because of the usage of annotations. Test methods are labelled with the annotation \attest and for the single initialization the annotation \ttt{@BeforeClass} replaces the class \ttt{TestSetup}.
+
+JTiger adds some features like categories, so you can run only a subset of test methods, and more detailed results like ''Failure (Set Up)'', ''Failure'', or ''Failure (Tear Down)''.
+
+TestNG also provides grouping of test methods. Furthermore, it allows us to define dependent test methods.
+
+\begin{lstlisting}[label=lst:testng,caption=Dependent test methods in TestNG.]
+
+public class ATest {
+
+	@Test
+	public void a() {
+		
+	}
+	
+	@Test(dependsOnMethods = { ''a'' })
+	public void b() {
+	
+	}
+}
+
+\end{lstlisting}
+
+Considering the dependencies in Listing \ref{lst:testng} if \ttt{a()} fails \ttt{b()} is marked as skipped and not failed. If in a conventional \JUnit test case the setup fails the test methods are marked as failed. This can be quite confusing as \JUnit doesn't tell you, that the problem is actually in the setup method and not in the test methods themselves.
 
 \section{Example}
 
