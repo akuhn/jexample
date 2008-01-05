@@ -90,9 +90,9 @@ public class ATest {
 %not sure, if this example is ok, because in TestNG you still need the setup method
 Considering the dependencies in Listing \ref{lst:testng} if \ttt{a()} fails \ttt{b()} is marked as skipped and not failed. If in a conventional \JUnit test case the setup fails all the test methods are marked as failed. This can be quite confusing as \JUnit doesn't tell you, that the problem is actually in the setup method and not in the test methods themselves. When marking dependent methods as skipped if a dependency failed, you see at once where the actual error occurred.
 
-A method can also depend on a group of methods, so you don't have to list all the methods of a group for all the dependent methods. To make things even easier to write, class annotations are applied to all the methods inside a class and methods can depend on methods in a superclass. This gives you the possibility to put different parts of tests in different classes, like the initialization of an environment in one class and the tests depending on that initialization in a subclass of this class.
+A method can also depend on a group of methods, so you don't have to list all the methods of a group for all the dependent methods. To make things even easier to write, class annotations are applied to all the methods inside a class and methods can depend on methods in a superclass. This gives you the possibility to put different parts of tests in different classes, like the initialization of an environment in one class and the tests depending on that initialization in a subclass of this class. \JExample doesn't provide grouping of methods. Hence, a method cannot depend on a group of methods without specifying every single method as dependency. What it provides, however, is the possibility to define dependencies of methods in other, totally unrelated, classes.
 
-What \TestNG doesn't provide is the possibility to return objects and take them as arguments. You still need the setup method to set up the test fixture.
+What \TestNG doesn't provide is the possibility to return objects and take them as arguments. You still need the setup method to set up the test fixture. \JExample has no more setup method. The initialization of a test fixture is done in a conventional test method and returned. Methods using this fixture define this method as their dependency. Like this you can easily set up multiple test fixtures and you have the possibility to test the initialization.
 
 \section{Example}
 
@@ -286,13 +286,16 @@ If a method takes arguments \verb|TestMethod| gets the return values from the de
 \includepdf[pages=1-13]{figures/docs.pdf}
 
 \section{Ullman Original}
-\lstinputlisting[label=lst:ullmanorig,breaklines=true,caption=TestUllman.java]{tests/TestUllman.java}
+\lstinputlisting[label=lst:ullmanorig,breaklines=true,tabsize=2,firstline=23,caption=TestUllman.java]{tests/TestUllman.java}
 
 \section{Ullman refactored}
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption=IsomorphTestUllman.java]{tests/IsomorphTestUllman.java}
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption= SimpleSubgraphTest.java]{tests/SimpleSubgraphTest.java}
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption= SpecialSubgraphTest.java]{tests/SpecialSubgraphTest.java}
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,caption= VertexPairTest.java]{tests/VertexPairTest.java}
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=21,caption=IsomorphTestUllman.java]{tests/IsomorphTestUllman.java}
+\newpage
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=22,caption= SimpleSubgraphTest.java]{tests/SimpleSubgraphTest.java}
+\newpage
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=15,caption= SpecialSubgraphTest.java]{tests/SpecialSubgraphTest.java}
+\newpage
+\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=15,caption= VertexPairTest.java]{tests/VertexPairTest.java}
 
 \end{appendix}
 
