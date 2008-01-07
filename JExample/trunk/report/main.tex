@@ -86,7 +86,7 @@ Such implicit dependencies are hard to avoid, as operations for software entitie
 
 In this report I will introduce the testing framework \JExample, an extension to \JUnit providing explicit dependencies between test methods.
 Each test can return an object, that may be used as input for other tests.
-The methods in Listing \ref{lst:intro} in \JExample would look as follows.
+The methods in Listing \ref{lst:intro} implemented for \JExample would look as follows.
 
 \begin{lstlisting}[label=lst:introDep,caption=Explicit dependency between test methods in \JExample.]
     @Test
@@ -104,12 +104,21 @@ The methods in Listing \ref{lst:intro} in \JExample would look as follows.
         assertEquals(0, set.size());
     }
 \end{lstlisting}
+
+I will also discuss the result of a case study, done to compare \JExample and conventional \JUnit tests. The following criteria was analysed:
+\begin{itemize}
+\item \emph{Defect localization:} in the presence of defects, the testing framework should focus one's attention on the most relevant failing tests. We randomly introduce defects to compare the locality of defects as reported by the framework.
+\item \emph{Runtime performance:} we measure the execution time of each implementation.
+\item \emph{Test suite size:} We calculate the number of lines, test methods, and assertion statements.
+\item \emph{Maintainability:} We evaluate the presence of duplicated code, and other common tests smells, namely General Fixture and Eager Test \cite{Deur01a}.
+\end{itemize}
  
 \section{Related Work}
 
 Besides \JUnit there are several other frameworks for Java unit testing like \JTiger and \TestNG. They both emerged because of some disadvantages of \JUnit 3. For example
 
-% more disadvantages?
+\todo{more, better disadvantages}
+
 \begin{itemize}
  \item naming conventions for test methods (they need to start with ''test'')
  \item in order to initialize some state only once during a test run, you need to call a static method in the class \ttt{TestSetup}
