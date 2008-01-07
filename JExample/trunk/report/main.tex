@@ -6,6 +6,7 @@
 \usepackage{xspace}
 \usepackage{bold-extra}
 \usepackage{listings}
+\usepackage{hyperref}
 \usepackage[final]{pdfpages}
 
 \graphicspath{{figures/}}
@@ -29,6 +30,8 @@
 \newcommand{\testPushAll}{\ttt{testPushAll()}}
 \newcommand{\testPop}{\ttt{testPop()}}
 \newcommand{\testPopFails}{\ttt{testPopFails()}}
+\newcommand{\testAdd}{\ttt{testAdd()}}
+\newcommand{\testRemove}{\ttt{testRemove()}}
 \newcommand{\attest}{\ttt{@Test}\xspace}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -51,8 +54,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-\todo{why JUnit}\\\\
-\todo{why dependencies}
+Whether dependencies between tests are good are bad is discussed a lot \cite{Deur01a,Fews99a,Mesz07a}.
+On one side is the xUnit family of testing frameworks. Test methods are supposed to be independent artifacts, sharing at most a test fixture creating the unit under test. Hence, they advise their users to avoid dependencies between tests.
+On the other side is \TestNG, a framework that supports explicit test dependencies \cite{Bues07a}.
+
+But, as shown by previous research, xUnit tests do have implicit dependencies\ \cite{Gael04c}.
+This suggests, that dependencies between tests are inevitable!
+As motivating example consider the methods in Listing \ref{lst:intro}. \testAdd and \testRemove are implemented to run independently of each other. Nevertheless, \testRemove implicitly depends on the outcome of \testAdd. Both methods must cover \ttt{Set}'s \ttt{add} method, hence, an implicit dependency between \testAdd and \testRemove exists: if \testAdd fails \testRemove is likely to fail too.
+
+\begin{lstlisting}[label=lst:intro,caption=Implicit dependency between test methods.]
+    public void testAdd() {
+    	Set set = new TreeSet();
+        set.add("Foo");
+        assertEquals(1, set.size());
+    }
+
+    public void testRemove() {
+    	Set set = new TreeSet();
+        set.add("Foo");
+        set.remove("Foo");
+        assertEquals(0, set.size());
+    }
+\end{lstlisting}
  
 \section{Related Work}
 
@@ -314,15 +337,18 @@ If a method takes arguments \verb|TestMethod| gets the return values from the de
 \lstinputlisting[label=lst:ullmanorig,breaklines=true,tabsize=2,firstline=23,caption=TestUllman.java]{tests/TestUllman.java}
 
 \section{Ullman refactored}
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=21,caption=IsomorphTestUllman.java]{tests/IsomorphTestUllman.java}
+\lstinputlisting[label=breaklines=true,tabsize=2,firstline=21,caption=IsomorphTestUllman.java]{tests/IsomorphTestUllman.java}
 \newpage
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=22,caption= SimpleSubgraphTest.java]{tests/SimpleSubgraphTest.java}
+\lstinputlisting[label=breaklines=true,tabsize=2,firstline=22,caption= SimpleSubgraphTest.java]{tests/SimpleSubgraphTest.java}
 \newpage
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=15,caption= SpecialSubgraphTest.java]{tests/SpecialSubgraphTest.java}
+\lstinputlisting[label=breaklines=true,tabsize=2,firstline=15,caption= SpecialSubgraphTest.java]{tests/SpecialSubgraphTest.java}
 \newpage
-\lstinputlisting[label=lst:ullmancomp,breaklines=true,tabsize=2,firstline=15,caption= VertexPairTest.java]{tests/VertexPairTest.java}
+\lstinputlisting[label=breaklines=true,tabsize=2,firstline=15,caption= VertexPairTest.java]{tests/VertexPairTest.java}
 
 \end{appendix}
+
+\bibliographystyle{ieee}
+\bibliography{scg,local}
 
 \end{document}
 
