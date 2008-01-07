@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,a4paper,pdftex]{article}
 
 \usepackage{graphicx}
 \usepackage{glossary}
@@ -54,24 +54,52 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
+\lstset{language=Java}
+
 Whether dependencies between tests are good are bad is discussed a lot \cite{Deur01a,Fews99a,Mesz07a}.
 On one side is the xUnit family of testing frameworks. Test methods are supposed to be independent artifacts, sharing at most a test fixture creating the unit under test. Hence, they advise their users to avoid dependencies between tests.
 On the other side is \TestNG, a framework that supports explicit test dependencies \cite{Bues07a}.
 
 But, as shown by previous research, xUnit tests do have implicit dependencies\ \cite{Gael04c}.
-This suggests, that dependencies between tests are inevitable!
+This suggests that dependencies between tests are inevitable!
 As motivating example consider the methods in Listing \ref{lst:intro}. \testAdd and \testRemove are implemented to run independently of each other. Nevertheless, \testRemove implicitly depends on the outcome of \testAdd. Both methods must cover \ttt{Set}'s \ttt{add} method, hence, an implicit dependency between \testAdd and \testRemove exists: if \testAdd fails \testRemove is likely to fail too.
 
 \begin{lstlisting}[label=lst:intro,caption=Implicit dependency between test methods.]
+    
+    @Test
     public void testAdd() {
     	Set set = new TreeSet();
         set.add("Foo");
         assertEquals(1, set.size());
     }
 
+    @Test
     public void testRemove() {
     	Set set = new TreeSet();
         set.add("Foo");
+        set.remove("Foo");
+        assertEquals(0, set.size());
+    }
+\end{lstlisting}
+
+Such implicit dependencies are hard to avoid, as operations for software entities naturally depend on each other \cite{Fews99a, Mesz07a, Deur01a}. They are not at all uncommon in test code.
+
+In this report I will introduce the testing framework \JExample, an extension to \JUnit providing explicit dependencies between test methods.
+Each test can return an object, that may be used as input for other tests.
+The methods in Listing \ref{lst:intro} in \JExample would look as follows.
+
+\begin{lstlisting}[label=lst:introDep,caption=Explicit dependency between test methods in \JExample.]
+    @Test
+    public Set testAdd() {
+    	Set set = new TreeSet();
+        set.add("Foo");
+        assertEquals(1, set.size());
+        return set;
+    }
+
+    @Test
+    @Depends( ''testAdd'' )
+    public void testRemove(Set set) {
         set.remove("Foo");
         assertEquals(0, set.size());
     }
@@ -141,8 +169,6 @@ As data providing in \JExample is done in conventional test methods, the creatio
 \TestNG provides some more features which \JUnit doesn't. But I will not go into them. This would be part of a comparison of \TestNG and the basic \JUnit framework.
 
 \section{Example}
-
-\lstset{language=Java}
 
 In this section I will illustrate the difference between composed and conventional test methods by exercising a sample test case. Unit under test is a simple Stack implementation. A convention test case would go as follows:
 
