@@ -61,7 +61,7 @@ On one side is the xUnit family of testing frameworks. Test methods are supposed
 On the other side is \TestNG, a framework that supports explicit test dependencies \cite{Bues07a}.
 
 But, as shown by previous research, xUnit tests do have implicit dependencies\ \cite{Gael04c}.
-This suggests that dependencies between tests are inevitable!
+This suggests that dependencies between tests are inevitable.
 As motivating example consider the methods in Listing \ref{lst:intro}. \testAdd and \testRemove are implemented to run independently of each other. Nevertheless, \testRemove implicitly depends on the outcome of \testAdd. Both methods must cover \ttt{Set}'s \ttt{add} method, hence, an implicit dependency between \testAdd and \testRemove exists: if \testAdd fails \testRemove is likely to fail too.
 
 \begin{lstlisting}[label=lst:intro,caption=Implicit dependency between test methods.]
@@ -105,7 +105,7 @@ The methods in Listing \ref{lst:intro} implemented for \JExample would look as f
     }
 \end{lstlisting}
 
-I will also discuss the result of a case study, done to compare \JExample and conventional \JUnit tests. The following criteria was analysed:
+I will also discuss the result of a case study, done to compare \JExample and conventional \JUnit tests by analysing the following criteria:
 \begin{itemize}
 \item \emph{Defect localization:} in the presence of defects, the testing framework should focus one's attention on the most relevant failing tests. We randomly introduce defects to compare the locality of defects as reported by the framework.
 \item \emph{Runtime performance:} we measure the execution time of each implementation.
@@ -127,7 +127,7 @@ Besides \JUnit there are several other frameworks for Java unit testing like \JT
 
 Most of these disadvantages disappeared with \JUnit 4.0 because of the usage of annotations. Test methods are labelled with the annotation \attest and for the single initialization the annotation \ttt{@BeforeClass} replaces the class \ttt{TestSetup}. The method annotated with \ttt{@BeforeClass} still needs to be static.
 
-\JTiger adds some features like categories, so you can run only a subset of test methods, and more detailed results like ''Failure (Set Up)'', ''Failure'', or ''Failure (Tear Down)''.
+\JTiger adds some features like categories, so you can run only a subset of test methods, and more detailed results like ''Failure (Set Up)'', ''Failure'', or ''Failure (Tear Down)''. Since \JTiger does not cover dependencies between test methods I will not go into further details about it.
 
 \TestNG also provides grouping of test methods. Furthermore, it allows us to define dependent test methods.
 
@@ -152,7 +152,7 @@ Considering the dependencies in Listing \ref{lst:testng} if \ttt{a()} fails \ttt
 
 A method can also depend on a group of methods, so you don't have to list all the methods of a group for all the dependent methods. To make things even easier to write, class annotations are applied to all the methods inside a class and methods can depend on methods in a superclass. This gives you the possibility to put different parts of tests in different classes, like the initialization of an environment in one class and the tests depending on that initialization in a subclass of this class. \JExample doesn't provide grouping of methods. Hence, a method cannot depend on a group of methods without specifying every single method as dependency. What it provides, however, is the possibility to define dependencies of methods in other, totally unrelated, classes.
 
-Test methods in \TestNG can also have parameters. The difference between \TestNG and \JExample is where the parameters come from. In \JExample the parameters are simply the objects returned from the dependencies. In \TestNG there are two possibilities. You can either define a parameter in the configuration xml and tell the method with the \ttt{@Parameters} annotation which values to take. Or you specify a method as data provider. A data provider is annotated with \ttt{@DataProvider} and has to return Object[][] or Iterator<Object[]>. Methods using this data need to specify which data provider to use by setting the \ttt{dataProvider} value of the \attest annotation.
+Test methods in \TestNG can also have parameters. The difference between \TestNG and \JExample is where the parameters come from. In \JExample the parameters are simply the objects returned from the dependencies. In \TestNG there are two possibilities. You can either define a parameter in the configuration xml and tell the method with the \ttt{@Parameters} annotation which values to take. Or you specify a method as data provider. A data provider is annotated with \ttt{@DataProvider} and has to return \ttt{Object[][]} or \ttt{Iterator<Object[]>}. Methods using this data need to specify which data provider to use by setting the \ttt{dataProvider} value of the \attest annotation.
 
 \begin{lstlisting}[label=lst:dataprovider,caption=Data providing in \TestNG with \ttt{@DataProvider}.]
 
@@ -179,7 +179,7 @@ As data providing in \JExample is done in conventional test methods, the creatio
 
 \section{Example}
 
-In this section I will illustrate the difference between composed and conventional test methods by exercising a sample test case. Unit under test is a simple Stack implementation. A convention test case would go as follows:
+In this section I will illustrate the difference between dependent and conventional test methods by exercising a sample test case. Unit under test is a simple Stack implementation. A conventional test case would go as follows:
 
 \begin{lstlisting}[label=lst:junit,caption=Conventional \JUnit test case.]
 public class StackTest {
@@ -222,7 +222,7 @@ public class StackTest {
 }
 \end{lstlisting}
 
-When running Listing \ref{lst:junit} \setup is executed before every test method and the test fixture is passed as class attribute. We could say, that all the test methods depend on \setup. In \JExample \setup would be a normal test method returning an instance of a Stack.
+When running Listing \ref{lst:junit} \setup is executed before every test method and the test fixture is passed as class attribute. Let's say that all the test methods depend on \setup. In \JExample \setup would be a normal test method returning an instance of a Stack.
 
 \begin{lstlisting}[label=lst:setup,caption=Promote fixture to test with return value.]
     @Test
@@ -234,8 +234,8 @@ When running Listing \ref{lst:junit} \setup is executed before every test method
     }
 \end{lstlisting}
 
-Please note, that by setting up the fixture in a test method instead of a setup method, the initialization of the fixture can be tested, too.
-\testPush and \testPopFails need to define \setup as their dependency because they need an empty stack. This is done by annotating them with \ttt{@Depends}. Furthermore, they need to take a Stack as an argument.
+Please note, that by setting up the fixture in a test method instead of a setup method, the initialization of the fixture can be tested too.
+\testPush and \testPopFails need to define \setup as their dependency because they need an empty stack. This is done by annotating them with \ttt{@Depends}. The Stack returned by \setup is passed to the dependent methods as argument. In order for a dependency to be valid, the type of the returned object and the type of argument taken by the dependent test method have to be the same.
 
 \begin{lstlisting}[label=lst:testpush,caption=Take another test's result as input value.]
     @Test
@@ -254,8 +254,8 @@ Please note, that by setting up the fixture in a test method instead of a setup 
     }
 \end{lstlisting}
 
-When running Listing \ref{lst:testPush} \JExample runs first \setup, as it is the root of the dependency hierarchy. If \setup run successfully \testPush and \testPopFails are run with the return value from \setup as argument (if \setup fails, \testPush and \testPopFails are ignored).
-In order to have the same state of the stack for both the dependents the return value needs to be cloned. Of course this can only be accomplished if the return value's class or one of its superclasses implements \verb|Object.clone()|.
+When running Listing \ref{lst:testpush} \JExample runs \setup first, as it is the root of the dependency hierarchy. If \setup has run successfully \testPush and \testPopFails are run with the return value from \setup as argument (if \setup fails, \testPush and \testPopFails are ignored).
+In order to have the same state of the stack for both the dependents the return value needs to be cloned. Of course this can only be accomplished if the return value's class or one of its superclasses implements \ttt{Object.clone()}.
 Let's now reconsider Listing \ref{lst:junit} to find deeper levels of dependencies in order to get a real graph of composed test methods.
 Indeed, we find two methods that depend on \testPush: \testPop cannot be executed without pushing an element on the stack first and \testPushAll will probably also fail if pushing a single element fails.
 
@@ -295,14 +295,29 @@ With \ttt{Stack}'s \ttt{push} method failing, the test result would be two green
 
 \section{Implementation}
 
-To extend the \JUnit Framework mainly one class is needed. The Runner. This class consists of three parts corresponding to the three steps of a test run.
+In this section I will first give a very short overview of what happens when running a test in \JUnit. Parting from there I will explain what was changed in \JExample and why it was changed.
+
+So, what happens when running a test case? First of all, every test case has a runner. This runner is either the default runner of the \JUnit framework or it is specified from the user with the class annotation \ttt{@RunWith}. This annotation takes as value the class of the runner the user wishes to run his tests with. To run a test with \JExample the class definition would look as follows: 
+
+\begin{lstlisting}[caption=test class definition in \JExample]
+
+@RunWith(ComposedTestRunner.class)
+public class SomeTest {
+
+}
+
+\end{lstlisting}
+
+A runner extends the abstract class \ttt{Runner} from the framework and consists of three parts corresponding to the three steps of a test run.
 
 \begin{enumerate}
- \item a constructor for the initialization of the Runner
- \item a method \verb|Runner.run()| to run the test methods
- \item a method \verb|Runner.getDescription()| to get information about the run
+ \item a constructor for the initialization of the runner
+ \item a method \ttt{run()} to run the test methods
+ \item a method \ttt{getDescription()} to get information about the run test case
 \end{enumerate}
-In \JExample \verb|ComposedTestRunner| is only a delegator. It passes the responsibilities to the \verb|TestGraph|. The reason will be explained later on.\\
+First important thing happening when running a test is the initialization of a runner per test case. The initialization consists of collecting and validating the test methods. If something fails during the initialization the test case won't be run. Then \ttt{run()} is called and all the test methods are run and the results are saved. At last the framework gets the description of the run test case. This description does not contain test results. It just tells the framework, what test methods were inovked.
+
+Since the goal of \JExample was to change the allowed form of test methods (in \JUnit the return type of a test method has to be \ttt{void} and arguments are not allowed) and when and how test methods are invoked, the runner was the place to start.
 See Figure \ref{fig:classDiag} for the important classes of \JExample.
 
 \begin{figure}[htbp]
@@ -311,7 +326,8 @@ See Figure \ref{fig:classDiag} for the important classes of \JExample.
  \label{fig:classDiag}
 \end{figure}
 
-For \JExample also wrapper classes and validators needed to be adapted. \JUnit only allows methods without parameters and with return type void. As methods in \JExample need to be allowed to take arguments and return objects, the validation of the methods needed to be adapted. See Figure \ref{fig:classDiagInit} for the classes responsible for the initialization and validation of a test run.
+As mentioned above, the allowed form of methods is different in \JExample. Furthermore, dependencies cannot be cyclic. Therefore, the validation of a test case also includes cycle detection. For conventional \JUnit test cases only the form of the class under test, including its methods, needs to be validated. In addition to the extended validation also the collection of test methods is not as simple as for conventional test cases. A method can depend on a method of another class that is not part of the current test suite. These methods have to be collected without adding the whole class to the current run.
+See Figure \ref{fig:classDiagInit} for the classes responsible for the initialization and validation of a test run.
 
 \begin{figure}[htbp]
  \includegraphics[width=20.0cm]{classdiagramInit.pdf}
@@ -319,22 +335,23 @@ For \JExample also wrapper classes and validators needed to be adapted. \JUnit o
  \label{fig:classDiagInit}
 \end{figure}
 
-In \JUnit a separate class is responsible for running the test methods. In \JExample \verb|TestMethod| is responsible for running its wrapped method. A \verb|TestMethod| knows its dependencies and its return value. Therefore it can simply ask its dependencies if they passed and get possible return values.
+The last big change is the class responsible for the actual invoking of the test methods. In \JUnit a separate class is responsible for running the test methods. This includes to invoke the set up method before every method. In \JExample methods run themselves. Every method is wrapped in a\ttt{TestMethod}. The same happens in conventional \JUnit test cases. But in \JExample this wrapper has some more responsibilities like knowing its dependencies and return value. Every \ttt{TestMethod} makes sure that all of its dependencies have been run and terminated successfully before invoking its wrapped method.
 
-In the following section I will go into more detail for the single, most important classes of \JExample
+In the following I will go into more detail for the most important classes of \JExample.
 
 \subsubsection{The ComposedTestRunner}
 
-The Runner is the main connection to the \JUnit Framework. It extends the abstract class \verb|org.junit.runner.Runner| and implements two methods \verb|Runner.run()| and \verb|Runner.getDescription()|. A test run consists of three steps:
+The runner is the main connection to the \JUnit framework. It extends the abstract class \verb|org.junit.runner.Runner| and implements two methods \verb|Runner.run()| and \verb|Runner.getDescription()|. A test run consists of three steps:
 \begin{enumerate}
  \item initializing the Runner, this includes collecting and validating methods and test dependencies
  \item running the methods
  \item getting the description of the run
 \end{enumerate}
+In \JExample the \ttt{ComposedTestRunner} is only a delegator. The reason for that is explained in the section about the real runner, the \ttt{TestGraph}.
 
 \subsubsection{The TestGraph}
 
-The real Runner in \JExample is the \verb|TestGraph|. The reason for delegating this responsibility to another class is that we wanted the Runner to be a singleton. A singleton is necessary because a method can depend on a method from another class. When running a test suite, this makes sure that every method is collected and run only once. Therefore, every method is counted only once and the run count correpsonds to the number of methods. This is possible because of the behaviour of \JUnit when running multiple classes at once. First, a Runner per class is initialized, then all the classes are run and in the end, the description for every class is collected.
+The real runner in \JExample is the \verb|TestGraph|. The reason for delegating this responsibility to another class is that we wanted the runner to be a singleton. A singleton is necessary because a method can depend on a method from another class. When running a test suite, this makes sure that every method is collected and run only once. Therefore, every method is counted only once and the run count correpsonds to the number of methods. This is possible because of the behaviour of \JUnit when running multiple classes at once. First, a runner per class is initialized, then all the classes are run and in the end, the description for every class is collected.
 
 \todo{ev. insert sequence diagram for the three steps of a test run with two or more classes}
 
@@ -355,7 +372,7 @@ The \verb|TestGraph| reflects the three steps of a test run in its three public 
  \item[IGNORED] the method is either annotated with \verb|@Ignore| or one of its dependencies has the result RED or IGNORED
  \end{description}
 
-It makes sure, that all of its dependencies have been run before it's run itself. It also checks the results of its dependencies. If one of the dependencies failed or was ignored, either because of the annotation \verb|@Ignore| or because one of its dependencies failed or was ignored, it informs the \verb|RunNotifier| that it is ignored, too.
+It makes sure, that all of its dependencies have been run before it's run itself. It also checks the results of its dependencies. If one of the dependencies failed or was ignored, either because of the annotation \verb|@Ignore| or because one of its dependencies failed or was ignored, it informs the framework that it is ignored too.
 
 If a method takes arguments \verb|TestMethod| gets the return values from the dependencies and passes them to the method to be run. The return value is cloned before it is passed to the method if its class or one of its superclasses implements \verb|Cloneable| and overrides \verb|Object.clone()|.
 
