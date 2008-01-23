@@ -28,11 +28,11 @@
     </target>
 	
     <target name="compress-javadoc" description="Compression target">
-        <jar id="files" jarfile="jexample-docs.jar">
+        <zip id="files" jarfile="jexample-docs.zip">
     		<fileset dir="javadoc" includes="**/*.html"/>
     		<fileset dir="src" includes="**/*.java"/>
-        </jar>
-    	<zipfileset id="files" src="jexample-docs.jar"/>
+        </zip>
+    	<zipfileset id="files" src="jexample-docs.zip"/>
     	<pathconvert property="listing" refid="files" pathsep="${line.separator}">
     		<globmapper from="${basedir}${file.separator}*" to="*"/>
     	</pathconvert>	
