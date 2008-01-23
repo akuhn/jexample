@@ -1,7 +1,7 @@
 /**
  * 
  */
-package extension.tests;
+package jexample.internal.tests;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,15 +9,16 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import jexample.Depends;
+import jexample.internal.CycleDetector;
+import jexample.internal.MethodCollector;
+import jexample.internal.TestClass;
+import jexample.internal.TestMethod;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
-import extension.CycleDetector;
-import extension.MethodCollector;
-import extension.TestClass;
-import extension.TestMethod;
-import extension.annotations.Depends;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -192,7 +193,7 @@ public class CycleDetectorTest {
 		}
 
 		@Test
-		@Depends( "rootMethod;extension.tests.B.cyclicMethod" )
+		@Depends( "rootMethod;jexample.internal.tests.B.cyclicMethod" )
 		public void middleCyclicMethod() {
 
 		}

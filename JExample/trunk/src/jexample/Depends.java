@@ -1,4 +1,4 @@
-package extension.annotations;
+package jexample;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

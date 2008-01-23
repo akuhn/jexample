@@ -1,10 +1,11 @@
-package extension.tests;
+package jexample.internal.tests;
+
+import jexample.ComposedTestRunner;
+import jexample.Depends;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import extension.ComposedTestRunner;
-import extension.annotations.Depends;
 
 @RunWith( ComposedTestRunner.class )
 public class A {

@@ -1,19 +1,20 @@
 /**
  * 
  */
-package extension.tests;
+package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import jexample.Depends;
+import jexample.internal.MethodCollector;
+import jexample.internal.TestClass;
+import jexample.internal.TestMethod;
+
 import org.junit.Test;
 
-import extension.MethodCollector;
-import extension.TestClass;
-import extension.TestMethod;
-import extension.annotations.Depends;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)

@@ -1,4 +1,4 @@
-package extension.tests;
+package jexample.internal.tests;
 
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;

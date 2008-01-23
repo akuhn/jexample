@@ -1,18 +1,19 @@
 /**
  * 
  */
-package extension.tests;
+package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 
+import jexample.ComposedTestRunner;
+import jexample.internal.DependencyValidator;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import extension.ComposedTestRunner;
-import extension.DependencyValidator;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)

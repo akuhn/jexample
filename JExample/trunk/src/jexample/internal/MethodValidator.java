@@ -1,4 +1,4 @@
-package extension;
+package jexample.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import jexample.Depends;
+
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
-import extension.annotations.Depends;
 
 /**
  * The <code>MethodValidator</code> class validates all test methods in

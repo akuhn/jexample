@@ -1,9 +1,13 @@
-package extension;
+package jexample;
+
+import jexample.internal.TestClass;
+import jexample.internal.TestGraph;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
+
 
 /**
  * The <code>ComposedTestRunner</code> class is the Runner for composed JUnit

@@ -1,20 +1,21 @@
 /**
  * 
  */
-package extension.tests;
+package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
+import jexample.ComposedTestRunner;
+import jexample.internal.DependencyParser;
+import jexample.internal.TestClass;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import extension.ComposedTestRunner;
-import extension.DependencyParser;
-import extension.TestClass;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -65,7 +66,7 @@ public class DependencyParserTest {
 
 	@Test
 	public void testExtDepWithPackageFound() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "extension.TestClass.getJavaClass", annotatedMethod );
+		List<Method> methods = this.parser.getDependencies( "jexample.internal.TestClass.getJavaClass", annotatedMethod );
 		assertEquals( 1, methods.size() );
 	}
 

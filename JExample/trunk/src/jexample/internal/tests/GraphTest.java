@@ -1,18 +1,19 @@
-package extension.tests;
+package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import jexample.Depends;
+import jexample.internal.TestClass;
+import jexample.internal.TestGraph;
+import jexample.internal.TestMethod;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
-import extension.TestClass;
-import extension.TestGraph;
-import extension.TestMethod;
-import extension.annotations.Depends;
 
 public class GraphTest {
 

@@ -1,18 +1,18 @@
 /**
  * 
  */
-package extension.tests;
+package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import jexample.ComposedTestRunner;
+import jexample.Depends;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
-import extension.ComposedTestRunner;
-import extension.annotations.Depends;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)

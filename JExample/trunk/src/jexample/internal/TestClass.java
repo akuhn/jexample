@@ -1,4 +1,4 @@
-package extension;
+package jexample.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jexample.Depends;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import extension.annotations.Depends;
 
 /**
  * A wrapper for the {@link Class} under test.

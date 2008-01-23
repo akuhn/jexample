@@ -1,14 +1,15 @@
 /**
  * 
  */
-package extension;
+package jexample.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import extension.annotations.Depends;
+import jexample.Depends;
+
 
 /**
  * The <code>DependencyParser</code> class parses a String for the {@link Method}'s it
