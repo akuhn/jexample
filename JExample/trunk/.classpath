@@ -2,13 +2,6 @@
 <classpath>
 	<classpathentry excluding="org/junit/experimental/imposterization/|org/junit/experimental/test/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="cglib-nodep-2.2_beta1.jar"/>
-	<classpathentry kind="lib" path="hamcrest-core-1.1.jar"/>
-	<classpathentry kind="lib" path="jmock-2.2.0-RC1.jar"/>
-	<classpathentry kind="lib" path="objenesis-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/concurrent.jar"/>
-	<classpathentry kind="lib" path="lib/jung-1.7.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
