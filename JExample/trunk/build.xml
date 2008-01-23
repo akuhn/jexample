@@ -3,7 +3,7 @@
 
     <target name="compress" description="Compression target">
         <jar id="files" jarfile="jexample.jar">
-    		<fileset dir="bin" includes="**/*.class*"/>
+    		<fileset dir="bin" includes="**/*.class"/>
     		<fileset dir="src" includes="**/*.java"/>
         </jar>
     	<zipfileset id="files" src="jexample.jar"/>
@@ -16,8 +16,9 @@
 	<property name="eclipse.home" value="C:\Program Files\Eclipse\eclipse-SDK-3.3.1-win32\eclipse"/> 
 	
     <target name="javadoc">
-    	<deltree dir="javadoc"/>
-    	<echo message="${eclipse.home}/plugins/org.junit4_4.3.1/junit.jar"/>
+    	<delete>
+    		<fileset dir="javadoc" includes="**/*.html"/>
+    	</delete>	
         <javadoc access="public" author="true" 
         	classpath="${eclipse.home}/plugins/org.junit4_4.3.1/junit.jar"
         	destdir="javadoc" nodeprecated="false" nodeprecatedlist="false"
@@ -26,5 +27,16 @@
         	sourcepath="src" splitindex="true" use="true" version="true"/>
     </target>
 	
+    <target name="compress-javadoc" description="Compression target">
+        <jar id="files" jarfile="jexample-docs.jar">
+    		<fileset dir="javadoc" includes="**/*.html"/>
+    		<fileset dir="src" includes="**/*.java"/>
+        </jar>
+    	<zipfileset id="files" src="jexample-docs.jar"/>
+    	<pathconvert property="listing" refid="files" pathsep="${line.separator}">
+    		<globmapper from="${basedir}${file.separator}*" to="*"/>
+    	</pathconvert>	
+    	<echo message="${listing}"/>
+    </target>
 
 </project>
