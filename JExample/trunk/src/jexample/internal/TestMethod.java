@@ -18,7 +18,7 @@ import org.junit.runner.notification.RunNotifier;
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 enum TestResult {
-	NOT_YET_RUN, GREEN, RED, IGNORED
+	NOT_YET_RUN, GREEN, RED, WHITE
 }
 
 /**
@@ -91,7 +91,7 @@ public class TestMethod {
 		if ( allParentsGreen && !this.isIgnoredByAnnotation() ) {
 			this.runTestMethod( notifier );
 		} else {
-			this.setIgnored();
+			this.setWhite();
 			notifier.fireTestIgnored( this.createDescription() );
 		}
 	}
@@ -268,8 +268,8 @@ public class TestMethod {
 		this.state = TestResult.GREEN;
 	}
 
-	private void setIgnored() {
-		this.state = TestResult.IGNORED;
+	private void setWhite() {
+		this.state = TestResult.WHITE;
 	}
 
 	private void setFailed() {

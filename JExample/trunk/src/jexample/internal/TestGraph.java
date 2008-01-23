@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jexample.ComposedTestRunner;
+import jexample.JExampleRunner;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
@@ -15,7 +15,7 @@ import org.junit.runner.notification.RunNotifier;
 
 /**
  * The <code>TestGraph</code> class takes the responsibility delegated from
- * {@link ComposedTestRunner}: validating {@link Method}'s, running tests and
+ * {@link JExampleRunner}: validating {@link Method}'s, running tests and
  * returning {@link Description}'s.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)

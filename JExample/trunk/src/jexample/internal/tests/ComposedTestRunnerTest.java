@@ -5,7 +5,7 @@ package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import jexample.ComposedTestRunner;
+import jexample.JExampleRunner;
 import jexample.Depends;
 
 import org.junit.Test;
@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
  */
 public class ComposedTestRunnerTest {
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class CycleMethods {
 
 		public CycleMethods() {
@@ -52,7 +52,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( "The dependencies are cyclic.", result.getFailures().get( 0 ).getMessage() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class SkipMethods {
 
 		public SkipMethods() {
@@ -93,7 +93,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( 2, result.getRunCount() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class BadDependencies {
 
 		public BadDependencies() {
@@ -124,7 +124,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class GoodTest {
 		public GoodTest() {
 		}
@@ -155,7 +155,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class FirstGoodTest {
 		public FirstGoodTest() {
 		}
@@ -172,7 +172,7 @@ public class ComposedTestRunnerTest {
 		}
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class SecondGoodTest {
 		public SecondGoodTest() {
 		}
@@ -192,7 +192,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class FirstBadTest {
 		public FirstBadTest() {
 		}
@@ -215,7 +215,7 @@ public class ComposedTestRunnerTest {
 		}
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class SecondBadTest {
 		public SecondBadTest() {
 		}
@@ -235,7 +235,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( 1, result.getRunCount() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class WithAttributes {
 		public WithAttributes() {
 
@@ -286,7 +286,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( 6, result.getRunCount() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class DependsOnBeforeTest {
 
 		public DependsOnBeforeTest() {
@@ -319,7 +319,7 @@ public class ComposedTestRunnerTest {
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	static public class CloneRetVal {
 
 		public CloneRetVal() {

@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import jexample.ComposedTestRunner;
+import jexample.JExampleRunner;
 import jexample.internal.DependencyParser;
 import jexample.internal.TestClass;
 
@@ -70,7 +70,7 @@ public class DependencyParserTest {
 		assertEquals( 1, methods.size() );
 	}
 
-	@RunWith( ComposedTestRunner.class )
+	@RunWith( JExampleRunner.class )
 	private class TestTestClass {
 		@Test
 		public void annotatedMethod() {

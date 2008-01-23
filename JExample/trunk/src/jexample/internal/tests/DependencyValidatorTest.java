@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 
-import jexample.ComposedTestRunner;
+import jexample.JExampleRunner;
 import jexample.internal.DependencyValidator;
 
 import org.junit.Before;
@@ -94,7 +94,7 @@ public class DependencyValidatorTest {
 		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.returnsInt ).size() );
 	}
 
-	@RunWith(ComposedTestRunner.class)
+	@RunWith(JExampleRunner.class)
 	private class TestTestClass {
 
 		@Test

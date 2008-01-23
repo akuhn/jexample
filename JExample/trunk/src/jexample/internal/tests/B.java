@@ -1,13 +1,13 @@
 package jexample.internal.tests;
 
-import jexample.ComposedTestRunner;
+import jexample.JExampleRunner;
 import jexample.Depends;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
-@RunWith( ComposedTestRunner.class )
+@RunWith( JExampleRunner.class )
 public class B {
 
 	public B() {

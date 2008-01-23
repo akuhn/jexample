@@ -10,12 +10,12 @@ import org.junit.runner.notification.RunNotifier;
 
 
 /**
- * The <code>ComposedTestRunner</code> class is the Runner for composed JUnit
+ * The <code>JExampleRunner</code> class is the Runner for composed JUnit
  * Tests. It delegates everything to the Singleton {@link TestGraph}.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
-public class ComposedTestRunner extends Runner {
+public class JExampleRunner extends Runner {
 
 	private static TestGraph graph = TestGraph.getInstance();
 
@@ -25,7 +25,7 @@ public class ComposedTestRunner extends Runner {
 	 * @param underTest the {@link Class} to be run as a test
 	 * @throws InitializationError
 	 */
-	public ComposedTestRunner( Class<?> underTest ) throws InitializationError {
+	public JExampleRunner( Class<?> underTest ) throws InitializationError {
 		this.underTest = new TestClass( underTest );
 		graph.addClass( this.underTest );
 	}
