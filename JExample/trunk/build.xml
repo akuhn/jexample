@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<project default="compress" basedir=".">
+
+    <target name="compress" description="Compression target">
+        <jar id="files" jarfile="jexample.jar">
+    		<fileset dir="bin" includes="**/*.class*"/>
+    		<fileset dir="src" includes="**/*.java"/>
+        </jar>
+    	<zipfileset id="files" src="jexample.jar"/>
+    	<pathconvert property="listing" refid="files" pathsep="${line.separator}">
+    		<globmapper from="${basedir}${file.separator}*" to="*"/>
+    	</pathconvert>	
+    	<echo message="${listing}"/>
+    </target>
+	
+	<property name="eclipse.home" value="C:\Program Files\Eclipse\eclipse-SDK-3.3.1-win32\eclipse"/> 
+	
+    <target name="javadoc">
+    	<deltree dir="javadoc"/>
+    	<echo message="${eclipse.home}/plugins/org.junit4_4.3.1/junit.jar"/>
+        <javadoc access="public" author="true" 
+        	classpath="${eclipse.home}/plugins/org.junit4_4.3.1/junit.jar"
+        	destdir="javadoc" nodeprecated="false" nodeprecatedlist="false"
+        	noindex="false" nonavbar="false" notree="false"
+        	packagenames="jexample,jexample.internal" source="1.6"
+        	sourcepath="src" splitindex="true" use="true" version="true"/>
+    </target>
+	
+
+</project>
