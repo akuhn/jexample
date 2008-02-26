@@ -11,18 +11,18 @@ import org.junit.runner.RunWith;
 public class DemoTest {
 
 	@Test
-	public Demo demoTest(){
+	public Demo demoTest() {
 		Demo aDemo = new Demo("Hi, I'm a Demo.");
 		assertEquals(aDemo, aDemo);
-		
+
 		System.out.println("demoTest:\t" + aDemo);
-		
+
 		return aDemo;
 	}
-	
+
 	@Test
 	@Depends("demoTest")
-	public void secondDemoTest(Demo clonedDemo){
+	public void secondDemoTest(Demo clonedDemo) {
 		assertEquals(new Demo("Hi, I'm a Demo."), clonedDemo);
 		
 		System.out.println("secondDemoTest:\t" + clonedDemo);

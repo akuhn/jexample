@@ -131,7 +131,6 @@ public class TestMethod {
 	 */
 	public Description createDescription() {
 		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName() );
-		// this.javaMethod.getAnnotations() );
 	}
 
 	/**
@@ -155,10 +154,22 @@ public class TestMethod {
 		}
 		this.invokeMethod( test, description, notifier, this.getArguments() );
 	}
+	
+	private void reRunTestMethod() {
+		Object test;
+		try {
+			test = this.javaMethod.getDeclaringClass().getConstructor().newInstance();
+			this.returnValue = this.javaMethod.invoke( test, this.getArguments() );
+		} catch ( Exception e ) {
+			//TODO: do something intelligent
+			return;
+		}
+	}
 
 	/**
 	 * Collects all the arguments taken by the test method. If
 	 * <code>clone</code> is implemented, the arguments are cloned.
+	 * @param notifier 
 	 * 
 	 * @return an {@link Array} of arguments to be passed to the test method
 	 *         when invoking it.
@@ -171,7 +182,10 @@ public class TestMethod {
 				if ( this.typeIsCloneable( paramTypes[i] ) ) {
 					arguments[i] = this.cloneReturnValue( this.dependencies.get( i ).returnValue, paramTypes[i] );
 				} else {
-					arguments[i] = this.dependencies.get( i ).returnValue;
+					//TODO: run test method again, so you get a new instance of the return value
+					TestMethod provider = this.dependencies.get(i);
+					provider.reRunTestMethod();
+					arguments[i] = provider.returnValue;
 				}
 			}
 		}
@@ -238,6 +252,8 @@ public class TestMethod {
 			notifier.fireTestFinished( description );
 		}
 	}
+	
+
 
 	private boolean isUnexpectedException( Throwable actual ) {
 		return this.getExpectedException() != actual.getClass();

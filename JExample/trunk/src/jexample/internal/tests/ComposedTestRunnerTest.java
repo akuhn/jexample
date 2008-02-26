@@ -4,9 +4,11 @@
 package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import jexample.JExampleRunner;
 import jexample.Depends;
+import jexample.JExampleRunner;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -364,5 +366,70 @@ public class ComposedTestRunnerTest {
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
 	}
+	
+	@RunWith( JExampleRunner.class )
+	static public class NotCloneRetVal {
 
+		private static NoClone rootClone, secondClone;
+		
+		public NotCloneRetVal() {
+		}
+
+		@Test
+		public NoClone root() {
+			NoClone clone = new NoClone("original");
+			NotCloneRetVal.rootClone = clone;
+			return clone;
+		}
+
+		@Test
+		@Depends( "root" )
+		public NoClone second( NoClone aClone ) {
+			NotCloneRetVal.secondClone = aClone;
+			assertEquals( "original", aClone.getName() );
+			assertSame(NotCloneRetVal.rootClone, aClone);
+			
+			return aClone;
+		}
+		
+		@Test
+		@Depends( "root" )
+		public void third( NoClone aClone ) {
+			assertEquals( "original", aClone.getName() );
+			assertSame(NotCloneRetVal.rootClone, aClone);
+			assertNotSame(NotCloneRetVal.secondClone,aClone);
+		}
+		
+		@Test
+		@Depends("second(jexample.internal.tests.ComposedTestRunnerTest$NotCloneRetVal$NoClone)")
+		public void fourth(NoClone aClone){
+			assertEquals( "original", aClone.getName() );
+			assertSame(NotCloneRetVal.rootClone, aClone);
+			assertSame(NotCloneRetVal.secondClone,aClone);
+		}
+
+		static public class NoClone {
+			private final String name;
+
+			public NoClone() {
+				this.name = "";
+			}
+
+			public NoClone( String name ) {
+				this.name = name;
+			}
+
+			public String getName() {
+				return this.name;
+			}
+		}
+	}
+
+	@Test
+	public void testNotCloneRetVal() {
+		Result result = JUnitCore.runClasses( NotCloneRetVal.class );
+		assertEquals( 0, result.getFailureCount() );
+		assertEquals( 0, result.getIgnoreCount() );
+		assertEquals( 4, result.getRunCount() );
+	}
 }

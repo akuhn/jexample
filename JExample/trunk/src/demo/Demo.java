@@ -1,8 +1,8 @@
 package demo;
 
-public class Demo implements Cloneable{
+public class Demo implements Cloneable {
 
-	private final String name;
+	private String name;
 
 	public Demo(String name){
 		this.name = name;
