@@ -41,7 +41,7 @@ public class TestMethod {
 	 * @param method
 	 *            the {@link Method} to be run
 	 */
-	public TestMethod( Method method ) {
+	public TestMethod(Method method) {
 		this.javaMethod = method;
 		this.dependencies = new ArrayList<TestMethod>();
 		this.state = TestResult.NOT_YET_RUN;
@@ -56,10 +56,11 @@ public class TestMethod {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchMethodException
 	 */
-	public List<Method> extractDependencies( TestClass testClass ) throws SecurityException, ClassNotFoundException,
+	public List<Method> extractDependencies(TestClass testClass)
+			throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
 
-		return testClass.getDependenciesFor( this.javaMethod );
+		return testClass.getDependenciesFor(this.javaMethod);
 	}
 
 	/**
@@ -70,8 +71,9 @@ public class TestMethod {
 	 * @return true, if the {@link TestMethod} belongs to <code>testClass</code>,
 	 *         false otherwise
 	 */
-	public boolean belongsToClass( TestClass testClass ) {
-		return this.javaMethod.getDeclaringClass().equals( testClass.getJavaClass() );
+	public boolean belongsToClass(TestClass testClass) {
+		return this.javaMethod.getDeclaringClass().equals(
+				testClass.getJavaClass());
 	}
 
 	/**
@@ -80,19 +82,19 @@ public class TestMethod {
 	 * @param notifier
 	 *            the {@link RunNotifier}
 	 */
-	public void run( RunNotifier notifier ) {
-		if ( this.hasBeenRun() )
+	public void run(RunNotifier notifier) {
+		if (this.hasBeenRun())
 			return;
 		boolean allParentsGreen = true;
-		for ( TestMethod dependency : this.dependencies ) {
-			dependency.run( notifier );
+		for (TestMethod dependency : this.dependencies) {
+			dependency.run(notifier);
 			allParentsGreen = allParentsGreen && dependency.isGreen();
 		}
-		if ( allParentsGreen && !this.isIgnoredByAnnotation() ) {
-			this.runTestMethod( notifier );
+		if (allParentsGreen && !this.isIgnoredByAnnotation()) {
+			this.runTestMethod(notifier);
 		} else {
 			this.setWhite();
-			notifier.fireTestIgnored( this.createDescription() );
+			notifier.fireTestIgnored(this.createDescription());
 		}
 	}
 
@@ -101,8 +103,8 @@ public class TestMethod {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals( Object obj ) {
-		return this.javaMethod.equals( ( ( TestMethod ) obj ).javaMethod );
+	public boolean equals(Object obj) {
+		return this.javaMethod.equals(((TestMethod) obj).javaMethod);
 	}
 
 	/**
@@ -113,9 +115,9 @@ public class TestMethod {
 	 * @param testMethod
 	 *            the {@link TestMethod} to be added as a dependency
 	 */
-	public void addDependency( TestMethod testMethod ) {
-		if ( !this.dependencies.contains( testMethod ) ) {
-			this.dependencies.add( testMethod );
+	public void addDependency(TestMethod testMethod) {
+		if (!this.dependencies.contains(testMethod)) {
+			this.dependencies.add(testMethod);
 		}
 	}
 
@@ -130,7 +132,8 @@ public class TestMethod {
 	 * @return the test {@link Description} of this {@link TestMethod}
 	 */
 	public Description createDescription() {
-		return Description.createTestDescription( this.javaMethod.getDeclaringClass(), this.javaMethod.getName() );
+		return Description.createTestDescription(this.javaMethod
+				.getDeclaringClass(), this.javaMethod.getName());
 	}
 
 	/**
@@ -140,49 +143,50 @@ public class TestMethod {
 		return this.javaMethod.getDeclaringClass();
 	}
 
-	private void runTestMethod( RunNotifier notifier ) {
+	private void runTestMethod(RunNotifier notifier) {
 		Description description = this.createDescription();
 		Object test;
 		try {
-			test = this.javaMethod.getDeclaringClass().getConstructor().newInstance();
-		} catch ( InvocationTargetException e ) {
-			notifier.testAborted( description, e.getCause() );
+			test = this.javaMethod.getDeclaringClass().getConstructor()
+					.newInstance();
+			this.invokeMethod(test, description, notifier, this.getArguments());
+		} catch (InvocationTargetException e) {
+			notifier.testAborted(description, e.getCause());
 			return;
-		} catch ( Exception e ) {
-			notifier.testAborted( description, e );
+		} catch (Exception e) {
+			notifier.testAborted(description, e);
 			return;
 		}
-		this.invokeMethod( test, description, notifier, this.getArguments() );
 	}
-	
-	private void reRunTestMethod() {
-		Object test;
-		try {
-			test = this.javaMethod.getDeclaringClass().getConstructor().newInstance();
-			this.returnValue = this.javaMethod.invoke( test, this.getArguments() );
-		} catch ( Exception e ) {
-			//TODO: do something intelligent
-			return;
-		}
+
+	private void reRunTestMethod() throws Exception {
+		Object test = this.javaMethod.getDeclaringClass().getConstructor()
+				.newInstance();
+		this.returnValue = this.javaMethod.invoke(test, this.getArguments());
 	}
 
 	/**
 	 * Collects all the arguments taken by the test method. If
 	 * <code>clone</code> is implemented, the arguments are cloned.
-	 * @param notifier 
+	 * 
+	 * @param notifier
 	 * 
 	 * @return an {@link Array} of arguments to be passed to the test method
 	 *         when invoking it.
+	 * @throws Exception if the return value could not be cloned and the provider method could
+	 * not be re-run
 	 */
-	private Object[] getArguments() {
+	private Object[] getArguments() throws Exception {
 		Class<?>[] paramTypes = this.javaMethod.getParameterTypes();
 		Object[] arguments = new Object[paramTypes.length];
-		for ( int i = 0; i < paramTypes.length; i++ ) {
-			if ( this.dependencies.get( i ).returnValue != null ) {
-				if ( this.typeIsCloneable( paramTypes[i] ) ) {
-					arguments[i] = this.cloneReturnValue( this.dependencies.get( i ).returnValue, paramTypes[i] );
+		for (int i = 0; i < paramTypes.length; i++) {
+			if (this.dependencies.get(i).returnValue != null) {
+				if (this.typeIsCloneable(paramTypes[i])) {
+					arguments[i] = this.cloneReturnValue(this.dependencies
+							.get(i).returnValue, paramTypes[i]);
 				} else {
-					//TODO: run test method again, so you get a new instance of the return value
+					// TODO: run test method again, so you get a new instance of
+					// the return value
 					TestMethod provider = this.dependencies.get(i);
 					provider.reRunTestMethod();
 					arguments[i] = provider.returnValue;
@@ -194,68 +198,69 @@ public class TestMethod {
 	}
 
 	// really ugly method, but java leaves no alternative, i think
-	private Object cloneReturnValue( Object returnValue, Class<?> clazz ) {
+	private Object cloneReturnValue(Object returnValue, Class<?> clazz) {
 		Object cloned = null;
 		try {
-			Method cloneMethod = clazz.getMethod( "clone" );
-			cloneMethod.setAccessible( true );
-			cloned = cloneMethod.invoke( returnValue );
-		} catch ( Exception e ) {
+			Method cloneMethod = clazz.getMethod("clone");
+			cloneMethod.setAccessible(true);
+			cloned = cloneMethod.invoke(returnValue);
+		} catch (Exception e) {
 			return returnValue;
 		}
 		return cloned;
 	}
 
 	/**
-	 * Checks if <code>clazz</code> or one of its superlcasses implements {@link Cloneable} and declares a
-	 * {@link Method} <code>clone()</code>.
+	 * Checks if <code>clazz</code> or one of its superlcasses implements
+	 * {@link Cloneable} and declares a {@link Method} <code>clone()</code>.
 	 * 
 	 * @param clazz
 	 *            the {@link Class} to check, if it is cloneable
 	 * @return true, if all this conditions are fulfilled, false otherwise
 	 */
-	private boolean typeIsCloneable( Class<?> clazz ) {
-		for ( Class<?> iface : clazz.getInterfaces() ) {
-			if ( iface.equals( Cloneable.class ) ) {
+	private boolean typeIsCloneable(Class<?> clazz) {
+		for (Class<?> iface : clazz.getInterfaces()) {
+			if (iface.equals(Cloneable.class)) {
 				try {
-					clazz.getMethod( "clone" );
-				} catch ( Exception e ) {
+					clazz.getMethod("clone");
+				} catch (Exception e) {
 					return false;
 				}
 				return true;
 			}
 		}
-		if ( clazz.getSuperclass() != null ) {
-			return this.typeIsCloneable( clazz.getSuperclass() );
+		if (clazz.getSuperclass() != null) {
+			return this.typeIsCloneable(clazz.getSuperclass());
 		} else {
 			return false;
 		}
 	}
 
-	private void invokeMethod( Object test, Description description, RunNotifier notifier, Object... args ) {
-		notifier.fireTestStarted( description );
+	private void invokeMethod(Object test, Description description,
+			RunNotifier notifier, Object... args) {
+		notifier.fireTestStarted(description);
 		try {
-			this.returnValue = this.javaMethod.invoke( test, args );
+			this.returnValue = this.javaMethod.invoke(test, args);
 			this.setGreen();
-		} catch ( InvocationTargetException e ) {
+		} catch (InvocationTargetException e) {
 			Throwable actual = e.getTargetException();
-			if ( !this.expectsException() ) {
-				this.addFailure( actual, notifier, description );
-			} else if ( this.isUnexpectedException( actual ) ) {
-				String message = "Unexpected exception, expected<" + this.getExpectedException().getName()
-						+ "> but was<" + actual.getClass().getName() + ">";
-				this.addFailure( new Exception( message, actual ), notifier, description );
+			if (!this.expectsException()) {
+				this.addFailure(actual, notifier, description);
+			} else if (this.isUnexpectedException(actual)) {
+				String message = "Unexpected exception, expected<"
+						+ this.getExpectedException().getName() + "> but was<"
+						+ actual.getClass().getName() + ">";
+				this.addFailure(new Exception(message, actual), notifier,
+						description);
 			}
-		} catch ( Throwable e ) {
-			this.addFailure( e, notifier, description );
+		} catch (Throwable e) {
+			this.addFailure(e, notifier, description);
 		} finally {
-			notifier.fireTestFinished( description );
+			notifier.fireTestFinished(description);
 		}
 	}
-	
 
-
-	private boolean isUnexpectedException( Throwable actual ) {
+	private boolean isUnexpectedException(Throwable actual) {
 		return this.getExpectedException() != actual.getClass();
 	}
 
@@ -264,20 +269,22 @@ public class TestMethod {
 	}
 
 	private Class<? extends Throwable> getExpectedException() {
-		Test annotation = this.javaMethod.getAnnotation( Test.class );
-		if ( annotation != null && annotation.expected() != org.junit.Test.None.class ) {
+		Test annotation = this.javaMethod.getAnnotation(Test.class);
+		if (annotation != null
+				&& annotation.expected() != org.junit.Test.None.class) {
 			return annotation.expected();
 		}
 		return null;
 	}
 
-	private void addFailure( Throwable e, RunNotifier notifier, Description description ) {
-		notifier.fireTestFailure( new Failure( description, e ) );
+	private void addFailure(Throwable e, RunNotifier notifier,
+			Description description) {
+		notifier.fireTestFailure(new Failure(description, e));
 		this.setFailed();
 	}
 
 	private boolean isIgnoredByAnnotation() {
-		return this.javaMethod.getAnnotation( Ignore.class ) != null;
+		return this.javaMethod.getAnnotation(Ignore.class) != null;
 	}
 
 	private void setGreen() {
