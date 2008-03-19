@@ -1,5 +1,0 @@
-* DependenyParser: cope with primitive datatypes
-
-* Direct the exceptions correctly to the junit framework
-
-* see TODO comments
