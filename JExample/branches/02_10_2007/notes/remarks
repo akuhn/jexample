@@ -1,3 +1,0 @@
-@Ignore: still validates the testmethods, if one is not valid, there is an initialization error
-
-If the validation fails, a new Runner, which aborts the test, is created and run (ErrorReportingRunner).
