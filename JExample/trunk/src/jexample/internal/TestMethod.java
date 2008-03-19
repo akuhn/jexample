@@ -306,4 +306,12 @@ public class TestMethod {
 	private boolean hasBeenRun() {
 		return state != TestResult.NOT_YET_RUN;
 	}
+
+	public Method getDeclaringMethod() {
+		return this.javaMethod;
+	}
+
+	public Object getReturnValue() {
+		return this.returnValue;
+	}
 }
