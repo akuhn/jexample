@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  *class = FULLNAME
  *method = NAME
  *
- *NAME = [A-Za-z][A-Za-z0-9]*
+ *NAME = [$A-Za-z][$A-Za-z0-9]*
  *FULLNAME = ( FULLNAME "." ) ? NAME
  *</pre>
  *
@@ -37,11 +37,11 @@ public class DependencyScanner {
 	}
 	
 	private static final Pattern CLASS_NAME =
-			Pattern.compile("([\\$A-Za-z][\\$A-Za-z0-9]*\\.)+");
+			Pattern.compile("([$A-Za-z][$A-Za-z0-9]*\\.)+");
 	private static final Pattern METHOD_NAME =
-			Pattern.compile("[\\$A-Za-z][\\$A-Za-z0-9]*");
+			Pattern.compile("[$A-Za-z][$A-Za-z0-9]*");
 	private static final Pattern PARAMETER =
-			Pattern.compile("[\\$A-Za-z][\\$A-Za-z0-9]*(\\.[\\$A-Za-z][\\$A-Za-z0-9]*)*");
+			Pattern.compile("[$A-Za-z][$A-Za-z0-9]*(\\.[$A-Za-z][$A-Za-z0-9]*)*");
 
 	private CharBuffer buf;
 	private LinkedList<Token> tokens;

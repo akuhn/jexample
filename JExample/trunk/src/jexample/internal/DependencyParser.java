@@ -98,22 +98,26 @@ public class DependencyParser {
 		Class<?>[] newParams = new Class<?>[parameters.length];
 		for ( int i = 0; i < parameters.length; i++ ) {
 			try {
-				newParams[i] = Class.forName( parameters[i].trim() );
-			} catch ( ClassNotFoundException e ) {
-				if ( parameters[i].equals( "int" ) ) {
-					newParams[i] = int.class;
-				} else if ( parameters[i].equals( "long" ) ) {
-					newParams[i] = long.class;
-				} else if ( parameters[i].equals( "double" ) ) {
-					newParams[i] = double.class;
-				} else if ( parameters[i].equals( "float" ) ) {
-					newParams[i] = float.class;
-				} else if ( parameters[i].equals( "char" ) ) {
-					newParams[i] = char.class;
-				} else if ( parameters[i].equals( "boolean" ) ) {
-					newParams[i] = boolean.class;
-				} else {
-					throw e;
+				newParams[i] = Class.forName( parameters[i] );
+			} catch ( ClassNotFoundException ex ) {
+				try {
+					newParams[i] = Class.forName( "java.lang." + parameters[i] );
+				} catch ( ClassNotFoundException ignore ) {	
+					if ( parameters[i].equals( "int" ) ) {
+						newParams[i] = int.class;
+					} else if ( parameters[i].equals( "long" ) ) {
+						newParams[i] = long.class;
+					} else if ( parameters[i].equals( "double" ) ) {
+						newParams[i] = double.class;
+					} else if ( parameters[i].equals( "float" ) ) {
+						newParams[i] = float.class;
+					} else if ( parameters[i].equals( "char" ) ) {
+						newParams[i] = char.class;
+					} else if ( parameters[i].equals( "boolean" ) ) {
+						newParams[i] = boolean.class;
+					} else {
+						throw ex;
+					}
 				}
 			}
 		}
