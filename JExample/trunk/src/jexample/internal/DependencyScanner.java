@@ -37,11 +37,11 @@ public class DependencyScanner {
 	}
 	
 	private static final Pattern CLASS_NAME =
-			Pattern.compile("([A-Za-z][A-Za-z0-9]*\\.)+");
+			Pattern.compile("([\\$A-Za-z][\\$A-Za-z0-9]*\\.)+");
 	private static final Pattern METHOD_NAME =
-			Pattern.compile("[A-Za-z][A-Za-z0-9]*");
+			Pattern.compile("[\\$A-Za-z][\\$A-Za-z0-9]*");
 	private static final Pattern PARAMETER =
-			Pattern.compile("[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*");
+			Pattern.compile("[\\$A-Za-z][\\$A-Za-z0-9]*(\\.[\\$A-Za-z][\\$A-Za-z0-9]*)*");
 
 	private CharBuffer buf;
 	private LinkedList<Token> tokens;
@@ -92,7 +92,7 @@ public class DependencyScanner {
 	private String scanMethodName() {
 		Matcher m = METHOD_NAME.matcher(buf);
 		if (!m.lookingAt())
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(buf.toString());
 		String name = m.group();
 		buf.position(buf.position() + m.end());
 		return name; 

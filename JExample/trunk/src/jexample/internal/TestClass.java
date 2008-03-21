@@ -88,7 +88,7 @@ public class TestClass {
 		List<Method> deps = new ArrayList<Method>();
 		Depends annotation = testMethod.getAnnotation( Depends.class );
 		if ( annotation != null ) {
-			deps = parser.getDependencies( ( ( Depends ) annotation ).value(), testMethod );
+			deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
 		}
 		return deps;
 	}

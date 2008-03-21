@@ -31,42 +31,42 @@ public class DependencyParserTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.myClass = new TestClass( this.getClass() );
+		this.myClass = new TestClass( TestTestClass.class );
 		parser = new DependencyParser( myClass );
 		annotatedMethod = TestTestClass.class.getMethod( "annotatedMethod" );
 	}
 
 	@Test
 	public void testGetDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "annotatedMethod()", annotatedMethod );
+		List<Method> methods = this.parser.getDependencies( "annotatedMethod()" );
 		assertEquals( 1, methods.size() ); 
 
-		methods = this.parser.getDependencies( "annotatedMethod(java.lang.String)", annotatedMethod );
+		methods = this.parser.getDependencies( "annotatedMethod(java.lang.String)" );
 		assertEquals( 1, methods.size() );
 
-		methods = this.parser.getDependencies( "annotatedMethod();annotatedMethod(java.lang.String)", annotatedMethod );
+		methods = this.parser.getDependencies( "annotatedMethod();annotatedMethod(java.lang.String)" );
 		assertEquals( 2, methods.size() );
 
-		methods = this.parser.getDependencies( "annotatedMethod(int)", annotatedMethod );
+		methods = this.parser.getDependencies( "annotatedMethod(int)" );
 		assertEquals( 1, methods.size() );
 	}
 
 	@Test
 	public void testExternalDeps() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "B.otherTest", annotatedMethod );
+		List<Method> methods = this.parser.getDependencies( "B.otherTest" );
 		assertEquals( 1, methods.size() );
 	}
 
 	@Test( expected = ClassNotFoundException.class )
 	public void testExtDepWithoutPackageNotFound() throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "TestClass.getJavaClass", annotatedMethod );
+		List<Method> methods = this.parser.getDependencies( "TestClass.getJavaClass" );
 		assertEquals( 1, methods.size() );
 	}
 
 	@Test
 	public void testExtDepWithPackageFound() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "jexample.internal.TestClass.getJavaClass", annotatedMethod );
+		List<Method> methods = this.parser.getDependencies( "jexample.internal.TestClass.getJavaClass" );
 		assertEquals( 1, methods.size() );
 	}
 
