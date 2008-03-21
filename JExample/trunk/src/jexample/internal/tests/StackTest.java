@@ -1,4 +1,4 @@
-package demo;
+package jexample.internal.tests;
 
 import static org.junit.Assert.*;
 
@@ -25,6 +25,15 @@ public class StackTest {
 	public Stack withValue(Stack stack) {
 		stack.push("boe");
 		assertEquals(1, stack.size());
+		return stack;
+	}
+	
+	@Test
+	@Depends("withValue")
+	public Stack withManyValues(Stack stack) {
+		stack.push("foo");
+		stack.push("bar");
+		assertEquals("bar", stack.peek());
 		return stack;
 	}
 

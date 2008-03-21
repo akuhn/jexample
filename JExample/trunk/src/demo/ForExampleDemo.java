@@ -3,6 +3,7 @@ package demo;
 import java.util.Stack;
 
 import jexample.For;
+import jexample.internal.tests.StackTest;
 
 public class ForExampleDemo {
 

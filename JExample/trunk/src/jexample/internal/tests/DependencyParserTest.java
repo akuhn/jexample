@@ -38,13 +38,13 @@ public class DependencyParserTest {
 
 	@Test
 	public void testGetDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "annotatedMethod", annotatedMethod );
-		assertEquals( 1, methods.size() );
+		List<Method> methods = this.parser.getDependencies( "annotatedMethod()", annotatedMethod );
+		assertEquals( 1, methods.size() ); 
 
 		methods = this.parser.getDependencies( "annotatedMethod(java.lang.String)", annotatedMethod );
 		assertEquals( 1, methods.size() );
 
-		methods = this.parser.getDependencies( "annotatedMethod;annotatedMethod(java.lang.String)", annotatedMethod );
+		methods = this.parser.getDependencies( "annotatedMethod();annotatedMethod(java.lang.String)", annotatedMethod );
 		assertEquals( 2, methods.size() );
 
 		methods = this.parser.getDependencies( "annotatedMethod(int)", annotatedMethod );

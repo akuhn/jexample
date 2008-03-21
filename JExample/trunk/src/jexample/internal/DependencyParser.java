@@ -6,6 +6,8 @@ package jexample.internal;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import jexample.Depends;
@@ -16,6 +18,7 @@ import jexample.Depends;
  * represents.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Adrian Kuhn (akuhn at iam.unibe.ch)
  */
 public class DependencyParser {
 
@@ -87,14 +90,40 @@ public class DependencyParser {
 		return clazz;
 	}
 
-	private void addDependency( Class<?> clazz, String dependency, String[] parameters ) throws ClassNotFoundException,
-			SecurityException, NoSuchMethodException {
-		Method dep = clazz.getMethod( this.extractName( dependency ), this.getParameterClasses( parameters ) );
-		if ( !this.dependencies.contains( dep ) ) {
-			this.dependencies.add( dep );
-		}
+	/** Find matching method for dependency declaration.
+	 * 
+	 * @param clazz 
+	 * @param dependency
+	 * @param parameters
+	 * @throws ClassNotFoundException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
+	private void addDependency( Class<?> clazz, String dependency, String[] parameters )
+			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
+		Method found = searchMethod(clazz, this.extractName(dependency), parameters);
+		this.dependencies.add( found );
 	}
 
+	private Method searchMethod(Class receiver, String name, String[] parameters)
+			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
+		if (parameters == null) {
+			Method found = null;
+			for (Method m : receiver.getMethods()) { 
+				if (m.getName().equals(name)) {
+					 if (found != null) throw new NoSuchMethodException(
+							 "Ambigous depedency, please specify parameters: "
+							 + receiver.getName() + "." + m.getName());
+					 found = m;
+				}
+			}
+			return found;
+		}
+		else {
+			return receiver.getMethod(name, this.getParameterClasses(parameters));
+		}
+	}
+	
 	private String extractName( String dependency ) {
 		int index;
 
@@ -139,9 +168,10 @@ public class DependencyParser {
 		int index;
 		if ( ( index = dependency.indexOf( "(" ) ) > -1 ) {
 			String params = dependency.substring( index + 1, dependency.length() - 1 );
+			if (params.length() == 0) return new String[0];
 			return params.split( "," );
 		} else {
-			return new String[0];
+			return null;
 		}
 	}
 
