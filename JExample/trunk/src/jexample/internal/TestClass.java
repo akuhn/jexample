@@ -51,7 +51,7 @@ public class TestClass {
 	 * @throws NoSuchMethodException
 	 */
 	public Constructor<?> getConstructor() throws SecurityException, NoSuchMethodException {
-		return fClass.getConstructor();
+		return fClass.getDeclaredConstructor();
 	}
 
 	/**

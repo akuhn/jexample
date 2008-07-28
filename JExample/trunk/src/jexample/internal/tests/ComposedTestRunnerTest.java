@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 public class ComposedTestRunnerTest {
 
 	@RunWith( JExampleRunner.class )
-	static public class CycleMethods {
+	static private class CycleMethods {
 
 		public CycleMethods() {
 		}
@@ -55,7 +55,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class SkipMethods {
+	static private class SkipMethods {
 
 		public SkipMethods() {
 		}
@@ -96,7 +96,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class BadDependencies {
+	static private class BadDependencies {
 
 		public BadDependencies() {
 		}
@@ -127,7 +127,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class GoodTest {
+	static private class GoodTest {
 		public GoodTest() {
 		}
 
@@ -158,7 +158,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class FirstGoodTest {
+	static private class FirstGoodTest {
 		public FirstGoodTest() {
 		}
 
@@ -175,7 +175,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class SecondGoodTest {
+	static private class SecondGoodTest {
 		public SecondGoodTest() {
 		}
 
@@ -195,7 +195,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class FirstBadTest {
+	static private class FirstBadTest {
 		public FirstBadTest() {
 		}
 
@@ -218,7 +218,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class SecondBadTest {
+	static private class SecondBadTest {
 		public SecondBadTest() {
 		}
 
@@ -238,7 +238,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class WithAttributes {
+	static private class WithAttributes {
 		public WithAttributes() {
 
 		}
@@ -289,7 +289,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class DependsOnBeforeTest {
+	static private class DependsOnBeforeTest {
 
 		public DependsOnBeforeTest() {
 		}
@@ -322,7 +322,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class CloneRetVal {
+	static private class CloneRetVal {
 
 		public CloneRetVal() {
 		}
@@ -368,7 +368,7 @@ public class ComposedTestRunnerTest {
 	}
 	
 	@RunWith( JExampleRunner.class )
-	static public class NotCloneRetVal {
+	static private class NotCloneRetVal {
 
 		private static NoClone rootClone, secondClone;
 		

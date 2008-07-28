@@ -48,7 +48,7 @@ public class MethodValidator {
 
 	/**
 	 * Checks, if there is a default constructor, if there are test methods and
-	 * if they are all public and if their delcaring classes are also public.
+	 * if they are all public and if their declaring classes are also public.
 	 * In the end the declared dependencies are validated. 
 	 * 
 	 * @return a {@link List} of all encountered errors
@@ -81,8 +81,8 @@ public class MethodValidator {
 		Set<Method> methods = testMethods;
 
 		for ( Method each : methods ) {
-			if ( !Modifier.isPublic( each.getDeclaringClass().getModifiers() ) )
-				fErrors.add( new Exception( "Class " + each.getDeclaringClass().getName() + " should be public" ) );
+			//if ( !Modifier.isPublic( each.getDeclaringClass().getModifiers() ) )
+			//	fErrors.add( new Exception( "Class " + each.getDeclaringClass().getName() + " should be public" ) );
 			if ( !Modifier.isPublic( each.getModifiers() ) )
 				fErrors.add( new Exception( "Method " + each.getName() + " should be public" ) );
 

@@ -1,6 +1,7 @@
 package jexample.internal;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -147,8 +148,9 @@ public class TestMethod {
 		Description description = this.createDescription();
 		Object test;
 		try {
-			test = this.javaMethod.getDeclaringClass().getConstructor()
-					.newInstance();
+			Constructor<?> constructor = this.javaMethod.getDeclaringClass().getDeclaredConstructor();
+			constructor.setAccessible(true);
+			test = constructor.newInstance();
 			this.invokeMethod(test, description, notifier, this.getArguments());
 		} catch (InvocationTargetException e) {
 			notifier.testAborted(description, e.getCause());
@@ -240,6 +242,7 @@ public class TestMethod {
 			RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
+		    this.javaMethod.setAccessible(true);
 			this.returnValue = this.javaMethod.invoke(test, args);
 			this.setGreen();
 		} catch (InvocationTargetException e) {
