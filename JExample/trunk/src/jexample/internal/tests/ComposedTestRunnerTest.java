@@ -120,12 +120,11 @@ public class ComposedTestRunnerTest {
 	}
 
 	@Test
-	@Ignore
 	public void badDependencies() {
 		Result result = JUnitCore.runClasses( BadDependencies.class );
-		assertEquals( 2, result.getFailureCount() );
-		assertEquals( 2, result.getRunCount() );
-		assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
+		assertEquals( 1, result.getFailureCount() );
+		assertEquals( 1, result.getRunCount() );
+		//assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
 	}
 
 	@RunWith( JExampleRunner.class )

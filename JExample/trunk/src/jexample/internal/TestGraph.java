@@ -1,9 +1,11 @@
 package jexample.internal;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,12 +27,14 @@ public class TestGraph {
 	private static TestGraph graph;
 	private Set<TestClass> classesUnderTest;
 	private Map<Method,TestMethod> testMethods;
+	private List<Throwable> initializationErrors;
 	private boolean anyHasBeenRun = false;
 
 
 	public TestGraph() {
 		this.classesUnderTest = new HashSet<TestClass>();
 		this.testMethods = new HashMap<Method,TestMethod>();
+		this.initializationErrors = new ArrayList<Throwable>();
 	}
 
 	public static TestGraph instance() {
@@ -47,19 +51,18 @@ public class TestGraph {
 	 */
 	public TestClass addTestCase(Class<?> testCase) throws InitializationError {
 	    if (anyHasBeenRun) throw new InitializationError();
-	    try {
-    	    TestClass $ = new TestClass(testCase, this).validate();
-    		Collection<TestMethod> news = new MethodCollector($)
-    		    .collect()
-    		    .validate()
-    		    .result();
-    		this.detectCycles(news);
-    		this.classesUnderTest.add($);
-    		for (TestMethod m : news)
-    		    testMethods.put(m.getJavaMethod(), m);
-    		return $;
-	    } catch (InitializationError err) { throw err; } 
-	    catch(Exception ex) { throw new InitializationError(ex); }
+	    TestClass $ = new TestClass(testCase, this).validate();
+		Collection<TestMethod> news = new MethodCollector($)
+		    .collect()
+		    .validate()
+		    .result();
+		this.detectCycles(news);
+		this.classesUnderTest.add($);
+		for (TestMethod m : news)
+		    testMethods.put(m.getJavaMethod(), m);
+        if (!initializationErrors.isEmpty())
+            throw new InitializationError(initializationErrors);
+        return $;
 	}
 
 	/**
@@ -184,7 +187,7 @@ public class TestGraph {
             return this;
         }
 
-        public MethodCollector collect() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+        public MethodCollector collect() {
             while (!todo.isEmpty()) {
                 Method $ = todo.iterator().next();
                 process($);
@@ -193,7 +196,7 @@ public class TestGraph {
             return this;
         }
         
-        private void process(Method m) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+        private void process(Method m) {
             TestMethod $ = testMethod(m);
             for (Method d : $.dependencies()) {
                 $.addDependency(testMethod(d));
@@ -221,6 +224,10 @@ public class TestGraph {
 
     public TestMethod getTestMethod(Method m) {
         return testMethods.get(m);
+    }
+
+    public void addInitializationError(Throwable ex) {
+        initializationErrors.add(ex);
     }
     
 }

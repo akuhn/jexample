@@ -38,26 +38,16 @@ public class TestMethod {
 	private TestResult state;
 	private Object returnValue;
     private Description description;
+    private TestGraph graph;
 
     
-	/**
-	 * @param method
-	 *            the {@link Method} to be run
-	 */
-	public TestMethod(Method method) {
-		this.javaMethod = method;
-		this.dependencies = new ArrayList<TestMethod>();
-		this.state = TestResult.NOT_YET_RUN;
-	    this.description = Description.createTestDescription(method
-	                .getDeclaringClass(), method.getName());
-	}
-
 	public TestMethod(Method m, TestGraph graph) {
         this.javaMethod = m;
         this.dependencies = new ArrayList<TestMethod>();
         this.state = TestResult.NOT_YET_RUN;
         this.description = Description.createTestDescription(m
                     .getDeclaringClass(), m.getName());
+        this.graph = graph;
     }
 
 	/**
@@ -316,12 +306,20 @@ public class TestMethod {
         return javaMethod;
     }
 
-    public Collection<Method> dependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+    public Collection<Method> dependencies() {
         DependencyParser parser = new DependencyParser( javaMethod.getDeclaringClass() );
         List<Method> deps = new ArrayList<Method>();
         Depends annotation = javaMethod.getAnnotation( Depends.class );
         if ( annotation != null ) {
-            deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+            try {
+                deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+            } catch (SecurityException ex) {
+                graph.addInitializationError(ex);
+            } catch (ClassNotFoundException ex) {
+                graph.addInitializationError(ex);
+           } catch (NoSuchMethodException ex) {
+               graph.addInitializationError(ex);
+            }
         }
         return deps;
     }
@@ -332,7 +330,9 @@ public class TestMethod {
 
     public void validate() throws InitializationError {
         if (!javaMethod.isAnnotationPresent(Test.class)) {
-            throw new InitializationError(); // TODO
+            Exception ex = new Exception();
+            ex.fillInStackTrace();
+            graph.addInitializationError(ex);
         }
     }
 
