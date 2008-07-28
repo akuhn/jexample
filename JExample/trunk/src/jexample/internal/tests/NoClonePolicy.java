@@ -12,7 +12,7 @@ import jexample.InjectionPolicy;
 import jexample.JExampleRunner;
 import jexample.internal.TestGraph;
 
-public class TestNoClonePolicy {
+public class NoClonePolicy {
 
     public static class A {
         

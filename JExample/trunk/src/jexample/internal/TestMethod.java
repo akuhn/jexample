@@ -109,12 +109,9 @@ public class TestMethod {
 	}
 
 	private Object[] getInjectionValues() throws Exception {
-        Class<?>[] paramTypes = this.javaMethod.getParameterTypes();
-        Object[] $ = new Object[paramTypes.length];
-		for (int i = 0; i < paramTypes.length; i++) {
-            Class<?> paramType = paramTypes[i];
-			TestMethod testMethod = this.dependencies.get(i);
-			$[i] = getInjectionValue(testMethod);
+        Object[] $ = new Object[javaMethod.getParameterTypes().length];
+		for (int i = 0; i < $.length; i++) {
+			$[i] = getInjectionValue(dependencies.get(i));
 		}
 		return $;
 	}
@@ -145,12 +142,10 @@ public class TestMethod {
 	}
 
     private Class<? extends Throwable> getExpectedException() {
-		Test annotation = this.javaMethod.getAnnotation(Test.class);
-		if (annotation != null
-				&& annotation.expected() != org.junit.Test.None.class) {
-			return annotation.expected();
-		}
-		return null;
+		Test a = this.javaMethod.getAnnotation(Test.class);
+		if (a == null) return null;
+		if (a.expected() == org.junit.Test.None.class) return null;
+		return a.expected();
 	}
 
 	private Object getInjectionValue(TestMethod testMethod) throws Exception {

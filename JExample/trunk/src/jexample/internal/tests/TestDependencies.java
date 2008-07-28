@@ -12,7 +12,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
-public class RunningDependencies {
+public class TestDependencies {
 
     public static class A {
         
