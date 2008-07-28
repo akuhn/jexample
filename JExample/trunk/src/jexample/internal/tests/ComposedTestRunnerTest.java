@@ -9,12 +9,18 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExampleRunner;
+import jexample.internal.TestClass;
+import jexample.internal.TestGraph;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.internal.runners.CompositeRunner;
+import org.junit.internal.runners.InitializationError;
 import org.junit.runner.JUnitCore;
+import org.junit.runner.Request;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
+import org.junit.runner.Runner;
 
 
 /**
@@ -50,7 +56,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void cycleMethods() {
-		Result result = JUnitCore.runClasses( CycleMethods.class );
+		Result result = runJExampleTestCase( CycleMethods.class );
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( "The dependencies are cyclic.", result.getFailures().get( 0 ).getMessage() );
 	}
@@ -90,7 +96,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void skipMethods() {
-		Result result = JUnitCore.runClasses( SkipMethods.class );
+		Result result = runJExampleTestCase( SkipMethods.class );
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( 2, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
@@ -121,7 +127,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void badDependencies() {
-		Result result = JUnitCore.runClasses( BadDependencies.class );
+		Result result = runJExampleTestCase( BadDependencies.class );
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( 1, result.getRunCount() );
 		//assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
@@ -152,11 +158,30 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testGoodTest() {
-		Result result = JUnitCore.runClasses( GoodTest.class );
+	    Result result = runJExampleTestCase(GoodTest.class);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
+
+    private Result runJExampleTestCase(Class<?>... classes) {
+        TestGraph graph = new TestGraph();
+        CompositeRunner runner = new CompositeRunner("All");
+        for (Class<?> c : classes) {
+            runner.add(createJExampleRunner(c, graph));
+        }
+        return new JUnitCore().run(runner);
+    }
+    
+    private Runner createJExampleRunner(Class<?> c, TestGraph graph) {
+        try {
+            TestClass test = graph.addTestCase(c);
+            return new JExampleRunner(test);
+        } 
+        catch (InitializationError err) { 
+            return Request.errorReport(c, err).getRunner();
+        }
+    }
 
 	@RunWith( JExampleRunner.class )
 	static public class FirstGoodTest {
@@ -189,7 +214,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testGoodTests() {
-		Result result = JUnitCore.runClasses( FirstGoodTest.class, SecondGoodTest.class );
+		Result result = runJExampleTestCase( FirstGoodTest.class, SecondGoodTest.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
@@ -232,7 +257,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testBadTests() {
-		Result result = JUnitCore.runClasses( FirstBadTest.class );
+		Result result = runJExampleTestCase( FirstBadTest.class );
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 1, result.getRunCount() );
@@ -283,7 +308,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testWithAttributes() {
-		Result result = JUnitCore.runClasses( WithAttributes.class );
+		Result result = runJExampleTestCase( WithAttributes.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 6, result.getRunCount() );
@@ -316,7 +341,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testDependsOnBefore() {
-		Result result = JUnitCore.runClasses( DependsOnBeforeTest.class );
+		Result result = runJExampleTestCase( DependsOnBeforeTest.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
@@ -362,7 +387,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testCloneRetVal() {
-		Result result = JUnitCore.runClasses( CloneRetVal.class );
+		Result result = runJExampleTestCase( CloneRetVal.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
@@ -428,7 +453,7 @@ public class ComposedTestRunnerTest {
 
 	@Test
 	public void testNotCloneRetVal() {
-		Result result = JUnitCore.runClasses( NotCloneRetVal.class );
+		Result result = runJExampleTestCase( NotCloneRetVal.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 4, result.getRunCount() );

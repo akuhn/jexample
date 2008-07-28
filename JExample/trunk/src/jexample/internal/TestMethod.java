@@ -42,6 +42,7 @@ public class TestMethod {
 
     
 	public TestMethod(Method m, TestGraph graph) {
+	    assert graph != null;
         this.javaMethod = m;
         this.dependencies = new ArrayList<TestMethod>();
         this.state = TestResult.NOT_YET_RUN;

@@ -208,7 +208,7 @@ public class TestGraph {
             if ($ != null) return $;
             $ = found.get(m);
             if ($ != null) return $;
-            $ = new TestMethod(m, graph);
+            $ = new TestMethod(m, TestGraph.this);
             found.put(m, $);
             todo.add(m);
             return $;

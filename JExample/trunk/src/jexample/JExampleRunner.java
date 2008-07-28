@@ -22,12 +22,15 @@ import org.junit.runner.notification.RunNotifier;
 public class JExampleRunner extends Runner {
 
 	private final TestClass testCase;
-
 	
 	public JExampleRunner(Class<?> underTest) throws InitializationError {
 		this.testCase = TestGraph.addClass(underTest);
 	}
-
+	
+	public JExampleRunner(TestClass testClass) {
+	    this.testCase = testClass;
+	}
+	
 	@Override
 	public Description getDescription() {
 	    return testCase.getDescription();
