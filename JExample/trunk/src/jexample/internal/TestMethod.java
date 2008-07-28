@@ -5,10 +5,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import jexample.Depends;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -30,14 +34,12 @@ enum TestResult {
 public class TestMethod {
 
 	private Method javaMethod;
-
-	// has to be a list, because the order is important
 	private List<TestMethod> dependencies;
-
 	private TestResult state;
-
 	private Object returnValue;
+    private Description description;
 
+    
 	/**
 	 * @param method
 	 *            the {@link Method} to be run
@@ -46,23 +48,17 @@ public class TestMethod {
 		this.javaMethod = method;
 		this.dependencies = new ArrayList<TestMethod>();
 		this.state = TestResult.NOT_YET_RUN;
+	    this.description = Description.createTestDescription(method
+	                .getDeclaringClass(), method.getName());
 	}
 
-	/**
-	 * @param testClass
-	 *            the {@link TestClass} the method is declared in
-	 * @return a {@link List} of {@link Method}'s, which are the dependencies
-	 *         of this {@link TestMethod}
-	 * @throws SecurityException
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchMethodException
-	 */
-	public List<Method> extractDependencies(TestClass testClass)
-			throws SecurityException, ClassNotFoundException,
-			NoSuchMethodException {
-
-		return testClass.getDependenciesFor(this.javaMethod);
-	}
+	public TestMethod(Method m, TestGraph graph) {
+        this.javaMethod = m;
+        this.dependencies = new ArrayList<TestMethod>();
+        this.state = TestResult.NOT_YET_RUN;
+        this.description = Description.createTestDescription(m
+                    .getDeclaringClass(), m.getName());
+    }
 
 	/**
 	 * Checks, if this {@link TestMethod} belongs to <code>testClass</code>
@@ -95,7 +91,7 @@ public class TestMethod {
 			this.runTestMethod(notifier);
 		} else {
 			this.setWhite();
-			notifier.fireTestIgnored(this.createDescription());
+			notifier.fireTestIgnored(this.getDescription());
 		}
 	}
 
@@ -104,7 +100,8 @@ public class TestMethod {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj) {
+	@Override
+    public boolean equals(Object obj) {
 		return this.javaMethod.equals(((TestMethod) obj).javaMethod);
 	}
 
@@ -132,9 +129,8 @@ public class TestMethod {
 	/**
 	 * @return the test {@link Description} of this {@link TestMethod}
 	 */
-	public Description createDescription() {
-		return Description.createTestDescription(this.javaMethod
-				.getDeclaringClass(), this.javaMethod.getName());
+	public Description getDescription() {
+		return description;
 	}
 
 	/**
@@ -145,13 +141,12 @@ public class TestMethod {
 	}
 
 	private void runTestMethod(RunNotifier notifier) {
-		Description description = this.createDescription();
 		Object test;
 		try {
 			Constructor<?> constructor = this.javaMethod.getDeclaringClass().getDeclaredConstructor();
 			constructor.setAccessible(true);
 			test = constructor.newInstance();
-			this.invokeMethod(test, description, notifier, this.getArguments());
+			this.invokeMethod(test, notifier, this.getArguments());
 		} catch (InvocationTargetException e) {
 			notifier.testAborted(description, e.getCause());
 			return;
@@ -239,8 +234,8 @@ public class TestMethod {
 		}
 	}
 
-	private void invokeMethod(Object test, Description description,
-			RunNotifier notifier, Object... args) {
+	private void invokeMethod(Object test, RunNotifier notifier,
+			Object... args) {
 		notifier.fireTestStarted(description);
 		try {
 		    this.javaMethod.setAccessible(true);
@@ -249,16 +244,15 @@ public class TestMethod {
 		} catch (InvocationTargetException e) {
 			Throwable actual = e.getTargetException();
 			if (!this.expectsException()) {
-				this.addFailure(actual, notifier, description);
+				this.addFailure(actual, notifier);
 			} else if (this.isUnexpectedException(actual)) {
 				String message = "Unexpected exception, expected<"
 						+ this.getExpectedException().getName() + "> but was<"
 						+ actual.getClass().getName() + ">";
-				this.addFailure(new Exception(message, actual), notifier,
-						description);
+				this.addFailure(new Exception(message, actual), notifier);
 			}
 		} catch (Throwable e) {
-			this.addFailure(e, notifier, description);
+			this.addFailure(e, notifier);
 		} finally {
 			notifier.fireTestFinished(description);
 		}
@@ -281,8 +275,7 @@ public class TestMethod {
 		return null;
 	}
 
-	private void addFailure(Throwable e, RunNotifier notifier,
-			Description description) {
+	private void addFailure(Throwable e, RunNotifier notifier) {
 		notifier.fireTestFailure(new Failure(description, e));
 		this.setFailed();
 	}
@@ -312,10 +305,35 @@ public class TestMethod {
 	}
 
 	public Method getDeclaringMethod() {
-		return this.javaMethod;
+		return this.getJavaMethod();
 	}
 
 	public Object getReturnValue() {
 		return this.returnValue;
 	}
+
+    public Method getJavaMethod() {
+        return javaMethod;
+    }
+
+    public Collection<Method> dependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+        DependencyParser parser = new DependencyParser( javaMethod.getDeclaringClass() );
+        List<Method> deps = new ArrayList<Method>();
+        Depends annotation = javaMethod.getAnnotation( Depends.class );
+        if ( annotation != null ) {
+            deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+        }
+        return deps;
+    }
+
+    public Object getName() {
+        return javaMethod.getName();
+    }
+
+    public void validate() throws InitializationError {
+        if (!javaMethod.isAnnotationPresent(Test.class)) {
+            throw new InitializationError(); // TODO
+        }
+    }
+
 }

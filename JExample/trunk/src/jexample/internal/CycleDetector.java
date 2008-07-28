@@ -1,84 +1,102 @@
-/**
- * 
- */
 package jexample.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
- * The <code>CycleDetector</code> class checks the test dependencies for
- * cycles.
  * 
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Adrian Kuhn
+ *
+ * @param <E>
  */
-public class CycleDetector {
+public abstract class CycleDetector<E> {
 
-	private List<TestMethod> notVisited, visited, done;
+    private class Node {
 
-	/**
-	 * @param testMethods
-	 *            the {@link Collection} of {@link TestMethod}'s that have to
-	 *            be checked for cycles
-	 */
-	public CycleDetector( Collection<TestMethod> testMethods ) {
-		this.notVisited = new ArrayList<TestMethod>( testMethods );
-		this.visited = new ArrayList<TestMethod>();
-		this.done = new ArrayList<TestMethod>();
-	}
+        public int color = 0;
+        
+        public final E payload;
+        
+        public Node(E payload) {
+            this.payload = payload;
+        }
+        
+        private final boolean isWhite() {
+            return color == 0;
+        }
+        
+        private final void beGray() {
+            color = 1;
+        }
+        
+        private final void beBlack() {
+            color = 2;
+        }
+        
+        private final void cycle() throws CycleFound {
+            if (!isWhite()) return;
+            beGray();
+            path.push(this.payload);
+            for (Node n : children()) {
+                if (n.isGray()) throw new CycleFound();
+                if (n.isWhite()) n.cycle();
+            }
+            path.pop();
+            beBlack();
+        }
 
-	/**
-	 * Does for all not visited {@link TestMethod}'s a depth-first search and
-	 * marks the visited nodes. Nodes whos dependencies were all visited are
-	 * marked as 'done'. If you encounter a visited node, there is a cycle.
-	 * 
-	 * @return <code>true</code> if the dependencies are cyclic,
-	 *         <code>false</code> otherwise.
-	 */
-	public boolean hasCycle() {
-		List<TestMethod> nodes = new ArrayList<TestMethod>();
-		nodes.addAll( this.notVisited );
-		for ( TestMethod method : nodes ) {
-			if ( this.isNotVisisted( method ) && !this.processNode( method ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
+        private final boolean isGray() {
+            return color == 1;
+        }
 
-	private boolean processNode( TestMethod method ) {
-		if ( this.isVisited( method ) ) {
-			return false;
-		}
-		if ( this.isNotVisisted( method ) ) {
-			this.addToVisited( method );
-		}
+        private final Collection<Node> children() {
+            Collection<E> es = getChildren(payload);
+            Collection<Node> ns = new ArrayList(es.size());
+            for (E e : es) 
+                ns.add(map.get(e));
+            return ns;
+        }
+        
+    }
+    
+    private Stack<E> path = new Stack();
+    private Map<E, Node> map = new HashMap();
 
-		for ( TestMethod dep : method.getDependencies() ) {
-			if ( !this.processNode( dep ) ) {
-				return false;
-			}
-		}
-		this.addToDone( method );
-		return true;
-	}
+    public CycleDetector() {
+    }
+    
+    public CycleDetector(Collection<E> elements) {
+        for (E e : elements) put(e);
+    }
+    
+    public CycleDetector<E> put(E e) {
+        map.put(e, new Node(e));
+        return this;
+    }
+    
+    public abstract Collection<E> getChildren(E payload);
 
-	private boolean isNotVisisted( TestMethod method ) {
-		return this.notVisited.contains( method );
-	}
+    public List<E> getCycle() {
+        try {
+            for (Node n : map.values()) n.cycle();
+        }
+        catch (CycleFound ex) {
+            return path;
+        }
+        return null;
+    }
+    
+    @SuppressWarnings("serial")
+    private static class CycleFound extends Exception {
+        
+    }
 
-	private boolean isVisited( TestMethod method ) {
-		return this.visited.contains( method );
-	}
-
-	private void addToVisited( TestMethod method ) {
-		this.visited.add( method );
-		this.notVisited.remove( method );
-	}
-
-	private void addToDone( TestMethod method ) {
-		this.done.add( method );
-		this.visited.remove( method );
-	}
+    public boolean hasCycle() {
+        return getCycle() != null;
+    }
+    
 }

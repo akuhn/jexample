@@ -9,13 +9,13 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith( Suite.class )
 @SuiteClasses( {
+        AddingClasses.class,
 		ComposedTestRunnerTest.class,
 		CycleDetectorTest.class,
 		DependencyScannerTest.class,
 		DependencyParserTest.class,
 		DependencyValidatorTest.class,
 		GraphTest.class,
-		MethodCollectorTest.class,
 		StackTest.class } )
 public class AllTests {
 	public static Test suite() {

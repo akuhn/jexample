@@ -10,44 +10,32 @@ import org.junit.runner.notification.RunNotifier;
 
 
 /**
- * The <code>JExampleRunner</code> class is the Runner for composed JUnit
- * Tests. It delegates everything to the Singleton {@link TestGraph}.
+ * Runs JExample tests. Delegates all logic to the singleton {@link TestGraph}. Assumes
+ * that clients first create an instance for each classes under test, and only when all
+ * instances are created start calling {@link #run(RunNotifier)} on any of these instances. Current versions
+ * of JUnit's eclipse plug-in do so (as of Eclipse 3.4 and JUnit 4.4).
+ *  
+ * @author Lea Haensenberger 
+ * @author Adrian Kuhn
  * 
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 public class JExampleRunner extends Runner {
 
-	private static TestGraph graph = TestGraph.getInstance();
+	private final TestClass testCase;
 
-	private final TestClass underTest;
-
-	/**
-	 * @param underTest the {@link Class} to be run as a test
-	 * @throws InitializationError
-	 */
-	public JExampleRunner( Class<?> underTest ) throws InitializationError {
-		this.underTest = new TestClass( underTest );
-		graph.addClass( this.underTest );
+	
+	public JExampleRunner(Class<?> underTest) throws InitializationError {
+		this.testCase = TestGraph.addClass(underTest);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.junit.runner.Runner#getDescription()
-	 */
 	@Override
 	public Description getDescription() {
-		return graph.descriptionForClass( this.underTest );
+	    return testCase.getDescription();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.junit.runner.Runner#run(org.junit.runner.notification.RunNotifier)
-	 */
 	@Override
 	public void run( RunNotifier notifier ) {
-		graph.runClass( this.underTest, notifier );
+	    testCase.run(notifier);
 	}
 
 }

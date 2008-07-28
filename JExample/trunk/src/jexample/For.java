@@ -19,7 +19,7 @@ public class For {
 	
 	public static <T> T example(Class test, String method) {
 		TestGraph graph = createTestGraph(test);
-		for (TestMethod each : graph.getTestMethods().values()) {
+		for (TestMethod each : graph.getTestMethods()) {
 			// TODO use dependency parser to find matching method
 			if (each.getDeclaringMethod().getName().equals(method)) {
 				RunNotifier notifier = new RunNotifier();
@@ -35,8 +35,7 @@ public class For {
 	private static TestGraph createTestGraph(Class test) {
 		try {
 			TestGraph graph = new TestGraph();
-			TestClass testClass = new TestClass(test);
-			graph.addClass(testClass);
+			graph.addTestCase(test.getClass());
 			return graph;
 		} catch (InitializationError ex) {
 			// TODO verbose error message

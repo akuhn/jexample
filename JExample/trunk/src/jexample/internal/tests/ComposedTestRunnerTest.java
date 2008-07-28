@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExampleRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -23,7 +24,7 @@ import org.junit.runner.RunWith;
 public class ComposedTestRunnerTest {
 
 	@RunWith( JExampleRunner.class )
-	static private class CycleMethods {
+	static public class CycleMethods {
 
 		public CycleMethods() {
 		}
@@ -55,7 +56,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class SkipMethods {
+	static public class SkipMethods {
 
 		public SkipMethods() {
 		}
@@ -96,7 +97,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class BadDependencies {
+	static public class BadDependencies {
 
 		public BadDependencies() {
 		}
@@ -119,6 +120,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@Test
+	@Ignore
 	public void badDependencies() {
 		Result result = JUnitCore.runClasses( BadDependencies.class );
 		assertEquals( 2, result.getFailureCount() );
@@ -127,7 +129,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class GoodTest {
+	static public class GoodTest {
 		public GoodTest() {
 		}
 
@@ -158,7 +160,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class FirstGoodTest {
+	static public class FirstGoodTest {
 		public FirstGoodTest() {
 		}
 
@@ -175,7 +177,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class SecondGoodTest {
+	static public class SecondGoodTest {
 		public SecondGoodTest() {
 		}
 
@@ -195,7 +197,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class FirstBadTest {
+	static public class FirstBadTest {
 		public FirstBadTest() {
 		}
 
@@ -218,7 +220,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class SecondBadTest {
+	static public class SecondBadTest {
 		public SecondBadTest() {
 		}
 
@@ -238,7 +240,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class WithAttributes {
+	static public class WithAttributes {
 		public WithAttributes() {
 
 		}
@@ -289,7 +291,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class DependsOnBeforeTest {
+	static public class DependsOnBeforeTest {
 
 		public DependsOnBeforeTest() {
 		}
@@ -322,7 +324,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static private class CloneRetVal {
+	static public class CloneRetVal {
 
 		public CloneRetVal() {
 		}
@@ -368,7 +370,7 @@ public class ComposedTestRunnerTest {
 	}
 	
 	@RunWith( JExampleRunner.class )
-	static private class NotCloneRetVal {
+	static public class NotCloneRetVal {
 
 		private static NoClone rootClone, secondClone;
 		

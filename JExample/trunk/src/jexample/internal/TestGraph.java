@@ -7,38 +7,34 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jexample.JExampleRunner;
-
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-/**
- * The <code>TestGraph</code> class takes the responsibility delegated from
- * {@link JExampleRunner}: validating {@link Method}'s, running tests and
- * returning {@link Description}'s.
+/** Validates, describes and runs all JExample tests. Implemented as a singleton
+ * in order to persist results between runs of many classes. JUnit's eclipse
+ * plug-in runs all classes of a package in one bunch, but restarts JUnit whenever
+ * test are rerun. Thus, this singleton does persists for one run only.
  * 
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger
+ * @author Adrian Kuhn
+ * 
  */
 public class TestGraph {
 
 	private static TestGraph graph;
-
 	private Set<TestClass> classesUnderTest;
-
 	private Map<Method,TestMethod> testMethods;
+	private boolean anyHasBeenRun = false;
+
 
 	public TestGraph() {
 		this.classesUnderTest = new HashSet<TestClass>();
 		this.testMethods = new HashMap<Method,TestMethod>();
 	}
 
-	public static TestGraph getInstance() {
-		if ( graph == null ) {
-			graph = new TestGraph();
-		}
-
-		return graph;
+	public static TestGraph instance() {
+		return graph == null ? graph = new TestGraph() : graph;
 	}
 
 	/**
@@ -49,21 +45,21 @@ public class TestGraph {
 	 *            the {@link TestClass} to be added
 	 * @throws InitializationError
 	 */
-	public void addClass( TestClass testClass ) throws InitializationError {
-
-		Map<Method,TestMethod> methods = this.collectMethods( testClass );
-
-		this.detectCycles( methods.values() );
-
-		this.validate( methods.keySet(), testClass ); // validate the methods
-		// of the testClass
-		this.classesUnderTest.add( testClass );
-
-		for ( Method method : methods.keySet() ) {
-			if ( !this.testMethods.containsKey( method ) ) {
-				this.testMethods.put( method, methods.get( method ) );
-			}
-		}
+	public TestClass addTestCase(Class<?> testCase) throws InitializationError {
+	    if (anyHasBeenRun) throw new InitializationError();
+	    try {
+    	    TestClass $ = new TestClass(testCase, this).validate();
+    		Collection<TestMethod> news = new MethodCollector($)
+    		    .collect()
+    		    .validate()
+    		    .result();
+    		this.detectCycles(news);
+    		this.classesUnderTest.add($);
+    		for (TestMethod m : news)
+    		    testMethods.put(m.getJavaMethod(), m);
+    		return $;
+	    } catch (InitializationError err) { throw err; } 
+	    catch(Exception ex) { throw new InitializationError(ex); }
 	}
 
 	/**
@@ -78,11 +74,12 @@ public class TestGraph {
 	 * @return the <code>description</code> for <code>testClass</code>;
 	 */
 	public Description descriptionForClass( TestClass testClass ) {
+	    // TODO too long
 		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
 		Set<Description> subDescriptions = new HashSet<Description>();
-		for ( TestMethod method : this.testMethods.values() ) {
+		for ( TestMethod method : this.getTestMethods() ) {
 			if ( method.belongsToClass( testClass ) ) {
-				description.addChild( method.createDescription() );
+				description.addChild( method.getDescription() );
 			} else if ( this.methodBelongsToNoClass( method ) ) {
 				subDescriptions = this.addChildDescription( subDescriptions, method );
 			}
@@ -103,30 +100,27 @@ public class TestGraph {
 	 * @param notifier
 	 *            {@link RunNotifier}
 	 */
-	public void runClass( TestClass testClass, RunNotifier notifier ) {
-		for ( TestMethod method : this.testMethods.values() ) {
-			if ( method.belongsToClass( testClass ) ) {
-				method.run( notifier );
+	public void runClass(TestClass testClass, RunNotifier notifier) {
+	     // TODO anyHasBeenRun = true; does not work because of tests nested in tests
+		for (TestMethod method : this.getTestMethods()) {
+			if (method.belongsToClass(testClass)) {
+				method.run(notifier);
 			}
 		}
 	}
 
 	private void detectCycles( Collection<TestMethod> methods ) throws InitializationError {
-		CycleDetector detector = new CycleDetector( methods );
-
+		CycleDetector<TestMethod> detector = new CycleDetector<TestMethod>(methods) {
+            @Override
+            public Collection<TestMethod> getChildren(TestMethod tm) {
+                return tm.getDependencies();
+            }
+		};
 		if ( detector.hasCycle() ) {
 			throw new InitializationError( "The dependencies are cyclic." );
 		}
 	}
 
-	private Map<Method,TestMethod> collectMethods( TestClass testClass ) throws InitializationError {
-		MethodCollector collector = new MethodCollector( testClass, this.testMethods );
-		try {
-			return collector.collectTestMethods();
-		} catch ( Throwable e1 ) {
-			throw new InitializationError( e1 );
-		}
-	}
 
 	private Set<Description> addChildDescription( Set<Description> subDescriptions, TestMethod method ) {
 		Class<?> declaringClass = method.getDeclaringClass();
@@ -136,7 +130,7 @@ public class TestGraph {
 			description = Description.createSuiteDescription( declaringClass );
 			subDescriptions.add( description );
 		}
-		description.addChild( method.createDescription() );
+		description.addChild( method.getDescription() );
 
 		return subDescriptions;
 	}
@@ -159,28 +153,74 @@ public class TestGraph {
 		return true;
 	}
 
-	private void validate( Set<Method> methodUnderTest, TestClass testClass ) throws InitializationError {
-		MethodValidator validator = new MethodValidator( methodUnderTest, testClass );
-		validator.validateMethodsForComposedRunner();
-		validator.assertValid();
+	public Collection<Method> getMethods() {
+		return this.testMethods.keySet();
+	}
+	
+	public Collection<TestMethod> getTestMethods() {
+	    return this.testMethods.values();
 	}
 
-	/**
-	 * Only for testing purposes
-	 * 
-	 * @return a {@link Map} with the mapping {@link Method} -&gt;
-	 *         {@link TestMethod}
-	 */
-	public Map<Method,TestMethod> getTestMethods() {
-		return this.testMethods;
-	}
-
-	/**
-	 * Only for testing purposes
-	 * 
-	 * @return a {@link Set} of {@link TestClass} Objects
-	 */
-	public Set<TestClass> getClasses() {
+	public Collection<TestClass> getClasses() {
 		return this.classesUnderTest;
 	}
+
+    public static TestClass addClass(Class<?> testCase) throws InitializationError {
+        return TestGraph.instance().addTestCase(testCase);
+    }
+    
+    private class MethodCollector {
+        
+        private Map<Method, TestMethod> found;
+        private Collection<Method> todo;
+        
+        public MethodCollector(TestClass testClass) {
+            found = new HashMap();
+            todo = new HashSet(testClass.getTestMethods());
+        }
+        
+        public MethodCollector validate() throws InitializationError {
+            for (TestMethod m : found.values()) m.validate();
+            return this;
+        }
+
+        public MethodCollector collect() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+            while (!todo.isEmpty()) {
+                Method $ = todo.iterator().next();
+                process($);
+                todo.remove($);
+            }
+            return this;
+        }
+        
+        private void process(Method m) throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+            TestMethod $ = testMethod(m);
+            for (Method d : $.dependencies()) {
+                $.addDependency(testMethod(d));
+            }
+        }
+
+        private TestMethod testMethod(Method m) {
+            TestMethod $ = testMethods.get(m);
+            if ($ != null) return $;
+            $ = found.get(m);
+            if ($ != null) return $;
+            $ = new TestMethod(m, graph);
+            found.put(m, $);
+            todo.add(m);
+            return $;
+        }
+
+        public Collection<TestMethod> result() {
+            return found.values(); 
+        }
+        
+        
+        
+    }
+
+    public TestMethod getTestMethod(Method m) {
+        return testMethods.get(m);
+    }
+    
 }

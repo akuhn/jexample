@@ -23,13 +23,13 @@ import jexample.internal.DependencyScanner.Token;
  */
 public class DependencyParser {
 
-	private final TestClass testClass;
+	private final Class<?> testClass;
 
 	/**
-	 * @param myTestClass the {@link TestClass} that is to be run
+	 * @param class1 the {@link TestClass} that is to be run
 	 */
-	public DependencyParser(TestClass myTestClass) {
-		this.testClass = myTestClass;
+	public DependencyParser(Class<?> class1) {
+		this.testClass = class1;
 	}
 
 
@@ -64,10 +64,10 @@ public class DependencyParser {
 
 	private Class<?> getProviderClass(Token token) throws ClassNotFoundException {
 		if (token.className == null) {
-			return testClass.getJavaClass();
+			return testClass;
 		}
 		else if (!token.className.contains(".")) {
-			String fullName = testClass.getJavaClass().getPackage().getName() + "." + token.className;
+			String fullName = testClass.getPackage().getName() + "." + token.className;
 			return Class.forName(fullName);
 		}
 		else {

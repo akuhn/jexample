@@ -28,13 +28,13 @@ public class MethodValidator {
 	private final TestClass testClass;
 
 	/**
-	 * @param methodUnderTest
+	 * @param news
 	 *            a {@link Set} of {@link Method} under test
 	 * @param testClass
 	 *            the {@link TestClass} to be run
 	 */
-	public MethodValidator( Set<Method> methodUnderTest, TestClass testClass ) {
-		testMethods = methodUnderTest;
+	public MethodValidator( Set<Method> news, TestClass testClass ) {
+		testMethods = news;
 		this.testClass = testClass;
 	}
 
@@ -97,7 +97,7 @@ public class MethodValidator {
 		List<Throwable> errors = new ArrayList<Throwable>();
 		for ( Method each : methods ) {
 			try {
-				dependencies = this.testClass.getDependenciesFor( each );
+				// TODO dependencies = this.testClass.getDependenciesFor( each );
 			} catch ( Exception e ) {
 				fErrors.add( e );
 			}

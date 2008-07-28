@@ -31,8 +31,7 @@ public class DependencyParserTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.myClass = new TestClass( TestTestClass.class );
-		parser = new DependencyParser( myClass );
+		parser = new DependencyParser( TestTestClass.class );
 		annotatedMethod = TestTestClass.class.getMethod( "annotatedMethod" );
 	}
 
