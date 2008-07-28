@@ -26,20 +26,20 @@ public class GraphTest {
 
 	@Test
 	public void testAddOneClass() throws InitializationError {
-		graph.addTestCase( OneClass.class );
+		graph.add( OneClass.class );
 		assertEquals( 1, graph.getClasses().size() );
 		assertEquals( 4, graph.getTestMethods().size() );
 	}
 
 	@Test
 	public void testAddMethodsOfOneClass() throws InitializationError {
-		graph.addTestCase( OneClass.class );
+		graph.add( OneClass.class );
 		assertEquals( 4, graph.getTestMethods().size() );
 	}
 
 	@Test
 	public void testAddDependenciesOfOneClass() throws InitializationError, SecurityException, NoSuchMethodException {
-		graph.addTestCase( OneClass.class );
+		graph.add( OneClass.class );
 		assertEquals( 0, graph.getTestMethod( OneClass.class.getMethod( "testMethod" ) ).getDependencies().size() );
 		assertEquals( 1, graph.getTestMethod( OneClass.class.getMethod( "anotherTestMethod" ) ).getDependencies().size() );
 		assertEquals( 1, graph.getTestMethod( OneClass.class.getMethod( "depOnOtherTest" ) ).getDependencies().size() );
@@ -48,7 +48,7 @@ public class GraphTest {
 
 	@Test( expected = InitializationError.class )
 	public void detectCycles() throws InitializationError {
-		graph.addTestCase( Cyclic.class );
+		graph.add( Cyclic.class );
 	}
 
 	static private class OneClass {

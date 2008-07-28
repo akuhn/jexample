@@ -9,18 +9,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExampleRunner;
-import jexample.internal.TestClass;
 import jexample.internal.TestGraph;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.internal.runners.CompositeRunner;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.JUnitCore;
-import org.junit.runner.Request;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
-import org.junit.runner.Runner;
 
 
 /**
@@ -133,7 +127,11 @@ public class ComposedTestRunnerTest {
 		//assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
 	}
 
-	@RunWith( JExampleRunner.class )
+	private Result runJExampleTestCase(Class<?>... classes) {
+        return new JUnitCore().run(new TestGraph().newJExampleRunner(classes));
+    }
+
+    @RunWith( JExampleRunner.class )
 	static public class GoodTest {
 		public GoodTest() {
 		}
@@ -163,25 +161,6 @@ public class ComposedTestRunnerTest {
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
-
-    private Result runJExampleTestCase(Class<?>... classes) {
-        TestGraph graph = new TestGraph();
-        CompositeRunner runner = new CompositeRunner("All");
-        for (Class<?> c : classes) {
-            runner.add(createJExampleRunner(c, graph));
-        }
-        return new JUnitCore().run(runner);
-    }
-    
-    private Runner createJExampleRunner(Class<?> c, TestGraph graph) {
-        try {
-            TestClass test = graph.addTestCase(c);
-            return new JExampleRunner(test);
-        } 
-        catch (InitializationError err) { 
-            return Request.errorReport(c, err).getRunner();
-        }
-    }
 
 	@RunWith( JExampleRunner.class )
 	static public class FirstGoodTest {
@@ -375,7 +354,8 @@ public class ComposedTestRunnerTest {
 				this.name = name;
 			}
 
-			public Object clone() {
+			@Override
+            public Object clone() {
 				return new Clone( "clone" );
 			}
 

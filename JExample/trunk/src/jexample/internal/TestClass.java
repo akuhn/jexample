@@ -77,7 +77,7 @@ public class TestClass {
     }
 
     public void run(RunNotifier notifier) {
-        graph.runClass(this, notifier);
+        graph.run(this, notifier);
     }
 
     public TestClass validate() throws InitializationError {

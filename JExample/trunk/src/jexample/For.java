@@ -35,7 +35,7 @@ public class For {
 	private static TestGraph createTestGraph(Class test) {
 		try {
 			TestGraph graph = new TestGraph();
-			graph.addTestCase(test.getClass());
+			graph.add(test.getClass());
 			return graph;
 		} catch (InitializationError ex) {
 			// TODO verbose error message

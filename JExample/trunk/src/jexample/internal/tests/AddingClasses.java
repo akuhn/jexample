@@ -6,12 +6,19 @@ import jexample.JExampleRunner;
 import jexample.internal.TestGraph;
 import jexample.internal.TestMethod;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.RunWith;
 
 public class AddingClasses {
 
+    private TestGraph g;
+
+    @Before
+    public void fixture() {
+        g = new TestGraph();
+    }
+    
     @RunWith( JExampleRunner.class )
     public static class A {
         @Test
@@ -20,8 +27,7 @@ public class AddingClasses {
     
     @Test
     public void simpleClass() throws Throwable {
-        TestGraph g = new TestGraph();
-        g.addTestCase(A.class);
+        g.add(A.class);
         
         assertEquals(1, g.getClasses().size());
         assertEquals(1, g.getTestMethods().size());
@@ -40,8 +46,7 @@ public class AddingClasses {
     
     @Test
     public void simpleOverride() throws Throwable {
-        TestGraph g = new TestGraph();
-        g.addTestCase(B.class);
+        g.add(B.class);
         
         assertEquals(1, g.getClasses().size());
         assertEquals(1, g.getTestMethods().size());
@@ -62,8 +67,7 @@ public class AddingClasses {
 
     @Test
     public void simpleDepedency() throws Throwable {
-        TestGraph g = new TestGraph();
-        g.addTestCase(C.class);
+        g.add(C.class);
         
         assertEquals(1, g.getClasses().size());
         assertEquals(2, g.getTestMethods().size());
@@ -77,5 +81,6 @@ public class AddingClasses {
         assertEquals(p, c.getDependencies().iterator().next());
     }
     
+}   
     
-}
+

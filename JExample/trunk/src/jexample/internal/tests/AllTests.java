@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         AddingClasses.class,
 		ComposedTestRunnerTest.class,
 		CycleDetectorTest.class,
+		RunningDependencies.class,
 		DependencyScannerTest.class,
 		DependencyParserTest.class,
 		DependencyValidatorTest.class,

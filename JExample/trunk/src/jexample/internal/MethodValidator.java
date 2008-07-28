@@ -56,7 +56,6 @@ public class MethodValidator {
 	public List<Throwable> validateMethodsForComposedRunner() {
 		validateNoArgConstructor();
 		validateInstanceMethods();
-		validateDependencies();
 		return fErrors;
 	}
 
@@ -89,33 +88,4 @@ public class MethodValidator {
 		}
 	}
 
-	private void validateDependencies() {
-		DependencyValidator depValidator = new DependencyValidator();
-
-		List<Method> methods = this.getAnnotatedMethodsWithDependencies();
-		List<Method> dependencies = new ArrayList<Method>();
-		List<Throwable> errors = new ArrayList<Throwable>();
-		for ( Method each : methods ) {
-			try {
-				// TODO dependencies = this.testClass.getDependenciesFor( each );
-			} catch ( Exception e ) {
-				fErrors.add( e );
-			}
-			errors = depValidator.dependencyIsValid( each, dependencies.toArray( new Method[dependencies.size()] ) );
-			fErrors.addAll( errors );
-		}
-	}
-
-	private List<Method> getAnnotatedMethodsWithDependencies() {
-		List<Method> results = new ArrayList<Method>();
-		Annotation depAnnotation, testAnnotation;
-		for ( Method eachMethod : this.testMethods ) {
-			depAnnotation = eachMethod.getAnnotation( Depends.class );
-			testAnnotation = eachMethod.getAnnotation( Test.class );
-			if ( depAnnotation != null && testAnnotation != null ) {
-				results.add( eachMethod );
-			}
-		}
-		return results;
-	}
 }

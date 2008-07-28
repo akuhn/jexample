@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import jexample.Depends;
@@ -329,12 +330,36 @@ public class TestMethod {
         return javaMethod.getName();
     }
 
-    public void validate() throws InitializationError {
+    public void validate() {
         if (!javaMethod.isAnnotationPresent(Test.class)) {
-            Exception ex = new Exception();
-            ex.fillInStackTrace();
-            graph.addInitializationError(ex);
+            throwNewError("Method %s is not a test method, missing @Test annotation.", getName());
         }
+        int d = getDependencies().size();
+        int p = javaMethod.getParameterTypes().length;
+        if (p > 0 && p != d) {
+            throwNewError("Method %s has %d parameters but %d dependencies.", getName(), p, d);
+        }
+        else {
+            validateDependencyTypes();
+        }
+    }
+
+    private void validateDependencyTypes() {
+        Iterator<TestMethod> tms = getDependencies().iterator();
+        for (Class<?> t : javaMethod.getParameterTypes()) {
+            TestMethod tm = tms.next();
+            Class<?> r = tm.getJavaMethod().getReturnType();
+            if (!t.isAssignableFrom(r)) {
+                throwNewError("Parameter %s is not assignable from depedency %s.", t, tm);
+            }
+        }
+    }
+    
+    private InitializationError throwNewError(String message, Object... args) {
+        InitializationError $ = new InitializationError(String.format(message, args));
+        $.fillInStackTrace();
+        graph.addInitializationError($);
+        return $;
     }
 
 }

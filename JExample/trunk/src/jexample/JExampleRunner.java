@@ -23,12 +23,12 @@ public class JExampleRunner extends Runner {
 
 	private final TestClass testCase;
 	
-	public JExampleRunner(Class<?> underTest) throws InitializationError {
-		this.testCase = TestGraph.addClass(underTest);
+	public JExampleRunner(Class<?> testClass) throws InitializationError {
+		this.testCase = TestGraph.instance().add(testClass);
 	}
 	
-	public JExampleRunner(TestClass testClass) {
-	    this.testCase = testClass;
+	public JExampleRunner(TestClass testCase) {
+	    this.testCase = testCase;
 	}
 	
 	@Override

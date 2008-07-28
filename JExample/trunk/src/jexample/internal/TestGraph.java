@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jexample.JExampleRunner;
+
+import org.junit.internal.runners.CompositeRunner;
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
+import org.junit.runner.Request;
+import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
 /** Validates, describes and runs all JExample tests. Implemented as a singleton
@@ -49,7 +54,7 @@ public class TestGraph {
 	 *            the {@link TestClass} to be added
 	 * @throws InitializationError
 	 */
-	public TestClass addTestCase(Class<?> testCase) throws InitializationError {
+	public TestClass add(Class<?> testCase) throws InitializationError {
 	    if (anyHasBeenRun) throw new InitializationError();
 	    TestClass $ = new TestClass(testCase, this).validate();
 		Collection<TestMethod> news = new MethodCollector($)
@@ -103,7 +108,7 @@ public class TestGraph {
 	 * @param notifier
 	 *            {@link RunNotifier}
 	 */
-	public void runClass(TestClass testClass, RunNotifier notifier) {
+	public void run(TestClass testClass, RunNotifier notifier) {
 	     // TODO anyHasBeenRun = true; does not work because of tests nested in tests
 		for (TestMethod method : this.getTestMethods()) {
 			if (method.belongsToClass(testClass)) {
@@ -168,10 +173,6 @@ public class TestGraph {
 		return this.classesUnderTest;
 	}
 
-    public static TestClass addClass(Class<?> testCase) throws InitializationError {
-        return TestGraph.instance().addTestCase(testCase);
-    }
-    
     private class MethodCollector {
         
         private Map<Method, TestMethod> found;
@@ -229,5 +230,35 @@ public class TestGraph {
     public void addInitializationError(Throwable ex) {
         initializationErrors.add(ex);
     }
+    
+    public Runner newJExampleRunner(Class<?>... classes) {
+        CompositeRunner $ = new CompositeRunner("All");
+        for (Class<?> c : classes) {
+            $.add(newJExampleRunner(c));
+        }
+        return $;
+    }    
+        
+    public Runner newJExampleRunner(Class<?> c) {
+        try {
+            TestClass test = this.add(c);
+            return new JExampleRunner(test);
+        } 
+        catch (InitializationError err) { 
+            return Request.errorReport(c, err).getRunner();
+        }
+    }
+
+    public TestMethod getTestMethod(Class<?> c, String name) {
+        TestMethod found = null;
+        for (TestMethod tm : getTestMethods()) {
+            if (tm.getDeclaringClass() == c && tm.getJavaMethod().getName().equals(name)) {
+                if (found != null) throw new RuntimeException();
+                found = tm;
+            }
+        }
+        return found;
+    }
+    
     
 }
