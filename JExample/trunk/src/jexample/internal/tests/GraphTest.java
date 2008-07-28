@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import jexample.Depends;
+import jexample.JExampleRunner;
 import jexample.internal.TestClass;
 import jexample.internal.TestGraph;
 import jexample.internal.TestMethod;
@@ -13,6 +14,7 @@ import jexample.internal.TestMethod;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
+import org.junit.runner.RunWith;
 
 
 public class GraphTest {
@@ -51,6 +53,7 @@ public class GraphTest {
 		graph.add( Cyclic.class );
 	}
 
+	@RunWith(JExampleRunner.class)
 	static private class OneClass {
 
 		public OneClass() {

@@ -29,7 +29,7 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class TestGraph {
 
-	private static TestGraph graph;
+	private static TestGraph GRAPH;
 	private Set<TestClass> classesUnderTest;
 	private Map<Method,TestMethod> testMethods;
 	private List<Throwable> initializationErrors;
@@ -43,7 +43,7 @@ public class TestGraph {
 	}
 
 	public static TestGraph instance() {
-		return graph == null ? graph = new TestGraph() : graph;
+		return GRAPH == null ? GRAPH = new TestGraph() : GRAPH;
 	}
 
 	/**
@@ -54,9 +54,9 @@ public class TestGraph {
 	 *            the {@link TestClass} to be added
 	 * @throws InitializationError
 	 */
-	public TestClass add(Class<?> testCase) throws InitializationError {
+	public TestClass add(Class<?> javaClass) throws InitializationError {
 	    if (anyHasBeenRun) throw new InitializationError();
-	    TestClass $ = new TestClass(testCase, this).validate();
+	    TestClass $ = new TestClass(javaClass, this).validate();
 		Collection<TestMethod> news = new MethodCollector($)
 		    .collect()
 		    .validate()
@@ -67,6 +67,7 @@ public class TestGraph {
 		    testMethods.put(m.getJavaMethod(), m);
         if (!initializationErrors.isEmpty())
             throw new InitializationError(initializationErrors);
+        initializationErrors.clear();
         return $;
 	}
 
@@ -180,7 +181,7 @@ public class TestGraph {
         
         public MethodCollector(TestClass testClass) {
             found = new HashMap();
-            todo = new HashSet(testClass.getTestMethods());
+            todo = new HashSet(testClass.collectTestMethods());
         }
         
         public MethodCollector validate() throws InitializationError {
@@ -199,7 +200,7 @@ public class TestGraph {
         
         private void process(Method m) {
             TestMethod $ = testMethod(m);
-            for (Method d : $.dependencies()) {
+            for (Method d : $.collectDependencies()) {
                 $.addDependency(testMethod(d));
             }
         }
@@ -227,10 +228,16 @@ public class TestGraph {
         return testMethods.get(m);
     }
 
-    public void addInitializationError(Throwable ex) {
-        initializationErrors.add(ex);
+    public void throwNewError(String message, Object... args) {
+        Exception $ = new Exception(String.format(message, args));
+        $.fillInStackTrace();
+        this.addInitializationError($);
     }
     
+    public void addInitializationError(Throwable th) {
+        initializationErrors.add(th);
+    }
+
     public Runner newJExampleRunner(Class<?>... classes) {
         CompositeRunner $ = new CompositeRunner("All");
         for (Class<?> c : classes) {

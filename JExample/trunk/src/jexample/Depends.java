@@ -14,9 +14,9 @@ import java.lang.reflect.Method;
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
 
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.METHOD )
 @Documented
+@Target( ElementType.METHOD )
+@Retention( RetentionPolicy.RUNTIME )
 public @interface Depends {
 
 	/**

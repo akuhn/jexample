@@ -1,30 +1,30 @@
 package jexample.internal;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import jexample.Depends;
+import jexample.JExampleRunner;
 
 import org.junit.Test;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;
 
 
 /**
- * A wrapper for the {@link Class} under test.
+ * Java class with test methods.
  * 
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger
+ * @author Adrian Kuhn
+ * 
  */
 public class TestClass {
     
     private final TestGraph graph;
 	private final Class<?> fClass;
-
+	
 	public TestClass(Class<?> fClass, TestGraph graph) {
 		this.fClass = fClass;
 		this.graph = graph;
@@ -33,10 +33,16 @@ public class TestClass {
 	/**
 	 * @return a {@link List} of all {@link Method}'s annotated with {@link Test}
 	 */
-	public List<Method> getTestMethods() {
-		return getAnnotatedMethods( Test.class );
+	public List<Method> collectTestMethods() {
+		List<Method> $ = new ArrayList<Method>();
+        for (Method m : fClass.getMethods()) {
+            if (m.isAnnotationPresent(Test.class)) {
+                $.add(m);
+            }
+        }
+        return $;
 	}
-
+	
 	/**
 	 * @return the {@link Constructor} of <code>fClass</code>
 	 * @throws SecurityException
@@ -62,16 +68,6 @@ public class TestClass {
 		return fClass.getName();
 	}
 
-	private List<Method> getAnnotatedMethods(Class<? extends Annotation> annotationClass) {
-		List<Method> $ = new ArrayList<Method>();
-		for (Method m : fClass.getMethods()) {
-		    if (m.isAnnotationPresent(annotationClass)) {
-		        $.add(m);
-		    }
-		}
-		return $;
-	}
-
     public Description getDescription() {
         return graph.descriptionForClass(this);
     }
@@ -80,11 +76,23 @@ public class TestClass {
         graph.run(this, notifier);
     }
 
-    public TestClass validate() throws InitializationError {
+    public TestClass validate() {
+        RunWith run = fClass.getAnnotation(RunWith.class);
+        if (run == null || run.value() != JExampleRunner.class ) {
+            graph.throwNewError("Class %s is not a JExample test class, annotation @RunWith(JExampleRunner.class) missing.", this);
+        }
         try {
-            this.getConstructor();
-        } catch (Exception ex) {
-            throw new InitializationError(ex);
+            fClass.getConstructor();
+        }
+        catch (NoSuchMethodException ex) {
+            graph.addInitializationError(ex);
+        }
+        catch (SecurityException ex) {
+            graph.addInitializationError(ex);
+        }
+        int len = collectTestMethods().size();
+        if (len == 0) {
+            graph.throwNewError("Class %s does not contain test methods.", this);
         }
         return this;
     }

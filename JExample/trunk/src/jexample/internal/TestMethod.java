@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jexample.Depends;
+import jexample.InjectionPolicy;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,83 +20,31 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
 /**
- * The states, a {@link TestMethod} can have.
- * 
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
- */
-enum TestResult {
-	NOT_YET_RUN, GREEN, RED, WHITE
-}
-
-/**
  * The wrapper for the {@link Method}'s to be run.
  * 
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Adrian Kuhn
+ * 
  */
 public class TestMethod {
 
-	private Method javaMethod;
 	private List<TestMethod> dependencies;
-	private TestResult state;
-	private Object returnValue;
-    private Description description;
-    private TestGraph graph;
+	private Description description;
+	private TestGraph graph;
+	private Method javaMethod;
+    private TestResult result;
+    private Object returnValue;
 
     
 	public TestMethod(Method m, TestGraph graph) {
 	    assert graph != null;
         this.javaMethod = m;
         this.dependencies = new ArrayList<TestMethod>();
-        this.state = TestResult.NOT_YET_RUN;
+        this.result = TestResult.NOT_YET_RUN;
         this.description = Description.createTestDescription(m
                     .getDeclaringClass(), m.getName());
         this.graph = graph;
     }
-
-	/**
-	 * Checks, if this {@link TestMethod} belongs to <code>testClass</code>
-	 * 
-	 * @param testClass
-	 *            the {@link TestClass} to be compared
-	 * @return true, if the {@link TestMethod} belongs to <code>testClass</code>,
-	 *         false otherwise
-	 */
-	public boolean belongsToClass(TestClass testClass) {
-		return this.javaMethod.getDeclaringClass().equals(
-				testClass.getJavaClass());
-	}
-
-	/**
-	 * Runs this {@link TestMethod} after it run all of its dependencies.
-	 * 
-	 * @param notifier
-	 *            the {@link RunNotifier}
-	 */
-	public void run(RunNotifier notifier) {
-		if (this.hasBeenRun())
-			return;
-		boolean allParentsGreen = true;
-		for (TestMethod dependency : this.dependencies) {
-			dependency.run(notifier);
-			allParentsGreen = allParentsGreen && dependency.isGreen();
-		}
-		if (allParentsGreen && !this.isIgnoredByAnnotation()) {
-			this.runTestMethod(notifier);
-		} else {
-			this.setWhite();
-			notifier.fireTestIgnored(this.getDescription());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-    public boolean equals(Object obj) {
-		return this.javaMethod.equals(((TestMethod) obj).javaMethod);
-	}
 
 	/**
 	 * If the TestMethod doesn't already have the dependency
@@ -106,12 +55,82 @@ public class TestMethod {
 	 *            the {@link TestMethod} to be added as a dependency
 	 */
 	public void addDependency(TestMethod testMethod) {
-		if (!this.dependencies.contains(testMethod)) {
-			this.dependencies.add(testMethod);
+		this.dependencies.add(testMethod);
+		// TODO duplicate dependencies? an error or not? I'd say no.
+	}
+
+	private void addFailure(Throwable e, RunNotifier notifier) {
+		notifier.fireTestFailure(new Failure(description, e));
+		this.setFailed();
+	}
+
+	public boolean belongsToClass(TestClass testClass) {
+		return this.javaMethod.getDeclaringClass().equals(
+				testClass.getJavaClass());
+	}
+
+	private Object cloneReturnValue() {
+		try {
+            Method cloneMethod = returnValue.getClass().getMethod("clone");
+            return cloneMethod.invoke(returnValue);
+        } catch (SecurityException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException(ex);
+        } catch (NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
+	}
+
+	public Collection<Method> collectDependencies() {
+        DependencyParser parser = new DependencyParser( javaMethod.getDeclaringClass() );
+        List<Method> deps = new ArrayList<Method>();
+        Depends annotation = javaMethod.getAnnotation( Depends.class );
+        if ( annotation != null ) {
+            try {
+                deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+            } catch (SecurityException ex) {
+                graph.addInitializationError(ex);
+            } catch (ClassNotFoundException ex) {
+                graph.addInitializationError(ex);
+           } catch (NoSuchMethodException ex) {
+               graph.addInitializationError(ex);
+            }
+        }
+        return deps;
+    }
+
+	private boolean expectsException() {
+		return this.getExpectedException() != null;
+	}
+
+	private Object[] getInjectionValues() throws Exception {
+        Class<?>[] paramTypes = this.javaMethod.getParameterTypes();
+        Object[] $ = new Object[paramTypes.length];
+		for (int i = 0; i < paramTypes.length; i++) {
+            Class<?> paramType = paramTypes[i];
+			TestMethod testMethod = this.dependencies.get(i);
+			$[i] = getInjectionValue(testMethod);
 		}
+		return $;
 	}
 
 	/**
+	 * @return the declaring {@link Class} of <code>javaMethod</code>
+	 */
+	public Class<?> getDeclaringClass() {
+		return this.javaMethod.getDeclaringClass();
+	}
+
+	public Method getDeclaringMethod() {
+		return this.getJavaMethod();
+	}
+
+    /**
 	 * @return a {@link List} of {@link TestMethod}'s, being the dependencies
 	 */
 	public List<TestMethod> getDependencies() {
@@ -125,109 +144,41 @@ public class TestMethod {
 		return description;
 	}
 
-	/**
-	 * @return the declaring {@link Class} of <code>javaMethod</code>
-	 */
-	public Class<?> getDeclaringClass() {
-		return this.javaMethod.getDeclaringClass();
-	}
-
-	private void runTestMethod(RunNotifier notifier) {
-		Object test;
-		try {
-			Constructor<?> constructor = this.javaMethod.getDeclaringClass().getDeclaredConstructor();
-			constructor.setAccessible(true);
-			test = constructor.newInstance();
-			this.invokeMethod(test, notifier, this.getArguments());
-		} catch (InvocationTargetException e) {
-			notifier.testAborted(description, e.getCause());
-			return;
-		} catch (Exception e) {
-			notifier.testAborted(description, e);
-			return;
+    private Class<? extends Throwable> getExpectedException() {
+		Test annotation = this.javaMethod.getAnnotation(Test.class);
+		if (annotation != null
+				&& annotation.expected() != org.junit.Test.None.class) {
+			return annotation.expected();
 		}
+		return null;
 	}
 
-	private void reRunTestMethod() throws Exception {
-	    Constructor<?> constructor = this.javaMethod.getDeclaringClass().getConstructor();
-	    constructor.setAccessible(true);
-		Object test = constructor.newInstance();
-		this.returnValue = this.javaMethod.invoke(test, this.getArguments());
+	private Object getInjectionValue(TestMethod testMethod) throws Exception {
+        if (testMethod.returnValue == null) return null;
+        if (testMethod.isCloneable()) return testMethod.cloneReturnValue();
+        if (keepReturnValue()) return testMethod.getReturnValue();
+        TestMethod provider = testMethod;
+	    provider.reRunTestMethod();
+	    return provider.returnValue;
+    }
+
+	public Method getJavaMethod() {
+        return javaMethod;
+    }
+
+	public Object getName() {
+        return javaMethod.getName();
+    }
+
+	public Object getReturnValue() {
+		return this.returnValue;
 	}
 
-	/**
-	 * Collects all the arguments taken by the test method. If
-	 * <code>clone</code> is implemented, the arguments are cloned.
-	 * 
-	 * @param notifier
-	 * 
-	 * @return an {@link Array} of arguments to be passed to the test method
-	 *         when invoking it.
-	 * @throws Exception if the return value could not be cloned and the provider method could
-	 * not be re-run
-	 */
-	private Object[] getArguments() throws Exception {
-		Class<?>[] paramTypes = this.javaMethod.getParameterTypes();
-		Object[] arguments = new Object[paramTypes.length];
-		for (int i = 0; i < paramTypes.length; i++) {
-			if (this.dependencies.get(i).returnValue != null) {
-				if (this.typeIsCloneable(paramTypes[i])) {
-					arguments[i] = this.cloneReturnValue(this.dependencies
-							.get(i).returnValue, paramTypes[i]);
-				} else {
-					// TODO: run test method again, so you get a new instance of
-					// the return value
-					TestMethod provider = this.dependencies.get(i);
-					provider.reRunTestMethod();
-					arguments[i] = provider.returnValue;
-				}
-			}
-		}
-
-		return arguments;
+	private boolean hasBeenRun() {
+		return result != TestResult.NOT_YET_RUN;
 	}
 
-	// really ugly method, but java leaves no alternative, i think
-	private Object cloneReturnValue(Object returnValue, Class<?> clazz) {
-		Object cloned = null;
-		try {
-			Method cloneMethod = clazz.getMethod("clone");
-			cloneMethod.setAccessible(true);
-			cloned = cloneMethod.invoke(returnValue);
-		} catch (Exception e) {
-			return returnValue;
-		}
-		return cloned;
-	}
-
-	/**
-	 * Checks if <code>clazz</code> or one of its superlcasses implements
-	 * {@link Cloneable} and declares a {@link Method} <code>clone()</code>.
-	 * 
-	 * @param clazz
-	 *            the {@link Class} to check, if it is cloneable
-	 * @return true, if all this conditions are fulfilled, false otherwise
-	 */
-	private boolean typeIsCloneable(Class<?> clazz) {
-		for (Class<?> iface : clazz.getInterfaces()) {
-			if (iface.equals(Cloneable.class)) {
-				try {
-					clazz.getMethod("clone");
-				} catch (Exception e) {
-					return false;
-				}
-				return true;
-			}
-		}
-		if (clazz.getSuperclass() != null) {
-			return this.typeIsCloneable(clazz.getSuperclass());
-		} else {
-			return false;
-		}
-	}
-
-	private void invokeMethod(Object test, RunNotifier notifier,
-			Object... args) {
+	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
 		    this.javaMethod.setAccessible(true);
@@ -250,94 +201,112 @@ public class TestMethod {
 		}
 	}
 
-	private boolean isUnexpectedException(Throwable actual) {
-		return this.getExpectedException() != actual.getClass();
-	}
-
-	private boolean expectsException() {
-		return this.getExpectedException() != null;
-	}
-
-	private Class<? extends Throwable> getExpectedException() {
-		Test annotation = this.javaMethod.getAnnotation(Test.class);
-		if (annotation != null
-				&& annotation.expected() != org.junit.Test.None.class) {
-			return annotation.expected();
-		}
-		return null;
-	}
-
-	private void addFailure(Throwable e, RunNotifier notifier) {
-		notifier.fireTestFailure(new Failure(description, e));
-		this.setFailed();
+	private boolean isGreen() {
+		return result == TestResult.GREEN;
 	}
 
 	private boolean isIgnoredByAnnotation() {
 		return this.javaMethod.getAnnotation(Ignore.class) != null;
 	}
 
-	private void setGreen() {
-		this.state = TestResult.GREEN;
+	private boolean isUnexpectedException(Throwable actual) {
+		return this.getExpectedException() != actual.getClass();
 	}
 
-	private void setWhite() {
-		this.state = TestResult.WHITE;
+	private boolean keepReturnValue() {
+        InjectionPolicy policy = getDeclaringClass().getAnnotation(InjectionPolicy.class);
+        return policy != null && policy.keep();
+    }
+
+	private void reRunTestMethod() throws Exception {
+	    Constructor<?> constructor = this.javaMethod.getDeclaringClass().getConstructor();
+	    constructor.setAccessible(true);
+		Object test = constructor.newInstance();
+		this.returnValue = this.javaMethod.invoke(test, this.getInjectionValues());
 	}
+
+	/**
+	 * Runs this {@link TestMethod} after it run all of its dependencies.
+	 * 
+	 * @param notifier
+	 *            the {@link RunNotifier}
+	 */
+	public void run(RunNotifier notifier) {
+		if (this.hasBeenRun()) return;
+		boolean allParentsGreen = true;
+		for (TestMethod dependency : this.dependencies) {
+			dependency.run(notifier);
+			allParentsGreen &= dependency.isGreen();
+		}
+		if (allParentsGreen && !this.isIgnoredByAnnotation()) {
+			this.runTestMethod(notifier);
+		} else {
+			this.setWhite();
+			notifier.fireTestIgnored(this.getDescription());
+		}
+	}
+
+	private void runTestMethod(RunNotifier notifier) {
+		try {
+			this.invokeMethod(newTestCase(), notifier, this.getInjectionValues());
+		} catch (InvocationTargetException e) {
+			notifier.testAborted(description, e.getCause());
+		} catch (Exception e) {
+			notifier.testAborted(description, e);
+		}
+	}
+
+    private Object newTestCase() throws NoSuchMethodException,
+            InstantiationException, IllegalAccessException,
+            InvocationTargetException {
+        Object test;
+        Constructor<?> constructor = this.javaMethod.getDeclaringClass().getDeclaredConstructor();
+        constructor.setAccessible(true);
+        test = constructor.newInstance();
+        return test;
+    }
 
 	private void setFailed() {
-		this.state = TestResult.RED;
+		this.result = TestResult.RED;
 	}
 
-	private boolean isGreen() {
-		return state == TestResult.GREEN;
+    private void setGreen() {
+		this.result = TestResult.GREEN;
 	}
 
-	private boolean hasBeenRun() {
-		return state != TestResult.NOT_YET_RUN;
+    private void setWhite() {
+		this.result = TestResult.WHITE;
 	}
 
-	public Method getDeclaringMethod() {
-		return this.getJavaMethod();
-	}
-
-	public Object getReturnValue() {
-		return this.returnValue;
-	}
-
-    public Method getJavaMethod() {
-        return javaMethod;
-    }
-
-    public Collection<Method> dependencies() {
-        DependencyParser parser = new DependencyParser( javaMethod.getDeclaringClass() );
-        List<Method> deps = new ArrayList<Method>();
-        Depends annotation = javaMethod.getAnnotation( Depends.class );
-        if ( annotation != null ) {
-            try {
-                deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
-            } catch (SecurityException ex) {
-                graph.addInitializationError(ex);
-            } catch (ClassNotFoundException ex) {
-                graph.addInitializationError(ex);
-           } catch (NoSuchMethodException ex) {
-               graph.addInitializationError(ex);
-            }
+    /**
+     * Checks if <code>clazz</code> or one of its superlcasses implements
+     * {@link Cloneable} and declares a {@link Method} <code>clone()</code>.
+     * 
+     * @param clazz
+     *            the {@link Class} to check, if it is cloneable
+     * @return true, if all this conditions are fulfilled, false otherwise
+     */
+    private boolean isCloneable() {
+        if (returnValue == null) return true;
+        if (!(returnValue instanceof Cloneable)) return false;
+        try {
+            returnValue.getClass().getMethod("clone");
+        } catch (SecurityException ex) {
+            return false;
+        } catch (NoSuchMethodException ex) {
+            return false;
         }
-        return deps;
-    }
-
-    public Object getName() {
-        return javaMethod.getName();
+        return true;
     }
 
     public void validate() {
         if (!javaMethod.isAnnotationPresent(Test.class)) {
-            throwNewError("Method %s is not a test method, missing @Test annotation.", getName());
+            graph.throwNewError("Method %s is not a test method, missing @Test annotation.", getName());
         }
         int d = getDependencies().size();
         int p = javaMethod.getParameterTypes().length;
         if (p > 0 && p != d) {
-            throwNewError("Method %s has %d parameters but %d dependencies.", getName(), p, d);
+            graph.throwNewError("Method %s has %d parameters but %d dependencies.", getName(), p, d);
         }
         else {
             validateDependencyTypes();
@@ -350,16 +319,19 @@ public class TestMethod {
             TestMethod tm = tms.next();
             Class<?> r = tm.getJavaMethod().getReturnType();
             if (!t.isAssignableFrom(r)) {
-                throwNewError("Parameter %s is not assignable from depedency %s.", t, tm);
+                graph.throwNewError("Parameter %s is not assignable from depedency %s.", t, tm);
             }
         }
     }
     
-    private InitializationError throwNewError(String message, Object... args) {
-        InitializationError $ = new InitializationError(String.format(message, args));
-        $.fillInStackTrace();
-        graph.addInitializationError($);
-        return $;
-    }
 
+}
+
+/**
+ * The states, a {@link TestMethod} can have.
+ * 
+ * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ */
+enum TestResult {
+	GREEN, NOT_YET_RUN, RED, WHITE
 }
