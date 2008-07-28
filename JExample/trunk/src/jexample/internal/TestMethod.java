@@ -162,8 +162,9 @@ public class TestMethod {
 	}
 
 	private void reRunTestMethod() throws Exception {
-		Object test = this.javaMethod.getDeclaringClass().getConstructor()
-				.newInstance();
+	    Constructor<?> constructor = this.javaMethod.getDeclaringClass().getConstructor();
+	    constructor.setAccessible(true);
+		Object test = constructor.newInstance();
 		this.returnValue = this.javaMethod.invoke(test, this.getArguments());
 	}
 

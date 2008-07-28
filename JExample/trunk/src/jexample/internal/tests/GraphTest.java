@@ -52,7 +52,7 @@ public class GraphTest {
 		graph.addClass( new TestClass( Cyclic.class ) );
 	}
 
-	static public class OneClass {
+	static private class OneClass {
 
 		public OneClass() {
 
@@ -76,7 +76,7 @@ public class GraphTest {
 		}
 	}
 
-	static public class Cyclic {
+	static private class Cyclic {
 		public Cyclic() {
 
 		}
@@ -99,7 +99,7 @@ public class GraphTest {
 		}
 	}
 
-	static public class CyclicOverClasses {
+	static private class CyclicOverClasses {
 		public CyclicOverClasses() {
 
 		}
