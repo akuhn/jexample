@@ -63,7 +63,7 @@ public class TestDependencies {
         TestMethod t = $.getTestMethod( C.class, "test" );
         TestMethod e = $.getTestMethod( C.class, "empty" );
  
-        assertSame( e.getReturnValue(), t.getReturnValue() );
+        assertNotSame( e.returnValue, t.returnValue );
     }
 
     @RunWith( JExampleRunner.class )

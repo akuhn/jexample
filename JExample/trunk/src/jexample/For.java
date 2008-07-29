@@ -21,11 +21,11 @@ public class For {
 		TestGraph graph = createTestGraph(test);
 		for (TestMethod each : graph.getTestMethods()) {
 			// TODO use dependency parser to find matching method
-			if (each.getDeclaringMethod().getName().equals(method)) {
+			if (each.getJavaMethod().getName().equals(method)) {
 				RunNotifier notifier = new RunNotifier();
 				each.run(notifier);
 				// TODO check notifier for errors/assertions
-				return (T) each.getReturnValue();
+				return (T) each.returnValue;
 			}
 		}
 		// TODO verbose error message

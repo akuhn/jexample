@@ -23,11 +23,13 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class TestClass {
     
+    public final Class<?> javaClass;
+
     private final TestGraph graph;
-	private final Class<?> fClass;
 	
-	public TestClass(Class<?> fClass, TestGraph graph) {
-		this.fClass = fClass;
+	
+    public TestClass(Class<?> fClass, TestGraph graph) {
+		this.javaClass = fClass;
 		this.graph = graph;
 	}
 
@@ -36,7 +38,7 @@ public class TestClass {
 	 */
 	public List<Method> collectTestMethods() {
 		List<Method> $ = new ArrayList<Method>();
-        for (Method m : fClass.getMethods()) {
+        for (Method m : javaClass.getMethods()) {
             if (m.isAnnotationPresent(Test.class)) {
                 $.add(m);
             }
@@ -50,40 +52,30 @@ public class TestClass {
 	 * @throws NoSuchMethodException
 	 */
 	public Constructor<?> getConstructor() throws SecurityException, NoSuchMethodException {
-	    Constructor<?> $ = fClass.getDeclaredConstructor();
+	    Constructor<?> $ = javaClass.getDeclaredConstructor();
 	    $.setAccessible(true);
 	    return $;
 	}
 
-	/**
-	 * @return the {@link Class} object of <code>fClass</code>
-	 */
-	public Class<?> getJavaClass() {
-		return fClass;
-	}
-
-	/**
-	 * @return the name of <code>fClass</code>
-	 */
-	public String getName() {
-		return fClass.getName();
-	}
-
     public Description getDescription() {
-        return graph.descriptionForClass(this);
-    }
+        Description $ = Description.createSuiteDescription(javaClass);
+        for (TestMethod tm : graph.getTestMethods())
+            if (this.contains(tm))
+                $.addChild(tm.description);
+        return $;
+    }    
 
     public void run(RunNotifier notifier) {
         graph.run(this, notifier);
     }
 
     public TestClass validate() {
-        RunWith run = fClass.getAnnotation(RunWith.class);
+        RunWith run = javaClass.getAnnotation(RunWith.class);
         if (run == null || run.value() != JExampleRunner.class ) {
             graph.throwNewError("Class %s is not a JExample test class, annotation @RunWith(JExampleRunner.class) missing.", this);
         }
         try {
-            fClass.getConstructor();
+            javaClass.getConstructor();
         }
         catch (NoSuchMethodException ex) {
             graph.addInitializationError(ex);
@@ -100,6 +92,10 @@ public class TestClass {
 
     public void filter(final Filter filter) {
         graph.filter(filter);
+    }
+    
+    public boolean contains(TestMethod m) {
+       return m.javaMethod.getDeclaringClass().equals(javaClass);
     }
 
 }

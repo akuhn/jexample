@@ -71,28 +71,6 @@ public class TestGraph {
 	}
 
 	/**
-	 * The {@link Description}'s for the {@link Method}'s of this class are
-	 * added as children to the class description. If there are dependencies
-	 * from {@link TestMethod}'s which are not declared in a {@link TestClass}
-	 * that is run in this turn, the {@link Description} of the declaring
-	 * {@link Class} is also added as a child.
-	 * 
-	 * @param testClass
-	 *            the {@link TestClass} to get the {@link Description} from
-	 * @return the <code>description</code> for <code>testClass</code>;
-	 */
-	public Description descriptionForClass( TestClass testClass ) {
-	    // TODO too long
-		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
-		for ( TestMethod method : this.getTestMethods() ) {
-			if ( method.belongsToClass( testClass ) ) {
-				description.addChild( method.getDescription() );
-			}
-		}
-		return description;
-	}
-
-	/**
 	 * All {@link TestMethod}'s of <code>testClass</code> are run, inclusive
 	 * their dependencies.
 	 * 
@@ -102,9 +80,9 @@ public class TestGraph {
 	 *            {@link RunNotifier}
 	 */
 	public void run(TestClass testClass, RunNotifier notifier) {
-	     // TODO anyHasBeenRun = true; does not work because of tests nested in tests
+	    anyHasBeenRun = true;
 		for (TestMethod method : this.getTestMethods()) {
-			if (method.belongsToClass(testClass)) {
+			if ( testClass.contains(method)) {
 				method.run(notifier);
 			}
 		}
@@ -157,7 +135,7 @@ public class TestGraph {
         private void process(Method m) {
             TestMethod $ = testMethod(m);
             for (Method d : $.collectDependencies()) {
-                $.addDependency(testMethod(d));
+                $.providers.add(testMethod(d));
             }
         }
 
@@ -215,7 +193,7 @@ public class TestGraph {
     public TestMethod getTestMethod(Class<?> c, String name) {
         TestMethod found = null;
         for (TestMethod tm : getTestMethods()) {
-            if (tm.getDeclaringClass() == c && tm.getJavaMethod().getName().equals(name)) {
+            if (tm.javaMethod.getDeclaringClass() == c && tm.getJavaMethod().getName().equals(name)) {
                 if (found != null) throw new RuntimeException();
                 found = tm;
             }
@@ -226,11 +204,11 @@ public class TestGraph {
     public void filter(Filter filter) {
         Iterator<TestMethod> it = testMethods.values().iterator();
         while (it.hasNext())
-            if (!filter.shouldRun(it.next().getDescription()))
+            if (!filter.shouldRun(it.next().description))
                 it.remove();
         Collection<TestMethod> copy = new ArrayList(testMethods.values());
         for (TestMethod tm : copy)
-            for (TestMethod dep : tm.getAllDependencies())
+            for (TestMethod dep : tm.providers.transitiveClosure())
                 testMethods.put(dep.getJavaMethod(), dep);
     }
 
