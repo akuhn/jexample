@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import jexample.Depends;
-import jexample.internal.DependencyScanner.Token;
+import jexample.internal.DependsScanner.Token;
 
 
 /**
@@ -18,14 +18,14 @@ import jexample.internal.DependencyScanner.Token;
  * @author Adrian Kuhn (akuhn at iam.unibe.ch)
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
-public class DependencyParser {
+public class DependsParser {
 
 	private final Class<?> testClass;
 
 	/**
 	 * @param class1 the {@link TestClass} that is to be run
 	 */
-	public DependencyParser(Class<?> class1) {
+	public DependsParser(Class<?> class1) {
 		this.testClass = class1;
 	}
 
@@ -43,7 +43,7 @@ public class DependencyParser {
 	public List<Method> getDependencies(String value)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		LinkedList<Method> dependencies = new LinkedList<Method>();
-		Token[] tokens = DependencyScanner.scan(value);
+		Token[] tokens = DependsScanner.scan(value);
 		for (Token t : tokens) {
 			Method found = searchMethod(t);
 			dependencies.add(found);

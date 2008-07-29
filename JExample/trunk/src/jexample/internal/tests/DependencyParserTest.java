@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import jexample.JExampleRunner;
-import jexample.internal.DependencyParser;
+import jexample.internal.DependsParser;
 import jexample.internal.TestClass;
 
 import org.junit.Before;
@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
  */
 public class DependencyParserTest {
 
-	private DependencyParser parser;
+	private DependsParser parser;
 	private TestClass myClass;
 	private Method annotatedMethod;
 
@@ -31,7 +31,7 @@ public class DependencyParserTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		parser = new DependencyParser( TestTestClass.class );
+		parser = new DependsParser( TestTestClass.class );
 		annotatedMethod = TestTestClass.class.getMethod( "annotatedMethod" );
 	}
 

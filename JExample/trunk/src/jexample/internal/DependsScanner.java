@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * @author Adrian Kuhn (akuhn at iam.unibe.ch)
  *
  */
-public class DependencyScanner {
+public class DependsScanner {
 
 	public static class Token {
 		public final String className;
@@ -47,13 +47,13 @@ public class DependencyScanner {
 	private CharBuffer buf;
 	private LinkedList<Token> tokens;
 	
-	private DependencyScanner(String string) {
+	private DependsScanner(String string) {
 		buf = CharBuffer.wrap(string);
 		tokens = new LinkedList<Token>();
 	}
 	
 	public static Token[] scan(String string) {
-		DependencyScanner scanner = new DependencyScanner(string);
+		DependsScanner scanner = new DependsScanner(string);
 		scanner.scanRoot();
 		return scanner.tokens.toArray(new Token[0]);
 	}

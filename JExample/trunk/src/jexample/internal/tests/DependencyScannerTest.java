@@ -1,11 +1,11 @@
 package jexample.internal.tests;
 
-import static jexample.internal.DependencyScanner.scan;
+import static jexample.internal.DependsScanner.scan;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import jexample.internal.DependencyScanner.Token;
+import jexample.internal.DependsScanner.Token;
 
 import org.junit.Test;
 

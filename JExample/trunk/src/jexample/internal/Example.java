@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,12 +73,11 @@ public class Example {
 
 
 	public Collection<Method> collectDependencies() {
-        DependencyParser parser = new DependencyParser(jmethod.getDeclaringClass());
-        List<Method> deps = new ArrayList<Method>();
-        Depends annotation = jmethod.getAnnotation( Depends.class );
-        if ( annotation != null ) {
+        Depends a = jmethod.getAnnotation( Depends.class );
+        if (a != null) {
             try {
-                deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
+                DependsParser p = new DependsParser(jmethod.getDeclaringClass());
+                return p.getDependencies(a.value());
             } catch (SecurityException ex) {
                 context.addInitializationError(ex);
             } catch (ClassNotFoundException ex) {
@@ -86,7 +86,7 @@ public class Example {
                context.addInitializationError(ex);
             }
         }
-        return deps;
+        return Collections.EMPTY_LIST;
     }
 
 	private boolean expectsException() {
@@ -106,6 +106,7 @@ public class Example {
 		return result != TestResult.NOT_YET_RUN;
 	}
 
+	
 	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
@@ -132,6 +133,7 @@ public class Example {
 		}
 	}
 
+	
 	private boolean toBeIgnored() {
 		return this.jmethod.getAnnotation(Ignore.class) != null;
 	}
