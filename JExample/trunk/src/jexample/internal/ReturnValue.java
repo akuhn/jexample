@@ -5,12 +5,17 @@ import java.lang.reflect.Method;
 
 import jexample.InjectionPolicy;
 
+/**
+ * 
+ * @author Adrian Kuhn
+ *
+ */
 public class ReturnValue {
 
-    public final TestMethod provider;
+    public final Example provider;
     private Object returnValue;
 
-    public ReturnValue(TestMethod provider) {
+    public ReturnValue(Example provider) {
         this.provider = provider;
     }
     

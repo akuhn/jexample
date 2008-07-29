@@ -8,13 +8,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import jexample.JExampleRunner;
 
 import org.junit.internal.runners.CompositeRunner;
 import org.junit.internal.runners.InitializationError;
-import org.junit.runner.Description;
 import org.junit.runner.Request;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
@@ -29,101 +27,89 @@ import org.junit.runner.notification.RunNotifier;
  * @author Adrian Kuhn
  * 
  */
-public class TestGraph {
+public class ExampleGraph {
 
-	private static TestGraph GRAPH;
-	private Map<Method,TestMethod> testMethods;
+	private static ExampleGraph GRAPH;
+	private Map<Method,Example> examples;
 	private List<Throwable> initializationErrors;
 	private boolean anyHasBeenRun = false;
 
 
-	public TestGraph() {
-		this.testMethods = new HashMap<Method,TestMethod>();
-		this.initializationErrors = new ArrayList<Throwable>();
+	public ExampleGraph() {
+		this.examples = new HashMap();
+		this.initializationErrors = new ArrayList();
 	}
 
-	public static TestGraph instance() {
-		return GRAPH == null ? GRAPH = new TestGraph() : GRAPH;
+	public static ExampleGraph instance() {
+		return GRAPH == null ? GRAPH = new ExampleGraph() : GRAPH;
 	}
 
-	/**
-	 * All {@link Method}'s are collected, checked for cycles, validated and
-	 * then added to {@link Map} of all the {@link Method}'s to be run.
-	 * 
-	 * @param testClass
-	 *            the {@link TestClass} to be added
-	 * @throws InitializationError
+	/** All methods are collected, checked for cycles, validated and
+	 * then added to the list of examples.
 	 */
 	public TestClass add(Class<?> javaClass) throws InitializationError {
 	    if (anyHasBeenRun) throw new InitializationError();
 	    TestClass $ = new TestClass(javaClass, this).validate();
-		Collection<TestMethod> news = new MethodCollector($)
+		Collection<Example> novel = new ExampleCollector($)
 		    .collect()
 		    .validate()
 		    .result();
-		this.detectCycles(news, testMethods.values());
-		for (TestMethod m : news)
-		    testMethods.put(m.getJavaMethod(), m);
+		this.detectCycles(novel, examples.values());
+		for (Example e : novel)
+		    examples.put(e.jmethod, e);
         if (!initializationErrors.isEmpty())
             throw new InitializationError(initializationErrors);
         initializationErrors.clear();
         return $;
 	}
 
-	/**
-	 * All {@link TestMethod}'s of <code>testClass</code> are run, inclusive
-	 * their dependencies.
-	 * 
-	 * @param testClass
-	 *            the {@link TestClass} to be run
-	 * @param notifier
-	 *            {@link RunNotifier}
-	 */
 	public void run(TestClass testClass, RunNotifier notifier) {
 	    anyHasBeenRun = true;
-		for (TestMethod method : this.getTestMethods()) {
-			if ( testClass.contains(method)) {
-				method.run(notifier);
+		for (Example e : this.getExamples()) {
+			if (testClass.contains(e)) {
+				e.run(notifier);
 			}
 		}
 	}
 
-	private void detectCycles( Collection<TestMethod>... methods ) throws InitializationError {
-		CycleDetector<TestMethod> detector = new CycleDetector<TestMethod>(methods) {
+	private void detectCycles(Collection<Example>... es) throws InitializationError {
+		CycleDetector<Example> detector = new CycleDetector<Example>(es) {
             @Override
-            public Collection<TestMethod> getChildren(TestMethod tm) {
-                return tm.getDependencies();
+            public Collection<Example> getChildren(Example e) {
+                return e.providers;
             }
 		};
-		if ( detector.hasCycle() ) {
-			throw new InitializationError( "The dependencies are cyclic." );
+		List<Example> cycle = detector.getCycle();
+		if (cycle != null) {
+			throw new InitializationError( "The dependencies are cyclic: " + cycle);
 		}
 	}
 
 	public Collection<Method> getMethods() {
-		return this.testMethods.keySet();
+		return this.examples.keySet();
 	}
 	
-	public Collection<TestMethod> getTestMethods() {
-	    return this.testMethods.values();
+	public Collection<Example> getExamples() {
+	    return this.examples.values();
 	}
 
-    private class MethodCollector {
+    private class ExampleCollector {
         
-        private Map<Method, TestMethod> found;
+        private Map<Method, Example> found;
         private Collection<Method> todo;
         
-        public MethodCollector(TestClass testClass) {
+        public ExampleCollector(TestClass testClass) {
             found = new HashMap();
             todo = new HashSet(testClass.collectTestMethods());
         }
         
-        public MethodCollector validate() throws InitializationError {
-            for (TestMethod m : found.values()) m.validate();
+        public ExampleCollector validate() {
+            for (Example e : found.values())
+                e.validate();
             return this;
         }
 
-        public MethodCollector collect() {
+        public ExampleCollector collect() {
             while (!todo.isEmpty()) {
                 Method $ = todo.iterator().next();
                 process($);
@@ -133,33 +119,31 @@ public class TestGraph {
         }
         
         private void process(Method m) {
-            TestMethod $ = testMethod(m);
+            Example $ = makeExample(m);
             for (Method d : $.collectDependencies()) {
-                $.providers.add(testMethod(d));
+                $.providers.add(makeExample(d));
             }
         }
 
-        private TestMethod testMethod(Method m) {
-            TestMethod $ = testMethods.get(m);
-            if ($ != null) return $;
-            $ = found.get(m);
-            if ($ != null) return $;
-            $ = new TestMethod(m, TestGraph.this);
+        private Example makeExample(Method m) {
+            Example e = examples.get(m);
+            if (e != null) return e;
+            e = found.get(m);
+            if (e != null) return e;
+            Example $ = new Example(m, ExampleGraph.this);
             found.put(m, $);
             todo.add(m);
             return $;
         }
 
-        public Collection<TestMethod> result() {
+        public Collection<Example> result() {
             return found.values(); 
         }
         
-        
-        
     }
 
-    public TestMethod getTestMethod(Method m) {
-        return testMethods.get(m);
+    public Example getExample(Method m) {
+        return examples.get(m);
     }
 
     public void throwNewError(String message, Object... args) {
@@ -190,26 +174,31 @@ public class TestGraph {
         }
     }
 
-    public TestMethod getTestMethod(Class<?> c, String name) {
-        TestMethod found = null;
-        for (TestMethod tm : getTestMethods()) {
-            if (tm.javaMethod.getDeclaringClass() == c && tm.getJavaMethod().getName().equals(name)) {
+    public Example getExample(Class<?> c, String name) {
+        Example found = null;
+        for (Example e : getExamples()) {
+            if (e.jmethod.getDeclaringClass() == c && e.jmethod.getName().equals(name)) {
                 if (found != null) throw new RuntimeException();
-                found = tm;
+                found = e;
             }
         }
         return found;
     }
 
     public void filter(Filter filter) {
-        Iterator<TestMethod> it = testMethods.values().iterator();
-        while (it.hasNext())
-            if (!filter.shouldRun(it.next().description))
+        Iterator<Example> it = examples.values().iterator();
+        while (it.hasNext()) {
+            if (!filter.shouldRun(it.next().description)) {
                 it.remove();
-        Collection<TestMethod> copy = new ArrayList(testMethods.values());
-        for (TestMethod tm : copy)
-            for (TestMethod dep : tm.providers.transitiveClosure())
-                testMethods.put(dep.getJavaMethod(), dep);
+            }
+        }
+        // copy list of values to avoid concurrent modification
+        Collection<Example> copy = new ArrayList(examples.values()); 
+        for (Example e : copy) {
+            for (Example dependency : e.providers.transitiveClosure()) {
+                examples.put(dependency.jmethod, dependency);
+            }
+        }
     }
 
 }

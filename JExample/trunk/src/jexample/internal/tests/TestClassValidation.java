@@ -1,9 +1,9 @@
 package jexample.internal.tests;
 
+import jexample.internal.ExampleGraph;
+
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
-
-import jexample.internal.TestGraph;
 
 public class TestClassValidation {
 
@@ -13,7 +13,7 @@ public class TestClassValidation {
     
     @Test(expected = InitializationError.class)
     public void textClassValidation() throws InitializationError {
-        TestGraph g = new TestGraph();
+        ExampleGraph g = new ExampleGraph();
         g.add( A.class );
     }
     

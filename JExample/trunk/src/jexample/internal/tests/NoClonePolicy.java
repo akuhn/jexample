@@ -1,16 +1,16 @@
 package jexample.internal.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import jexample.Depends;
+import jexample.InjectionPolicy;
+import jexample.JExampleRunner;
+import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
-
-import jexample.Depends;
-import jexample.InjectionPolicy;
-import jexample.JExampleRunner;
-import jexample.internal.TestGraph;
 
 public class NoClonePolicy {
 
@@ -48,7 +48,7 @@ public class NoClonePolicy {
     
     @Test
     public void runCloneDetection() {
-        Result $ = new JUnitCore().run(new TestGraph().newJExampleRunner( B.class ));
+        Result $ = new JUnitCore().run(new ExampleGraph().newJExampleRunner( B.class ));
         assertTrue( $.wasSuccessful() );
     }
     

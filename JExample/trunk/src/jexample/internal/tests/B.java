@@ -1,7 +1,7 @@
 package jexample.internal.tests;
 
-import jexample.JExampleRunner;
 import jexample.Depends;
+import jexample.JExampleRunner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

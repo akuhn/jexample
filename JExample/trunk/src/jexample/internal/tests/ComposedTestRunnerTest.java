@@ -9,7 +9,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExampleRunner;
-import jexample.internal.TestGraph;
+import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -128,7 +128,7 @@ public class ComposedTestRunnerTest {
 	}
 
 	private Result runJExampleTestCase(Class<?>... classes) {
-        return new JUnitCore().run(new TestGraph().newJExampleRunner(classes));
+        return new JUnitCore().run(new ExampleGraph().newJExampleRunner(classes));
     }
 
     @RunWith( JExampleRunner.class )

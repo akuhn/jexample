@@ -1,15 +1,9 @@
 package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
-
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import jexample.Depends;
 import jexample.JExampleRunner;
-import jexample.internal.TestClass;
-import jexample.internal.TestGraph;
-import jexample.internal.TestMethod;
+import jexample.internal.ExampleGraph;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,33 +13,33 @@ import org.junit.runner.RunWith;
 
 public class GraphTest {
 
-	private TestGraph graph;
+	private ExampleGraph graph;
 
 	@Before
 	public void setUp() throws Exception {
-		graph = new TestGraph();
+		graph = new ExampleGraph();
 	}
 
 	@Test
 	public void testAddOneClass() throws InitializationError {
 		graph.add( OneClass.class );
 		//assertEquals( 1, graph.getClasses().size() );
-		assertEquals( 4, graph.getTestMethods().size() );
+		assertEquals( 4, graph.getExamples().size() );
 	}
 
 	@Test
 	public void testAddMethodsOfOneClass() throws InitializationError {
 		graph.add( OneClass.class );
-		assertEquals( 4, graph.getTestMethods().size() );
+		assertEquals( 4, graph.getExamples().size() );
 	}
 
 	@Test
 	public void testAddDependenciesOfOneClass() throws InitializationError, SecurityException, NoSuchMethodException {
 		graph.add( OneClass.class );
-		assertEquals( 0, graph.getTestMethod( OneClass.class.getMethod( "testMethod" ) ).getDependencies().size() );
-		assertEquals( 1, graph.getTestMethod( OneClass.class.getMethod( "anotherTestMethod" ) ).getDependencies().size() );
-		assertEquals( 1, graph.getTestMethod( OneClass.class.getMethod( "depOnOtherTest" ) ).getDependencies().size() );
-		assertEquals( 0, graph.getTestMethod( B.class.getMethod( "otherTest" ) ).getDependencies().size() );
+		assertEquals( 0, graph.getExample( OneClass.class.getMethod( "testMethod" ) ).providers.size() );
+		assertEquals( 1, graph.getExample( OneClass.class.getMethod( "anotherTestMethod" ) ).providers.size() );
+		assertEquals( 1, graph.getExample( OneClass.class.getMethod( "depOnOtherTest" ) ).providers.size() );
+		assertEquals( 0, graph.getExample( B.class.getMethod( "otherTest" ) ).providers.size() );
 	}
 
 	@Test( expected = InitializationError.class )

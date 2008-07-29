@@ -3,8 +3,6 @@
  */
 package jexample.internal.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import java.lang.reflect.Method;
 
 import jexample.JExampleRunner;

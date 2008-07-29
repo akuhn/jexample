@@ -18,40 +18,63 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
 /**
- * Test method.
- * 
+ * A test method with dependencies and return value. Test methods are written
+ * source code to illustrate the usage of the unit under test, and may return
+ * a characteristic instance of its unit under test. Thus, test methods are
+ * in fact <i>examples</i> of the unit under test.
+ * <p> 
+ * When executing an example method, the JExample framework caches its return
+ * value. If an example method declares dependencies and has arguments, the
+ * framework will inject the cache return values of the dependencies as
+ * parameters into the method execution. For more details, please refer to
+ * {@link jexample.InjectionPolicy @InjectionPolicy}.
+ * <p>
+ * An example method must have at least a {@link org.junit.Test @Test} annotation.
+ * The enclosing class must use an {@link org.junit.RunWith @RunWith} annotation
+ * to declare {@link jexample.JExampleRunner JExampleRunner} as test runner.
+ * <p>
+ * An example method may return an instance of its unit under test.
+ * <p>
+ * An example method may depend on both successful execution and return value
+ * of other examples. If it does, it must declare the dependencies using an
+ * {@link jexample.Depends @Depends} annotation. An example methods with
+ * dependencies may have method parameters. The number of parameters must be
+ * less than or equal to the number of dependencies. The type of the n-th
+ * parameter must match the return type of the n-th dependency.
+ *   
+ *   
  * @author Lea Haensenberger
  * @author Adrian Kuhn
  * 
  */
-public class TestMethod {
+public class Example {
 
     public final Description description;
     public final ReturnValue returnValue;
-    public final Method javaMethod;
+    public final Method jmethod;
     public final Dependencies providers;
     
-	private final TestGraph context;
+	private final ExampleGraph context;
     private TestResult result;
     private InjectionPolicy policy;
 
     
-	public TestMethod(Method javaMethod, TestGraph graph) {
-	    assert javaMethod != null && graph != null;
-        this.javaMethod = javaMethod;
+	public Example(Method jmethod, ExampleGraph graph) {
+	    assert jmethod != null && graph != null;
+        this.jmethod = jmethod;
         this.providers = new Dependencies();
         this.result = TestResult.NOT_YET_RUN;
-        this.description = Description.createTestDescription(javaMethod.getDeclaringClass(), javaMethod.getName());
+        this.description = Description.createTestDescription(jmethod.getDeclaringClass(), jmethod.getName());
         this.context = graph;
         this.returnValue = new ReturnValue(this);
-        this.policy = javaMethod.getClass().getAnnotation(InjectionPolicy.class);
+        this.policy = jmethod.getClass().getAnnotation(InjectionPolicy.class);
     }
 
 
 	public Collection<Method> collectDependencies() {
-        DependencyParser parser = new DependencyParser(javaMethod.getDeclaringClass());
+        DependencyParser parser = new DependencyParser(jmethod.getDeclaringClass());
         List<Method> deps = new ArrayList<Method>();
-        Depends annotation = javaMethod.getAnnotation( Depends.class );
+        Depends annotation = jmethod.getAnnotation( Depends.class );
         if ( annotation != null ) {
             try {
                 deps = parser.getDependencies( ( ( Depends ) annotation ).value() );
@@ -71,25 +94,13 @@ public class TestMethod {
 	}
 
 
-	/**
-	 * @return a {@link List} of {@link TestMethod}'s, being the dependencies
-	 */
-	public Dependencies getDependencies() {
-		return this.providers;
-	}
-	
-
-    private Class<? extends Throwable> getExpectedException() {
-		Test a = this.javaMethod.getAnnotation(Test.class);
+	private Class<? extends Throwable> getExpectedException() {
+		Test a = this.jmethod.getAnnotation(Test.class);
 		if (a == null) return null;
 		if (a.expected() == org.junit.Test.None.class) return null;
 		return a.expected();
 	}
 
-
-	public Method getJavaMethod() {
-        return javaMethod;
-    }
 
 	private boolean hasBeenRun() {
 		return result != TestResult.NOT_YET_RUN;
@@ -98,8 +109,8 @@ public class TestMethod {
 	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
-		    this.javaMethod.setAccessible(true);
-			returnValue.assign(this.javaMethod.invoke(test, args));
+		    this.jmethod.setAccessible(true);
+			returnValue.assign(this.jmethod.invoke(test, args));
 			this.result = TestResult.GREEN;
 		} catch (InvocationTargetException e) {
 			Throwable actual = e.getTargetException();
@@ -122,7 +133,7 @@ public class TestMethod {
 	}
 
 	private boolean toBeIgnored() {
-		return this.javaMethod.getAnnotation(Ignore.class) != null;
+		return this.jmethod.getAnnotation(Ignore.class) != null;
 	}
 
 	private boolean isUnexpectedException(Throwable actual) {
@@ -130,20 +141,20 @@ public class TestMethod {
 	}
 
 	public Object reRunTestMethod() throws Exception {
-	    Constructor<?> constructor = javaMethod.getDeclaringClass().getConstructor();
+	    Constructor<?> constructor = jmethod.getDeclaringClass().getConstructor();
 	    constructor.setAccessible(true);
 		Object test = constructor.newInstance();
 		Object[] args = providers.getInjectionValues(policy, arity());
-		return this.javaMethod.invoke(test, args);
+		return this.jmethod.invoke(test, args);
 	}
 
 
     private int arity() {
-        return javaMethod.getParameterTypes().length;
+        return jmethod.getParameterTypes().length;
     }
 
 	/**
-	 * Runs this {@link TestMethod} after it run all of its dependencies.
+	 * Runs this {@link Example} after it run all of its dependencies.
 	 * 
 	 * @param notifier
 	 *            the {@link RunNotifier}
@@ -151,7 +162,7 @@ public class TestMethod {
 	public void run(RunNotifier notifier) {
 		if (this.hasBeenRun()) return;
 		boolean allParentsGreen = true;
-		for (TestMethod dependency : this.providers) {
+		for (Example dependency : this.providers) {
 			dependency.run(notifier);
 			allParentsGreen &= dependency.result == TestResult.GREEN;
 		}
@@ -178,7 +189,7 @@ public class TestMethod {
             InstantiationException, IllegalAccessException,
             InvocationTargetException {
         Object test;
-        Constructor<?> constructor = this.javaMethod.getDeclaringClass().getDeclaredConstructor();
+        Constructor<?> constructor = this.jmethod.getDeclaringClass().getDeclaredConstructor();
         constructor.setAccessible(true);
         test = constructor.newInstance();
         return test;
@@ -187,7 +198,7 @@ public class TestMethod {
 
 
     public void validate() {
-        if (!javaMethod.isAnnotationPresent(Test.class)) {
+        if (!jmethod.isAnnotationPresent(Test.class)) {
             context.throwNewError("Method %s is not a test method, missing @Test annotation.", toString());
         }
         int d = providers.size();
@@ -202,17 +213,17 @@ public class TestMethod {
 
 
     private void validateDependencyTypes() {
-        Iterator<TestMethod> tms = getDependencies().iterator();
-        for (Class<?> t : javaMethod.getParameterTypes()) {
-            TestMethod tm = tms.next();
-            Class<?> r = tm.getJavaMethod().getReturnType();
+        Iterator<Example> tms = this.providers.iterator();
+        for (Class<?> t : jmethod.getParameterTypes()) {
+            Example tm = tms.next();
+            Class<?> r = tm.jmethod.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 context.throwNewError("Parameter (%s) in (%s) is not assignable from depedency (%s).",
-                        t, getJavaMethod(), tm.getJavaMethod());
+                        t, jmethod, tm.jmethod);
             }
             if (tm.expectsException()) {
                 context.throwNewError("(%s): invalid dependency (%s), provider must not expect exception.",
-                        getJavaMethod(), tm.getJavaMethod());
+                        jmethod, tm.jmethod);
             }
         }
     }
@@ -221,7 +232,7 @@ public class TestMethod {
 }
 
 /**
- * The states, a {@link TestMethod} can have.
+ * The states, a {@link Example} can have.
  * 
  * @author Lea Haensenberger
  */

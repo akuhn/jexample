@@ -1,9 +1,10 @@
 package jexample;
 
+import jexample.internal.Example;
+import jexample.internal.ExampleGraph;
+
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.RunNotifier;
-
-import jexample.internal.*;
 
 /**
  * Exercises test methods as sophisticated constructor to create example instances.
@@ -18,10 +19,10 @@ public class For {
 	}
 	
 	public static <T> T example(Class test, String method) {
-		TestGraph graph = createTestGraph(test);
-		for (TestMethod each : graph.getTestMethods()) {
+		ExampleGraph graph = createTestGraph(test);
+		for (Example each : graph.getExamples()) {
 			// TODO use dependency parser to find matching method
-			if (each.getJavaMethod().getName().equals(method)) {
+			if (each.jmethod.getName().equals(method)) {
 				RunNotifier notifier = new RunNotifier();
 				each.run(notifier);
 				// TODO check notifier for errors/assertions
@@ -32,9 +33,9 @@ public class For {
 		throw new IllegalArgumentException("Method not found");
 	}
 
-	private static TestGraph createTestGraph(Class test) {
+	private static ExampleGraph createTestGraph(Class test) {
 		try {
-			TestGraph graph = new TestGraph();
+			ExampleGraph graph = new ExampleGraph();
 			graph.add(test.getClass());
 			return graph;
 		} catch (InitializationError ex) {

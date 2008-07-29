@@ -1,10 +1,10 @@
 package jexample.internal.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import jexample.Depends;
 import jexample.JExampleRunner;
-import jexample.internal.TestGraph;
-import jexample.internal.TestMethod;
+import jexample.internal.Example;
+import jexample.internal.ExampleGraph;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +12,11 @@ import org.junit.runner.RunWith;
 
 public class AddingClasses {
 
-    private TestGraph g;
+    private ExampleGraph g;
 
     @Before
     public void fixture() {
-        g = new TestGraph();
+        g = new ExampleGraph();
     }
     
     @RunWith( JExampleRunner.class )
@@ -30,11 +30,11 @@ public class AddingClasses {
         g.add(A.class);
         
         //assertEquals(1, g.getClasses().size());
-        assertEquals(1, g.getTestMethods().size());
+        assertEquals(1, g.getExamples().size());
         //assertEquals(A.class,
         //        g.getClasses().iterator().next().getJavaClass());
         assertEquals(A.class.getMethod("t"), 
-                g.getTestMethods().iterator().next().getJavaMethod());
+                g.getExamples().iterator().next().jmethod);
     }
 
     @RunWith( JExampleRunner.class )
@@ -49,11 +49,11 @@ public class AddingClasses {
         g.add(B.class);
         
         //assertEquals(1, g.getClasses().size());
-        assertEquals(1, g.getTestMethods().size());
+        assertEquals(1, g.getExamples().size());
         //assertEquals(B.class,
         //        g.getClasses().iterator().next().getJavaClass());
         assertEquals(B.class.getMethod("t"), 
-                g.getTestMethods().iterator().next().getJavaMethod());
+                g.getExamples().iterator().next().jmethod);
     }
     
     @RunWith( JExampleRunner.class )
@@ -70,15 +70,15 @@ public class AddingClasses {
         g.add(C.class);
         
         //assertEquals(1, g.getClasses().size());
-        assertEquals(2, g.getTestMethods().size());
+        assertEquals(2, g.getExamples().size());
         //assertEquals(C.class,
         //        g.getClasses().iterator().next().getJavaClass());
         
-        TestMethod p = g.getTestMethod(C.class.getMethod("provider"));
-        TestMethod c = g.getTestMethod(C.class.getMethod("consumer", Object.class));
-        assertEquals(0, p.getDependencies().size());
-        assertEquals(1, c.getDependencies().size());
-        assertEquals(p, c.getDependencies().iterator().next());
+        Example p = g.getExample(C.class.getMethod("provider"));
+        Example c = g.getExample(C.class.getMethod("consumer", Object.class));
+        assertEquals(0, p.providers.size());
+        assertEquals(1, c.providers.size());
+        assertEquals(p, c.providers.iterator().next());
     }
     
 }   

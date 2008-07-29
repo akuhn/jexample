@@ -25,10 +25,10 @@ public class TestClass {
     
     public final Class<?> javaClass;
 
-    private final TestGraph graph;
+    private final ExampleGraph graph;
 	
 	
-    public TestClass(Class<?> fClass, TestGraph graph) {
+    public TestClass(Class<?> fClass, ExampleGraph graph) {
 		this.javaClass = fClass;
 		this.graph = graph;
 	}
@@ -59,7 +59,7 @@ public class TestClass {
 
     public Description getDescription() {
         Description $ = Description.createSuiteDescription(javaClass);
-        for (TestMethod tm : graph.getTestMethods())
+        for (Example tm : graph.getExamples())
             if (this.contains(tm))
                 $.addChild(tm.description);
         return $;
@@ -94,8 +94,8 @@ public class TestClass {
         graph.filter(filter);
     }
     
-    public boolean contains(TestMethod m) {
-       return m.javaMethod.getDeclaringClass().equals(javaClass);
+    public boolean contains(Example m) {
+       return m.jmethod.getDeclaringClass().equals(javaClass);
     }
 
 }

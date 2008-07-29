@@ -2,22 +2,26 @@ package jexample.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import jexample.InjectionPolicy;
 
-public class Dependencies extends ArrayList<TestMethod> {
+/**
+ * 
+ * @author Adrian Kuhn
+ *
+ */
+@SuppressWarnings("serial")
+public class Dependencies extends ArrayList<Example> {
 
-    public Collection<TestMethod> transitiveClosure() {
-        Collection<TestMethod> $ = new ArrayList();
+    public Collection<Example> transitiveClosure() {
+        Collection<Example> $ = new ArrayList();
         this.collectTransitiveClosureInto($);
         return $;
     }
 
-    private void collectTransitiveClosureInto(Collection<TestMethod> $) {
+    private void collectTransitiveClosureInto(Collection<Example> $) {
         $.addAll(this);
-        for (TestMethod p : this)
+        for (Example p : this)
             p.providers.collectTransitiveClosureInto($);
     }
     

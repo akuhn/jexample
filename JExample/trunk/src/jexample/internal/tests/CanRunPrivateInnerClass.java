@@ -1,16 +1,13 @@
 package jexample.internal.tests;
 
-import static org.junit.Assert.*;
-
-import java.util.NoSuchElementException;
+import static org.junit.Assert.assertEquals;
+import jexample.JExampleRunner;
 
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
-
-import jexample.JExampleRunner;
 
 public class CanRunPrivateInnerClass {
 

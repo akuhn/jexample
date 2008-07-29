@@ -1,7 +1,8 @@
 package jexample.internal;
 
 import java.nio.CharBuffer;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
