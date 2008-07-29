@@ -52,7 +52,8 @@ public class ComposedTestRunnerTest {
 	public void cycleMethods() {
 		Result result = runJExampleTestCase( CycleMethods.class );
 		assertEquals( 1, result.getFailureCount() );
-		assertEquals( "The dependencies are cyclic.", result.getFailures().get( 0 ).getMessage() );
+		assertTrue( result.getFailures().get(0)
+		        .getMessage().startsWith("The dependencies are cyclic:") );
 	}
 
 	@RunWith( JExampleRunner.class )
