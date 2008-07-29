@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,12 +17,13 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
 import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 /** Validates, describes and runs all JExample tests. Implemented as a singleton
  * in order to persist results between runs of many classes. JUnit's eclipse
- * plug-in runs all classes of a package in one bunch, but restarts JUnit whenever
- * test are rerun. Thus, this singleton does persists for one run only.
+ * plug-in runs all classes of a package in one bunch, but restarts JUnit for
+ * each new launch. Thus, this singleton should work for Eclipse.
  * 
  * @author Lea Haensenberger
  * @author Adrian Kuhn
@@ -30,14 +32,12 @@ import org.junit.runner.notification.RunNotifier;
 public class TestGraph {
 
 	private static TestGraph GRAPH;
-	private Set<TestClass> classesUnderTest;
 	private Map<Method,TestMethod> testMethods;
 	private List<Throwable> initializationErrors;
 	private boolean anyHasBeenRun = false;
 
 
 	public TestGraph() {
-		this.classesUnderTest = new HashSet<TestClass>();
 		this.testMethods = new HashMap<Method,TestMethod>();
 		this.initializationErrors = new ArrayList<Throwable>();
 	}
@@ -61,8 +61,7 @@ public class TestGraph {
 		    .collect()
 		    .validate()
 		    .result();
-		this.detectCycles(news);
-		this.classesUnderTest.add($);
+		this.detectCycles(news, testMethods.values());
 		for (TestMethod m : news)
 		    testMethods.put(m.getJavaMethod(), m);
         if (!initializationErrors.isEmpty())
@@ -85,17 +84,10 @@ public class TestGraph {
 	public Description descriptionForClass( TestClass testClass ) {
 	    // TODO too long
 		Description description = Description.createSuiteDescription( testClass.getJavaClass() );
-		Set<Description> subDescriptions = new HashSet<Description>();
 		for ( TestMethod method : this.getTestMethods() ) {
 			if ( method.belongsToClass( testClass ) ) {
 				description.addChild( method.getDescription() );
-			} else if ( this.methodBelongsToNoClass( method ) ) {
-				subDescriptions = this.addChildDescription( subDescriptions, method );
 			}
-	
-		}
-		for ( Description subDescription : subDescriptions ) {
-			description.addChild( subDescription );
 		}
 		return description;
 	}
@@ -118,7 +110,7 @@ public class TestGraph {
 		}
 	}
 
-	private void detectCycles( Collection<TestMethod> methods ) throws InitializationError {
+	private void detectCycles( Collection<TestMethod>... methods ) throws InitializationError {
 		CycleDetector<TestMethod> detector = new CycleDetector<TestMethod>(methods) {
             @Override
             public Collection<TestMethod> getChildren(TestMethod tm) {
@@ -130,48 +122,12 @@ public class TestGraph {
 		}
 	}
 
-
-	private Set<Description> addChildDescription( Set<Description> subDescriptions, TestMethod method ) {
-		Class<?> declaringClass = method.getDeclaringClass();
-		Description description;
-
-		if ( ( description = this.getDescriptionForClass( declaringClass, subDescriptions ) ) == null ) {
-			description = Description.createSuiteDescription( declaringClass );
-			subDescriptions.add( description );
-		}
-		description.addChild( method.getDescription() );
-
-		return subDescriptions;
-	}
-
-	private Description getDescriptionForClass( Class<?> declaringClass, Set<Description> subDescriptions ) {
-		for ( Description description : subDescriptions ) {
-			if ( description.getDisplayName().equals( declaringClass.getName() ) ) {
-				return description;
-			}
-		}
-		return null;
-	}
-
-	private boolean methodBelongsToNoClass( TestMethod method ) {
-		for ( TestClass testClass : this.classesUnderTest ) {
-			if ( method.belongsToClass( testClass ) ) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public Collection<Method> getMethods() {
 		return this.testMethods.keySet();
 	}
 	
 	public Collection<TestMethod> getTestMethods() {
 	    return this.testMethods.values();
-	}
-
-	public Collection<TestClass> getClasses() {
-		return this.classesUnderTest;
 	}
 
     private class MethodCollector {
@@ -266,6 +222,16 @@ public class TestGraph {
         }
         return found;
     }
-    
-    
+
+    public void filter(Filter filter) {
+        Iterator<TestMethod> it = testMethods.values().iterator();
+        while (it.hasNext())
+            if (!filter.shouldRun(it.next().getDescription()))
+                it.remove();
+        Collection<TestMethod> copy = new ArrayList(testMethods.values());
+        for (TestMethod tm : copy)
+            for (TestMethod dep : tm.getAllDependencies())
+                testMethods.put(dep.getJavaMethod(), dep);
+    }
+
 }

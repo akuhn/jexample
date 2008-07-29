@@ -10,6 +10,7 @@ import jexample.JExampleRunner;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 
@@ -95,6 +96,10 @@ public class TestClass {
             graph.throwNewError("Class %s does not contain test methods.", this);
         }
         return this;
+    }
+
+    public void filter(final Filter filter) {
+        graph.filter(filter);
     }
 
 }

@@ -28,7 +28,7 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class TestMethod {
 
-	private List<TestMethod> dependencies;
+	private List<TestMethod> providers;
 	private Description description;
 	private TestGraph graph;
 	private Method javaMethod;
@@ -39,7 +39,7 @@ public class TestMethod {
 	public TestMethod(Method m, TestGraph graph) {
 	    assert graph != null;
         this.javaMethod = m;
-        this.dependencies = new ArrayList<TestMethod>();
+        this.providers = new ArrayList<TestMethod>();
         this.result = TestResult.NOT_YET_RUN;
         this.description = Description.createTestDescription(m
                     .getDeclaringClass(), m.getName());
@@ -55,7 +55,7 @@ public class TestMethod {
 	 *            the {@link TestMethod} to be added as a dependency
 	 */
 	public void addDependency(TestMethod testMethod) {
-		this.dependencies.add(testMethod);
+		this.providers.add(testMethod);
 		// TODO duplicate dependencies? an error or not? I'd say no.
 	}
 
@@ -111,7 +111,7 @@ public class TestMethod {
 	private Object[] getInjectionValues() throws Exception {
         Object[] $ = new Object[javaMethod.getParameterTypes().length];
 		for (int i = 0; i < $.length; i++) {
-			$[i] = getInjectionValue(dependencies.get(i));
+			$[i] = getInjectionValue(providers.get(i));
 		}
 		return $;
 	}
@@ -131,10 +131,22 @@ public class TestMethod {
 	 * @return a {@link List} of {@link TestMethod}'s, being the dependencies
 	 */
 	public List<TestMethod> getDependencies() {
-		return this.dependencies;
+		return this.providers;
+	}
+	
+	public Collection<TestMethod> getAllDependencies() {
+	    Collection<TestMethod> $ = new ArrayList();
+	    this.collectAllDependenciesInto($);
+	    return $;
 	}
 
-	/**
+	private void collectAllDependenciesInto(Collection<TestMethod> $) {
+        $.addAll(providers);
+        for (TestMethod p : providers)
+            p.collectAllDependenciesInto($);
+    }
+
+    /**
 	 * @return the test {@link Description} of this {@link TestMethod}
 	 */
 	public Description getDescription() {
@@ -229,7 +241,7 @@ public class TestMethod {
 	public void run(RunNotifier notifier) {
 		if (this.hasBeenRun()) return;
 		boolean allParentsGreen = true;
-		for (TestMethod dependency : this.dependencies) {
+		for (TestMethod dependency : this.providers) {
 			dependency.run(notifier);
 			allParentsGreen &= dependency.isGreen();
 		}
@@ -314,7 +326,8 @@ public class TestMethod {
             TestMethod tm = tms.next();
             Class<?> r = tm.getJavaMethod().getReturnType();
             if (!t.isAssignableFrom(r)) {
-                graph.throwNewError("Parameter %s is not assignable from depedency %s.", t, tm);
+                graph.throwNewError("Parameter (%s) in (%s) is not assignable from depedency (%s).",
+                        t, getJavaMethod(), tm.getJavaMethod());
             }
         }
     }

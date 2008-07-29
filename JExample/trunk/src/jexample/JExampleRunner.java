@@ -6,6 +6,9 @@ import jexample.internal.TestGraph;
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.Filterable;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 
 
@@ -19,7 +22,7 @@ import org.junit.runner.notification.RunNotifier;
  * @author Adrian Kuhn
  * 
  */
-public class JExampleRunner extends Runner {
+public class JExampleRunner extends Runner implements Filterable {
 
 	private final TestClass testCase;
 	
@@ -40,5 +43,9 @@ public class JExampleRunner extends Runner {
 	public void run( RunNotifier notifier ) {
 	    testCase.run(notifier);
 	}
+
+    public void filter(Filter filter) throws NoTestsRemainException {
+        testCase.filter(filter);
+    }
 
 }

@@ -56,8 +56,11 @@ public abstract class CycleDetector<E> {
         private final Collection<Node> children() {
             Collection<E> es = getChildren(payload);
             Collection<Node> ns = new ArrayList(es.size());
-            for (E e : es) 
-                ns.add(map.get(e));
+            for (E e : es) {
+                Node n = map.get(e);
+                if (n == null) throw new AssertionError();
+                ns.add(n);
+            }
             return ns;
         }
         
@@ -69,8 +72,10 @@ public abstract class CycleDetector<E> {
     public CycleDetector() {
     }
     
-    public CycleDetector(Collection<E> elements) {
-        for (E e : elements) put(e);
+    public CycleDetector(Collection<E>... ess) {
+        for (Collection<E> es : ess)
+            for (E e : es)
+                put(e);
     }
     
     public CycleDetector<E> put(E e) {

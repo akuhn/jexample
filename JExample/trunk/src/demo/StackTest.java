@@ -2,6 +2,7 @@ package demo;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
 import java.util.Stack;
 
 import jexample.Depends;
@@ -15,26 +16,34 @@ public class StackTest {
 
 	@Test
 	public Stack empty() {
-		Stack stack = new Stack();
-		assertEquals(0, stack.size());
-		return stack;
+		Stack $ = new Stack();
+		assertEquals(0, $.size());
+		return $;
 	}
 	
 	@Test
 	@Depends("empty")
-	public Stack withValue(Stack stack) {
-		stack.push("boe");
-		assertEquals(1, stack.size());
-		return stack;
+	public Stack withValue(Stack $) {
+		$.push("boe");
+		assertEquals(1, $.size());
+		return $;
 	}
 	
 	@Test
 	@Depends("withValue")
-	public Stack withManyValues(Stack stack) {
-		stack.push("foo");
-		stack.push("bar");
-		assertEquals("bar", stack.peek());
-		return stack;
+	public Stack withMoreValues(Stack $) {
+		$.push("foo");
+		$.push("bar");
+		assertEquals("bar", $.peek());
+		return $;
 	}
+	
+    @Test
+    @Depends("withValue;ListTest.withMoreValues")
+    public void testPushAll(Stack $, List l) {
+        $.addAll(l);
+        assertEquals("Dolor", $.peek());
+    }
+	
 
 }
