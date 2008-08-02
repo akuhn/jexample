@@ -68,7 +68,7 @@ public class Example {
         this.description = Description.createTestDescription(jmethod.getDeclaringClass(), jmethod.getName());
         this.context = graph;
         this.returnValue = new ReturnValue(this);
-        this.policy = jmethod.getClass().getAnnotation(InjectionPolicy.class);
+        this.policy = jmethod.getDeclaringClass().getAnnotation(InjectionPolicy.class);
     }
 
 
@@ -205,8 +205,8 @@ public class Example {
         }
         int d = providers.size();
         int p = arity();
-        if (p > 0 && p != d) {
-            context.throwNewError("Method %s has %d parameters but %d dependencies.", toString(), p, d);
+        if (p > d) {
+            context.throwNewError("Method %s has %d parameters but only %d dependencies.", toString(), p, d);
         }
         else {
             validateDependencyTypes();
