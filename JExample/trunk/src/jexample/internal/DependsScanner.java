@@ -8,21 +8,26 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/** Breaks a dependency declaration into tokens. The grammar of dependency declarations is
- * <pre>
- *Declaration = Tokenlist
- *Tokenlist = ( Tokenlist ( ";" | "," ) ) ? Token
- *Token = ( Class "." ) ? Method ( "(" Paramlist ")" ) ?
- *Paramlist = ( Paramlist "," ) ? Param
- *Param = FULLNAME
- *Class = FULLNAME
- *Method = NAME
- *
- *NAME = [{@linkplain Character#isJavaIdentifierStart(char)}] [{@linkplain Character#isJavaIdentifierPart(char)}] *
- *FULLNAME = ( FULLNAME "." ) ? NAME
+/** Breaks a dependency declaration into method references. The class accepts the same syntax as the &#64;link tag of the Java
+ * documentation tool. The references can be either fully qualified or not. If less than fully qualified, the dependency parser
+ * searches specified name first in the declaring class and then the declaring package. The following table shows the different
+ * forms of references.
+ * <ul>
+ * <li>#method</li>
+ * <li>#method(Type, Type, ...)</li>
+ * <li>class#method</li>
+ * <li>class#method(Type, Type, ...)</li>
+ * <li>package.class#method</li>
+ * <li>package.class#method(Type, Type, ...)</li>
+ * </ul>
  *</pre>
  *
- * @author Adrian Kuhn
+ *Multiple references are separated by either a comma (,) or a semicolon (;).
+ *<p>
+ *<b>NB:</b> As listed above, the hash character (#), rather than a dot (.) separates a member from its class. However, this class is generally
+ *lenient and will properly parse a dot if there is no ambiguity. This is the same as the Java documentation tool does.
+ *
+ * @author Adrian Kuhn, 2007-2008
  *
  */
 public class DependsScanner {
@@ -31,16 +36,15 @@ public class DependsScanner {
 		public final String path;
 		public final String simple;
 		public final String[] args;
-		public Token(String full, String[] args) {
-		    int n = full.lastIndexOf('.');
-			this.path = n < 0 ? null : full.substring(0, n);
-			this.simple = n < 0 ? full : full.substring(n + 1);
+		public Token(String path, String simple, String[] args) {
+		    this.path = path;
+			this.simple = simple;
 			this.args = args;
 		}
         @Override
         public String toString() {
-            return String.format("[%s,%s,%s]", path, simple,
-                    args == null ? null : Arrays.asList(args));
+            return String.format("%s#%s%s]", path, simple,
+                    args == null ? "" : Arrays.asList(args));
         }
 		
 	}
@@ -57,6 +61,15 @@ public class DependsScanner {
         }
         return yank();
 	}
+
+    private String scanName() {
+        buf.mark();
+        if (!buf.hasRemaining()) return null;
+        if (!isJavaIdentifierStart(buf.charAt(0))) return null;
+        buf.get();
+        while (buf.hasRemaining() && isJavaIdentifierPart(buf.charAt(0))) buf.get();
+        return yank();
+    }
 	
 	private String[] scanParamlist() {
 	    ArrayList<String> $ = new ArrayList();
@@ -72,20 +85,31 @@ public class DependsScanner {
 	    return $.toArray(new String[$.size()]);
 	}
 	
-	private Token scanMethodHandle() {
-        String[] names = null;
-	    String fullname = scanFullname();
-	    if (fullname == null) return null;
+	private Token scanMethodReference() {
+	    String path, simple = null;
+        String[] args = null;
+        path = scanFullname();
+        if (buf.hasRemaining() && buf.charAt(0) == '#') {
+            buf.get();
+            simple = scanName();
+            if (simple == null) throw error();
+        }
+        else { // be lenient, Javadoc does the same!
+            if (path == null) return null;
+            int n = path.lastIndexOf('.');
+            simple = n < 0 ? path : path.substring(n + 1);
+            path = n < 0 ? null : path.substring(0, n);
+        }
         skipWhitespace();
         if (buf.hasRemaining() && buf.charAt(0) == '(') {
             buf.get();
             skipWhitespace();
-            names = scanParamlist();
+            args = scanParamlist();
             if (!(buf.hasRemaining() && buf.charAt(0) == ')')) throw error();
             buf.get();
-            if (names == null) names = new String[0];
+            if (args == null) args = new String[0];
         }
-        return new Token(fullname, names);
+        return new Token(path, simple, args);
 	}
 	
 	private InvalidDeclarationError error() {
@@ -96,7 +120,7 @@ public class DependsScanner {
 	    ArrayList<Token> $ = new ArrayList();
 	    skipWhitespace();
 	    while (true) {
-	        Token t = scanMethodHandle();
+	        Token t = scanMethodReference();
 	        if (t == null) break;
 	        $.add(t);
 	        skipWhitespace();
