@@ -48,8 +48,8 @@ public class DependenciesTest {
         //assertEquals( 1, $.getClasses().size() );
         assertEquals( 2, $.getMethods().size() );
         
-        Example t = $.getExample( C.class, "test" );
-        Example e = $.getExample( C.class, "empty" );
+        Example t = $.findExample( C.class, "test" );
+        Example e = $.findExample( C.class, "empty" );
         
         assertNotNull(t);
         assertNotNull(e);
@@ -64,8 +64,8 @@ public class DependenciesTest {
         assertTrue( result.wasSuccessful() );
         assertEquals( 2, result.getRunCount() );
         
-        Example t = $.getExample( C.class, "test" );
-        Example e = $.getExample( C.class, "empty" );
+        Example t = $.findExample( C.class, "test" );
+        Example e = $.findExample( C.class, "empty" );
  
         assertNotSame( e.returnValue, t.returnValue );
     }
@@ -96,9 +96,9 @@ public class DependenciesTest {
         //assertEquals( 1, $.getClasses().size() );
         assertEquals( 3, $.getMethods().size() );
         
-        Example a = $.getExample( D.class, "a" );
-        Example b = $.getExample( D.class, "b" );
-        Example e = $.getExample( D.class, "empty" );
+        Example a = $.findExample( D.class, "a" );
+        Example b = $.findExample( D.class, "b" );
+        Example e = $.findExample( D.class, "empty" );
         
         assertNotNull(a);
         assertNotNull(b);
@@ -158,9 +158,9 @@ public class DependenciesTest {
         //assertEquals( 1, $.getClasses().size() );
         assertEquals( 3, $.getMethods().size() );
         
-        Example a = $.getExample( F.class, "a" );
-        Example b = $.getExample( F.class, "b" );
-        Example x = $.getExample( F.class, "another" );
+        Example a = $.findExample( F.class, "a" );
+        Example b = $.findExample( F.class, "b" );
+        Example x = $.findExample( F.class, "another" );
         
         assertNotNull(a);
         assertNotNull(b);
@@ -169,6 +169,59 @@ public class DependenciesTest {
         assertEquals( x, b.providers.iterator().next() );
         assertEquals( 1, a.providers.size() );
         assertEquals( b, a.providers.iterator().next() );
+    }
+    
+    @RunWith( JExampleRunner.class )
+    public static class G {
+        @Test( expected = Exception.class )
+        public Object provider() throws Exception {
+            throw new Exception();
+        }
+        @Test
+        @Depends("provider")
+        public void consumer(Object o) {
+            // do nothing
+        }
+    }
+    
+    @Test
+    public void providerMustNotExpectException() {
+        try {
+            ExampleGraph $ = new ExampleGraph();
+            $.add( G.class );
+            fail();
+        }
+        catch (InitializationError ex) {
+            assertEquals(1, ex.getCauses().size());
+            assertTrue(ex.getCauses().get(0).getMessage().endsWith("provider must not expect exception."));
+        }
+    }
+    
+    @RunWith( JExampleRunner.class )
+    public static class H {
+        @Test
+        public Object provider() {
+            return new Object();
+        }
+        @Test
+        @Depends("provider")
+        public void consumer(Object a, Object b) {
+            // do nothing
+        }
+    }    
+
+    @Test
+    public void lesProvidersThanParameters() {
+        try {
+            ExampleGraph $ = new ExampleGraph();
+            $.add( H.class );
+            fail();
+        }
+        catch (InitializationError ex) {
+            assertEquals(1, ex.getCauses().size());
+            assertTrue(ex.getCauses().get(0).getMessage()
+                    .endsWith("has 2 parameters but only 1 dependencies."));
+        }
     }
     
 }

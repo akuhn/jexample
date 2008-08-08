@@ -135,6 +135,13 @@ public class DependsScannerTest {
         }
     }
     
+    @Test
+    public void tokenToString() {
+        // Make code coverage tools happy
+        Token[] tokens = scan("foo");
+        assertNotNull(tokens[0].toString());
+    }
+    
     
     
 	

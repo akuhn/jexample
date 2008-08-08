@@ -33,12 +33,9 @@ public class For {
     private static Example findExample(Class jClass, String method) {
         try {
             ExampleGraph graph = new ExampleGraph();
-            TestClass test = graph.add(jClass);
-            for (Example e : graph.getExamples()) {
-                if (test.contains(e) && e.jmethod.getName().equals(method)) return e;
-            }
-        } catch(InitializationError ex) { throw new RuntimeException(ex); };    
-        throw new IllegalArgumentException("Method not found");
+            graph.add(jClass);
+            return graph.findExample(jClass, method);
+        } catch(InitializationError ex) { throw new RuntimeException(ex); }    
     }
 
 }

@@ -58,7 +58,7 @@ public abstract class CycleDetector<E> {
             Collection<Node> ns = new ArrayList(es.size());
             for (E e : es) {
                 Node n = map.get(e);
-                if (n == null) throw new AssertionError();
+                assert n != null;
                 ns.add(n);
             }
             return ns;

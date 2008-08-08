@@ -9,12 +9,18 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExampleRunner;
+import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
+import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
+import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.Filterable;
+import org.junit.runner.manipulation.NoTestsRemainException;
 
 
 /**
@@ -439,4 +445,37 @@ public class JExampleRunnerTest {
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 4, result.getRunCount() );
 	}
+	
+	@Test
+	public void filter() throws NoTestsRemainException {
+	    ExampleGraph g = new ExampleGraph();
+	    Runner r = g.newJExampleRunner( StackTest.class );
+	    Example e = g.findExample( StackTest.class, "withValue" );
+	    ((Filterable) r).filter(newFilter(e.description));
+	    Result $ = new JUnitCore().run(r);
+	    assertEquals(2, $.getRunCount()); 
+        assertEquals(0, $.getIgnoreCount()); // it says filter, not ignore!
+        assertEquals(0, $.getFailureCount());
+        assertEquals(true, $.wasSuccessful()); 
+	}
+	
+	
+	private Filter newFilter(final Description d) {
+	    return new Filter() {
+	        @Override
+	        public String describe() {
+	            return String.format("Method %s", d);
+	        }
+	        @Override
+	        public boolean shouldRun(Description description) {
+                if (d.isTest())
+                    return d.equals(description);
+                for (Description each : d.getChildren())
+                    if (shouldRun(each))
+                        return true;
+                return false;   	        
+            }
+	    };
+	}
+	
 }

@@ -80,4 +80,16 @@ public class CycleDetectorTest {
         assertNotNull(cycle);
     }
     
+    @Test
+    public void hasCycle() {
+        CD cd = new CD()
+                .node(1, 2)
+                .node(2);
+        assertEquals(false, cd.hasCycle());
+        cd = new CD()
+                .node(1, 2)
+                .node(2, 1);
+        assertEquals(true, cd.hasCycle());
+    }
+    
 }

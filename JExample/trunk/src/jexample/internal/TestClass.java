@@ -46,18 +46,8 @@ public class TestClass {
         return $;
 	}
 	
-	/**
-	 * @return the {@link Constructor} of <code>fClass</code>
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
-	 */
-	public Constructor<?> getConstructor() throws SecurityException, NoSuchMethodException {
-	    Constructor<?> $ = javaClass.getDeclaredConstructor();
-	    $.setAccessible(true);
-	    return $;
-	}
 
-    public Description getDescription() {
+	public Description getDescription() {
         Description $ = Description.createSuiteDescription(javaClass);
         for (Example tm : graph.getExamples())
             if (this.contains(tm))

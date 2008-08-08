@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ForExampleTest.class,
         InjectionPolicyTest.class,
         JExampleRunnerTest.class,
+        ReturnValueTest.class,
 		StackTest.class,
 		TestClassValidationTest.class})
 public class AllTests {

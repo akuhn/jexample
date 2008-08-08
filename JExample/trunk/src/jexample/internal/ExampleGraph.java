@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import jexample.JExampleRunner;
+import jexample.internal.tests.StackTest;
 
 import org.junit.internal.runners.CompositeRunner;
 import org.junit.internal.runners.InitializationError;
@@ -174,7 +175,7 @@ public class ExampleGraph {
         }
     }
 
-    public Example getExample(Class<?> c, String name) {
+    public Example findExample(Class<?> c, String name) {
         Example found = null;
         for (Example e : getExamples()) {
             if (e.jmethod.getDeclaringClass() == c && e.jmethod.getName().equals(name)) {
