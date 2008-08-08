@@ -8,18 +8,25 @@ import java.lang.annotation.Target;
 
 
 /**
- * Declares dependencies (and providers) of an example method. Methods with this annotations must be marked as {@link org.junit.Test @Test}, while the declaring class must use
- * <code>{@link org.junit.RunWith @RunWith}({@link jexample.JExample JExample}.class)</code> to select JExample as
- * preferred JUnit runner.
+ * Declares dependencies (and providers) of an example method. When running a test suite, JExample will skips any example
+ * method whose dependencies have previously failed or been skipped. Furthermore, dependencies are used for fixture injection,
+ * that is, to establish producer-consumer relationships among examples. Therefore, JExample caches the return value of
+ * producer methods and injects them as method arguments when a consumer is about to be executed.
  * <p>
- * When running a test suite, JExample will skips any example method whose dependencies have previously failed or been skipped.
- * Furthermore, dependencies are used for fixture injection, that is, to establish producer-consumer relationships among
- * examples. Therefore, JExample caches the return value of producer methods and injects them as method arguments when a
- * consumer is about to be executed.
+ * You can run both JUnit and JExample tests in the same test suite, even using the JUnit plugin of Eclipse. All example methods
+ * must be marked as {@link org.junit.Test @Test} and the declaring class must use {@link org.junit.RunWith @RunWith} to select
+ * {@link jexample.JExample JExample} as its preferred test runner.
  * <p>
- * You can think of example methods as test methods on stereoids. Example methods are, in addition to test methods,
- * written source code to illustrate the usage of the unit under test, and may return a characteristic instance of
- * their unit under test. Thus, test methods are in fact <i>examples</i> of the unit under test.
+ * You can think of example methods as test methods on stereoids. They do more than just testing the unit under test. Example
+ * methods are written source code to illustrate the usage of the unit under test, and may return a characteristic instance of
+ * their unit under test. Thus, examples methods are in fact <i>examples</i> of the unit under test.
+ * <p>
+ * As such, example methods tackle the same problem as mocks. How to test a unit which depends on other units? When working with
+ * mocks, you solve this problem by creating a mock for each dependency. When working with examples, you solve this problem by
+ * declaring producer-consumer dependencies. Thus, instead of testing against mocks, you test against the previously created
+ * return values of other tests. Since example methods are both producers and testers of their returned value, all return values
+ * are guaranteed to be valid and fully functional instances of the corresponding unit. In addition, JExample will use cloning
+ * to take care that no side-effects are introduced when two or more consumers use the same return value.
  * <p>
  * An example method may depend on both successful execution and return value of other examples. If it does, it must declare
  * the dependencies using this annotation. An example methods with dependencies may have method parameters. The number of
@@ -45,6 +52,8 @@ import java.lang.annotation.Target;
  * 
  * @author Adrian Kuhn, 2007-2008
  * @author Lea Haensenberger, 2007
+ * 
+ * @see http://www.iam.unibe.ch/~scg/Research/JExample/jexample-r246.jar
  */
 @Documented
 @Target( ElementType.METHOD )
