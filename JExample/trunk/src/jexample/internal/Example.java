@@ -75,7 +75,7 @@ public class Example {
         if (a != null) {
             try {
                 DependsParser p = new DependsParser(jmethod.getDeclaringClass());
-                return p.getDependencies(a.value());
+                return p.collectProviderMethods(a.value());
             } catch (SecurityException ex) {
                 context.addInitializationError(ex);
             } catch (ClassNotFoundException ex) {

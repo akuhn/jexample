@@ -19,7 +19,8 @@ import org.junit.runner.RunWith;
 
 
 /**
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Lea Haensenberger
+ * 
  */
 public class DependsParserTest {
 
@@ -38,35 +39,35 @@ public class DependsParserTest {
 
 	@Test
 	public void testGetDependencies() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "annotatedMethod()" );
+		List<Method> methods = this.parser.collectProviderMethods( "annotatedMethod()" );
 		assertEquals( 1, methods.size() ); 
 
-		methods = this.parser.getDependencies( "annotatedMethod(java.lang.String)" );
+		methods = this.parser.collectProviderMethods( "annotatedMethod(java.lang.String)" );
 		assertEquals( 1, methods.size() );
 
-		methods = this.parser.getDependencies( "annotatedMethod();annotatedMethod(java.lang.String)" );
+		methods = this.parser.collectProviderMethods( "annotatedMethod();annotatedMethod(java.lang.String)" );
 		assertEquals( 2, methods.size() );
 
-		methods = this.parser.getDependencies( "annotatedMethod(int)" );
+		methods = this.parser.collectProviderMethods( "annotatedMethod(int)" );
 		assertEquals( 1, methods.size() );
 	}
 
 	@Test
 	public void testExternalDeps() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "DependsParserTest$B.otherTest" );
+		List<Method> methods = this.parser.collectProviderMethods( "DependsParserTest$B.otherTest" );
 		assertEquals( 1, methods.size() );
 	}
 
 	@Test( expected = ClassNotFoundException.class )
 	public void testExtDepWithoutPackageNotFound() throws SecurityException, ClassNotFoundException,
 			NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "TestClass.getJavaClass" );
+		List<Method> methods = this.parser.collectProviderMethods( "TestClass.getJavaClass" );
 		assertEquals( 1, methods.size() );
 	}
 
 	@Test
 	public void testExtDepWithPackageFound() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "jexample.internal.TestClass.getJavaClass" );
+		List<Method> methods = this.parser.collectProviderMethods( "jexample.internal.TestClass.getJavaClass" );
 		assertEquals( 1, methods.size() );
 	}
 

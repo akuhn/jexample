@@ -4,6 +4,7 @@
 package jexample.internal;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,21 +13,18 @@ import jexample.internal.DependsScanner.Token;
 
 
 /**
- * The <code>DependencyParser</code> class parses a String for the {@link Method}'s it
- * represents.
  * 
- * @author Adrian Kuhn (akuhn at iam.unibe.ch)
- * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
+ * @author Adrian Kuhn 
+ * @author Lea Haensenberger
  */
 public class DependsParser {
 
-	private final Class<?> testClass;
+    
+    private final Class base;
 
-	/**
-	 * @param class1 the {@link TestClass} that is to be run
-	 */
-	public DependsParser(Class<?> class1) {
-		this.testClass = class1;
+    
+	public DependsParser(Class base) {
+		this.base = base;
 	}
 
 
@@ -36,43 +34,50 @@ public class DependsParser {
 	 * 
 	 * @param value String value of the {@link Depends} annotation.
 	 * @return list of all provider methods.
-	 * @throws ClassNotFoundException
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
 	 */
-	public List<Method> getDependencies(String value)
+	public List<Method> collectProviderMethods(String value)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		LinkedList<Method> dependencies = new LinkedList<Method>();
 		Token[] tokens = DependsScanner.scan(value);
 		for (Token t : tokens) {
-			Method found = searchMethod(t);
+			Method found = findProviderMethod(t);
 			dependencies.add(found);
 		}
 		return dependencies;
 	}
 
 	
-	private Method searchMethod(Token token)
+	private Method findProviderMethod(Token token)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
-		Class<?> providerClass = getProviderClass(token);
-		return getProviderMethod(providerClass, token);
+		Class providerClass = findProviderClass(token);
+		return findProviderMethod(providerClass, token);
 	}
 
 
-	private Class<?> getProviderClass(Token token) throws ClassNotFoundException {
-		if (token.path == null) {
-			return testClass;
-		}
-		else if (!token.path.contains(".")) {
-			String fullName = testClass.getPackage().getName() + "." + token.path;
-			return Class.forName(fullName);
-		}
-		else {
-			return Class.forName(token.path);
-		}
+	private Class findProviderClass(Token token) throws ClassNotFoundException {
+	    if (token.path == null) return base;
+	    String name = token.path;
+	    Class $ = findClass(name);
+	    if ($ != null) return $;
+        name = base.getName() + "$" + token.path;
+        $ = findClass(name);
+        if ($ != null) return $;
+	    name = base.getPackage().getName() + "." + token.path;
+        $ = findClass(name);
+	    if ($ != null) return $;
+		throw new ClassNotFoundException(token.path);
+	}
+	
+	private static Class findClass(String fullname) {
+	    try {
+            return Class.forName(fullname);
+        } 
+        catch (ClassNotFoundException _) {
+            return null;
+        }
 	}
 
-	private Method getProviderMethod(Class receiver, Token token)
+	private Method findProviderMethod(Class receiver, Token token)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		if (token.args == null) {
 			Method found = null;
@@ -91,34 +96,33 @@ public class DependsParser {
 		}
 	}
 	
-	private Class<?>[] getParameterClasses( String[] parameters ) throws ClassNotFoundException {
-		Class<?>[] newParams = new Class<?>[parameters.length];
-		for ( int i = 0; i < parameters.length; i++ ) {
-			try {
-				newParams[i] = Class.forName( parameters[i] );
-			} catch ( ClassNotFoundException ex ) {
-				try {
-					newParams[i] = Class.forName( "java.lang." + parameters[i] );
-				} catch ( ClassNotFoundException ignore ) {	
-					if ( parameters[i].equals( "int" ) ) {
-						newParams[i] = int.class;
-					} else if ( parameters[i].equals( "long" ) ) {
-						newParams[i] = long.class;
-					} else if ( parameters[i].equals( "double" ) ) {
-						newParams[i] = double.class;
-					} else if ( parameters[i].equals( "float" ) ) {
-						newParams[i] = float.class;
-					} else if ( parameters[i].equals( "char" ) ) {
-						newParams[i] = char.class;
-					} else if ( parameters[i].equals( "boolean" ) ) {
-						newParams[i] = boolean.class;
-					} else {
-						throw ex;
-					}
+	private Class[] getParameterClasses( String[] parameters ) throws ClassNotFoundException {
+		ArrayList<Class> $ = new ArrayList();
+		for (String name : parameters) {
+		    Class c = findClass(name);
+		    if (c == null) {
+		        c = findClass("java.lang." + name);
+		        if (c == null) {
+		            if ( name.equals( "int" ) ) {
+        				c = int.class;
+        			} else if ( name.equals( "long" ) ) {
+        				c = long.class;
+        			} else if ( name.equals( "double" ) ) {
+        				c = double.class;
+        			} else if ( name.equals( "float" ) ) {
+        				c = float.class;
+        			} else if ( name.equals( "char" ) ) {
+        				c = char.class;
+        			} else if ( name.equals( "boolean" ) ) {
+        				c = boolean.class;
+        			} else {
+        				throw new ClassNotFoundException(name);
+        			}
 				}
 			}
+		    $.add(c);
 		}
-		return newParams;
+		return $.toArray(new Class[$.size()]);
 	}
 
 
