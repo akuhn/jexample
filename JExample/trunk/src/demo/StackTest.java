@@ -31,7 +31,7 @@ public class StackTest {
 	
 	@Test
 	@Depends("withValue")
-	public Stack withMoreValues(Stack $) {
+	public Stack withManyValues(Stack $) {
 		$.push("foo");
 		$.push("bar");
 		assertEquals("bar", $.peek());

@@ -24,6 +24,8 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
 
+import demo.StackTest;
+
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -423,7 +425,7 @@ public class JExampleRunnerTest {
 	}
 	
     @RunWith( JExample.class )
-    private static class B_fail {
+    static class B_fail {
         public void missingAnnotation() { }
         @Test
         @Depends("#missingAnnotation")
@@ -442,7 +444,7 @@ public class JExampleRunnerTest {
     }
 
     @RunWith( JExample.class )
-    private static class C_fail {
+    static class C_fail {
         @Test
         @Depends( "D#test" )
         public void test() {
@@ -451,7 +453,7 @@ public class JExampleRunnerTest {
     }
 
     @RunWith( JExample.class )
-    private static class D_fail {
+    static class D_fail {
         @Test
         @Depends( "C#test" )
         public void test() { }

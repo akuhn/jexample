@@ -14,23 +14,23 @@ import org.junit.runner.Runner;
 
 public class TestClassValidationTest {
 
-    private static class A {
+    static class A {
         @Test public void test() { }
     }
 
     @RunWith( JExample.class )
-    private static class B {
+    static class B {
         public B(Object... args) { }
         @Test public void test() { }
     }
 
     @RunWith( JExample.class )
-    private static class C {
+    static class C {
         // no example methods
     }
 
     @RunWith( Runner.class )
-    private static class D {
+    static class D {
         @Test public void test() { }
     }
     

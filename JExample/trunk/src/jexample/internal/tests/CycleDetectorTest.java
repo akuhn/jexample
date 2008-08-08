@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class CycleDetectorTest {
 
-    private class CD extends CycleDetector<Integer> {
+    static class CD extends CycleDetector<Integer> {
 
         private Map<Integer,Collection<Integer>> data = new TreeMap();
         

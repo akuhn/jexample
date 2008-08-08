@@ -12,14 +12,11 @@ import org.junit.runner.notification.RunNotifier;
  *
  */
 
-public class For {
+public abstract class For {
 
-	private For() {
-		assert false : "Cannot instantiate.";
-	}
-	
 	public static <T> T example(Class jClass, String method) {
 	    Example e = findExample(jClass, method);
+	    if (e == null) throw new NoSuchMethodError("Method not found.");
 	    return (T) runExample(e);
 	}
 

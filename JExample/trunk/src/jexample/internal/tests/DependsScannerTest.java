@@ -27,6 +27,12 @@ public class DependsScannerTest {
         Token[] tokens = scan("");
         assertEquals(0, tokens.length);
     }
+    
+    @Test( expected = InvalidDeclarationError.class )
+    public void hash() {
+        scan("#");
+    }
+    
 	
     @Test
     public void whitespace() {

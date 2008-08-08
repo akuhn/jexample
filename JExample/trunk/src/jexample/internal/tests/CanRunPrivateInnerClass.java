@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 public class CanRunPrivateInnerClass {
 
     @RunWith( JExample.class )
-    private static class PrivateInnerClass {
+    static class PrivateInnerClass {
         @Test public void success() { }
     }
     

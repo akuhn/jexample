@@ -43,7 +43,7 @@ public class DependsScanner {
 		}
         @Override
         public String toString() {
-            return String.format("%s#%s%s]", path, simple,
+            return String.format("%s#%s%s", path, simple,
                     args == null ? "" : Arrays.asList(args));
         }
 		
