@@ -3,12 +3,12 @@ package jexample.internal;
 import java.nio.CharBuffer;
 
 @SuppressWarnings("serial")
-public class IllegalDeclaration extends RuntimeException {
+public class InvalidDeclarationError extends RuntimeException {
 
     public final int position;
     public final String string;
 
-    public IllegalDeclaration(CharBuffer buf) {
+    public InvalidDeclarationError(CharBuffer buf) {
         super(message(buf));
         this.position = buf.position();
         this.string = buf.rewind().toString();

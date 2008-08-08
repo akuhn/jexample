@@ -1,9 +1,12 @@
 package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import jexample.Depends;
 import jexample.JExampleRunner;
 import jexample.internal.ExampleGraph;
+import jexample.internal.InvalidExampleError;
+import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +45,18 @@ public class ExampleGraphTest {
 		assertEquals( 0, graph.getExample( DependsParserTest.B.class.getMethod( "otherTest" ) ).providers.size() );
 	}
 
-	@Test( expected = InitializationError.class )
+	@Test
 	public void detectCycles() throws InitializationError {
-		graph.add( Cyclic.class );
+        try {
+            graph.add( Cyclic.class );
+            fail("InitializationError expected!");
+        }
+        catch (InitializationError ex) {
+            assertEquals(1, ex.getCauses().size());
+            assertEquals(InvalidExampleError.class, ex.getCauses().get(0).getClass());
+            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
+            assertEquals(Kind.RECURSIVE_DEPENDENCIES, $.kind);
+        }
 	}
 
 	@RunWith(JExampleRunner.class)
@@ -72,6 +84,7 @@ public class ExampleGraphTest {
 		}
 	}
 
+    @RunWith(JExampleRunner.class)
 	private static class Cyclic {
 		public Cyclic() {
 

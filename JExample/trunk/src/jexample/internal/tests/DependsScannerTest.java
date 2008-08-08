@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import jexample.internal.IllegalDeclaration;
+import jexample.internal.InvalidDeclarationError;
 import jexample.internal.DependsScanner.Token;
 
 import org.junit.Test;
@@ -129,7 +129,7 @@ public class DependsScannerTest {
                 scan(fail);
                 fail();
             }
-            catch (IllegalDeclaration ex) {
+            catch (InvalidDeclarationError ex) {
                 assertEquals(n, ex.position);
             }
         }

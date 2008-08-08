@@ -11,6 +11,8 @@ import jexample.Depends;
 import jexample.JExampleRunner;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
+import jexample.internal.InvalidExampleError;
+import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -58,8 +60,8 @@ public class JExampleRunnerTest {
 	public void cycleMethods() {
 		Result result = runJExampleTestCase( CycleMethods.class );
 		assertEquals( 1, result.getFailureCount() );
-		assertTrue( result.getFailures().get(0)
-		        .getMessage().startsWith("The dependencies are cyclic:") );
+		InvalidExampleError $ = (InvalidExampleError) result.getFailures().get(0).getException();
+		assertEquals(Kind.RECURSIVE_DEPENDENCIES, $.kind);
 	}
 
 	@RunWith( JExampleRunner.class )

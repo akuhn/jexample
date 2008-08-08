@@ -88,8 +88,8 @@ public class DependsScanner {
         return new Token(fullname, names);
 	}
 	
-	private IllegalDeclaration error() {
-	    return new IllegalDeclaration(buf);
+	private InvalidDeclarationError error() {
+	    return new InvalidDeclarationError(buf);
     }
 
     private Token[] scanDeclaration() {

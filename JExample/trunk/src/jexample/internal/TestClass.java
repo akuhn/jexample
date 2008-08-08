@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jexample.JExampleRunner;
+import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -72,20 +73,21 @@ public class TestClass {
     public TestClass validate() {
         RunWith run = javaClass.getAnnotation(RunWith.class);
         if (run == null || run.value() != JExampleRunner.class ) {
-            graph.throwNewError("Class %s is not a JExample test class, annotation @RunWith(JExampleRunner.class) missing.", this);
+            graph.throwNewError(Kind.MISSING_RUNWITH_ANNOTATION,
+                    "Class %s is not a JExample test class, annotation @RunWith(JExampleRunner.class) missing.", this);
         }
         try {
             getConstructor(javaClass);
         }
         catch (NoSuchMethodException ex) {
-            graph.addInitializationError(ex);
+            graph.throwNewError(Kind.MISSING_CONSTRUCTOR, ex);
         }
         catch (SecurityException ex) {
-            graph.addInitializationError(ex);
+            graph.throwNewError(Kind.MISSING_CONSTRUCTOR, ex);
         }
         int len = collectTestMethods().size();
         if (len == 0) {
-            graph.throwNewError("Class %s does not contain test methods.", this);
+            graph.throwNewError(Kind.NO_EXAMPLES_FOUND, "Class %s does not contain test methods.", this);
         }
         return this;
     }

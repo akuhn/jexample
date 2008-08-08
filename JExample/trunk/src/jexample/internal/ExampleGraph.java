@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import jexample.JExampleRunner;
+import jexample.internal.InvalidExampleError.Kind;
 import jexample.internal.tests.StackTest;
 
 import org.junit.internal.runners.CompositeRunner;
@@ -55,10 +56,13 @@ public class ExampleGraph {
 		    .collect()
 		    .validate()
 		    .result();
-		this.detectCycles(novel, examples.values());
-		for (Example e : novel)
-		    examples.put(e.jmethod, e);
-        if (!initializationErrors.isEmpty())
+		List<Example> cycle = this.detectCycles(novel, examples.values());
+		if (cycle == null) 
+	        for (Example e : novel) examples.put(e.jmethod, e);
+		else
+		    this.throwNewError(Kind.RECURSIVE_DEPENDENCIES,
+		            "Recursive dependency in cycle %s", cycle); 
+       if (!initializationErrors.isEmpty())
             throw new InitializationError(initializationErrors);
         initializationErrors.clear();
         return $;
@@ -73,17 +77,14 @@ public class ExampleGraph {
 		}
 	}
 
-	private void detectCycles(Collection<Example>... es) throws InitializationError {
+	private List<Example> detectCycles(Collection<Example>... es) {
 		CycleDetector<Example> detector = new CycleDetector<Example>(es) {
             @Override
             public Collection<Example> getChildren(Example e) {
                 return e.providers;
             }
 		};
-		List<Example> cycle = detector.getCycle();
-		if (cycle != null) {
-			throw new InitializationError( "The dependencies are cyclic: " + cycle);
-		}
+		return detector.getCycle();
 	}
 
 	public Collection<Method> getMethods() {
@@ -147,16 +148,18 @@ public class ExampleGraph {
         return examples.get(m);
     }
 
-    public void throwNewError(String message, Object... args) {
-        Exception $ = new Exception(String.format(message, args));
+    public void throwNewError(Kind kind, String message, Object... args) {
+        Exception $ = new InvalidExampleError(kind, message, args);
         $.fillInStackTrace();
-        this.addInitializationError($);
-    }
-    
-    public void addInitializationError(Throwable th) {
-        initializationErrors.add(th);
+        initializationErrors.add($);
     }
 
+    public void throwNewError(Kind kind, Throwable cause) {
+        Exception $ = new InvalidExampleError(kind, cause, cause.getMessage());
+        $.fillInStackTrace();
+        initializationErrors.add($);
+    }
+    
     public Runner newJExampleRunner(Class<?>... classes) {
         CompositeRunner $ = new CompositeRunner("All");
         for (Class<?> c : classes) {

@@ -9,6 +9,8 @@ import jexample.Depends;
 import jexample.JExampleRunner;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
+import jexample.internal.InvalidExampleError;
+import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -137,16 +139,17 @@ public class DependenciesTest {
     }
     
     @Test
-    public void testFailPolymorphicDepedency() throws Exception {
+    public void testParameterNotAssignableFromProvider() throws Exception {
         try {
             ExampleGraph $ = new ExampleGraph();
             $.add( E_fail.class );
+            fail("InitializationError expected!");
         }
-        catch (InitializationError err) {
-            assertEquals( 1, err.getCauses().size() );
-            return;
+        catch (InitializationError ex) {
+            assertEquals(1, ex.getCauses().size());
+            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
+            assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, $.kind);
         }
-        fail("InitializationError expected!");
     }
     
     @Test
@@ -189,11 +192,12 @@ public class DependenciesTest {
         try {
             ExampleGraph $ = new ExampleGraph();
             $.add( G.class );
-            fail();
+            fail("InitializationError expected!");
         }
         catch (InitializationError ex) {
             assertEquals(1, ex.getCauses().size());
-            assertTrue(ex.getCauses().get(0).getMessage().endsWith("provider must not expect exception."));
+            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
+            assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, $.kind);
         }
     }
     
@@ -215,12 +219,12 @@ public class DependenciesTest {
         try {
             ExampleGraph $ = new ExampleGraph();
             $.add( H.class );
-            fail();
+            fail("InitializationError expected!");
         }
         catch (InitializationError ex) {
             assertEquals(1, ex.getCauses().size());
-            assertTrue(ex.getCauses().get(0).getMessage()
-                    .endsWith("has 2 parameters but only 1 dependencies."));
+            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
+            assertEquals(Kind.MISSING_PROVIDERS, $.kind);
         }
     }
     

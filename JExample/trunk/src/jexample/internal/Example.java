@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import jexample.Depends;
 import jexample.InjectionPolicy;
+import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -77,12 +78,14 @@ public class Example {
             try {
                 DependsParser p = new DependsParser(jmethod.getDeclaringClass());
                 return p.collectProviderMethods(a.value());
+            } catch (InvalidDeclarationError ex) {
+                context.throwNewError(Kind.INVALID_DEPENDS_DECLARATION, ex);
             } catch (SecurityException ex) {
-                context.addInitializationError(ex);
+                context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
             } catch (ClassNotFoundException ex) {
-                context.addInitializationError(ex);
-           } catch (NoSuchMethodException ex) {
-               context.addInitializationError(ex);
+                context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
+            } catch (NoSuchMethodException ex) {
+                context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
             }
         }
         return Collections.EMPTY_LIST;
@@ -196,12 +199,12 @@ public class Example {
 
     public void validate() {
         if (!jmethod.isAnnotationPresent(Test.class)) {
-            context.throwNewError("Method %s is not a test method, missing @Test annotation.", toString());
+            context.throwNewError(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.", toString());
         }
         int d = providers.size();
         int p = arity();
         if (p > d) {
-            context.throwNewError("Method %s has %d parameters but only %d dependencies.", toString(), p, d);
+            context.throwNewError(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p, d);
         }
         else {
             validateDependencyTypes();
@@ -215,12 +218,12 @@ public class Example {
             Example tm = tms.next();
             Class<?> r = tm.jmethod.getReturnType();
             if (!t.isAssignableFrom(r)) {
-                context.throwNewError("Parameter (%s) in (%s) is not assignable from depedency (%s).",
-                        t, jmethod, tm.jmethod);
+                context.throwNewError(Kind.PARAMETER_NOT_ASSIGNABLE,
+                        "Parameter (%s) in (%s) is not assignable from depedency (%s).", t, jmethod, tm.jmethod);
             }
             if (tm.expectsException()) {
-                context.throwNewError("(%s): invalid dependency (%s), provider must not expect exception.",
-                        jmethod, tm.jmethod);
+                context.throwNewError(Kind.PROVIDER_EXPECTS_EXCEPTION,
+                        "(%s): invalid dependency (%s), provider must not expect exception.", jmethod, tm.jmethod);
             }
         }
     }

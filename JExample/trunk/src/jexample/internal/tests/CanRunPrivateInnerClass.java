@@ -18,7 +18,7 @@ public class CanRunPrivateInnerClass {
     }
     
     @Test
-    public void createJExampleRunner() throws InitializationError {
+    public void createJExampleRunner() {
         new ExampleGraph().newJExampleRunner( PrivateInnerClass.class );
     }
     
