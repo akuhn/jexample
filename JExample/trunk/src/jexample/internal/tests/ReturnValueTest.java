@@ -1,22 +1,19 @@
 package jexample.internal.tests;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.RunWith;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import jexample.JExampleRunner;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
-import jexample.internal.ReturnValue;
-import jexample.internal.tests.InjectionPolicyTest.B;
+
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
 
 public class ReturnValueTest {
 
     @RunWith( JExampleRunner.class )
-    public static class Null {
+    private static class Null {
         @Test
         public Object returnNull() {
             return null;

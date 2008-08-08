@@ -14,13 +14,13 @@ import org.junit.runner.RunWith;
 
 public class InjectionPolicyTest {
 
-    public static class A {
+    private static class A {
         
     }
     
     @RunWith( JExampleRunner.class )
     @InjectionPolicy( keep = true )
-    public static class B {
+    private static class B {
         
         @Test
         public A create() {

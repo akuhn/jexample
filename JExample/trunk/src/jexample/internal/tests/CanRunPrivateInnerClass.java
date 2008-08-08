@@ -2,6 +2,7 @@ package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import jexample.JExampleRunner;
+import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
@@ -18,12 +19,12 @@ public class CanRunPrivateInnerClass {
     
     @Test
     public void createJExampleRunner() throws InitializationError {
-        new JExampleRunner( PrivateInnerClass.class );
+        new ExampleGraph().newJExampleRunner( PrivateInnerClass.class );
     }
     
     @Test
     public void testRunningPrivateInnerClass()  {
-        Result result = JUnitCore.runClasses( PrivateInnerClass.class );
+        Result result = new JUnitCore().run(new ExampleGraph().newJExampleRunner( PrivateInnerClass.class ));;
         assertEquals(true, result.wasSuccessful());
         assertEquals(1, result.getRunCount());
         assertEquals(0, result.getFailureCount());

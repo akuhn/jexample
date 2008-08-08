@@ -72,7 +72,7 @@ public class ExampleGraphTest {
 		}
 	}
 
-	static private class Cyclic {
+	private static class Cyclic {
 		public Cyclic() {
 
 		}
@@ -95,7 +95,7 @@ public class ExampleGraphTest {
 		}
 	}
 
-	static private class CyclicOverClasses {
+	private static class CyclicOverClasses {
 		public CyclicOverClasses() {
 
 		}

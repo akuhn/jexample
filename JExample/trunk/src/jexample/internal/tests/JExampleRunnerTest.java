@@ -30,7 +30,7 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 public class JExampleRunnerTest {
 
 	@RunWith( JExampleRunner.class )
-	static public class CycleMethods {
+	private static class CycleMethods {
 
 		public CycleMethods() {
 		}
@@ -63,7 +63,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class SkipMethods {
+	private static class SkipMethods {
 
 		public SkipMethods() {
 		}
@@ -104,7 +104,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class BadDependencies {
+	private static class BadDependencies {
 
 		public BadDependencies() {
 		}
@@ -139,7 +139,7 @@ public class JExampleRunnerTest {
     }
 
     @RunWith( JExampleRunner.class )
-	static public class GoodTest {
+	private static class GoodTest {
 		public GoodTest() {
 		}
 
@@ -170,7 +170,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class FirstGoodTest {
+	private static class FirstGoodTest {
 		public FirstGoodTest() {
 		}
 
@@ -187,7 +187,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class SecondGoodTest {
+	private static class SecondGoodTest {
 		public SecondGoodTest() {
 		}
 
@@ -207,7 +207,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class FirstBadTest {
+	private static class FirstBadTest {
 		public FirstBadTest() {
 		}
 
@@ -230,7 +230,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class SecondBadTest {
+	private static class SecondBadTest {
 		public SecondBadTest() {
 		}
 
@@ -250,7 +250,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class WithAttributes {
+	private static class WithAttributes {
 		public WithAttributes() {
 
 		}
@@ -301,7 +301,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class DependsOnBeforeTest {
+	private static class DependsOnBeforeTest {
 
 		public DependsOnBeforeTest() {
 		}
@@ -334,7 +334,7 @@ public class JExampleRunnerTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	static public class CloneRetVal {
+	private static class CloneRetVal {
 
 		public CloneRetVal() {
 		}
@@ -381,7 +381,7 @@ public class JExampleRunnerTest {
 	}
 	
 	@RunWith( JExampleRunner.class )
-	static public class NotCloneRetVal {
+	private static class NotCloneRetVal {
 
 		private static NoClone rootClone, secondClone;
 		

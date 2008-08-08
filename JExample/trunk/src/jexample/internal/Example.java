@@ -60,6 +60,7 @@ public class Example {
     
 	public Example(Method jmethod, ExampleGraph graph) {
 	    assert jmethod != null && graph != null;
+	    jmethod.setAccessible(true);
         this.jmethod = jmethod;
         this.providers = new Dependencies();
         this.result = TestResult.NOT_YET_RUN;
@@ -111,7 +112,6 @@ public class Example {
 	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
-		    this.jmethod.setAccessible(true);
 			returnValue.assign(this.jmethod.invoke(test, args));
 			this.result = TestResult.GREEN;
 		} catch (InvocationTargetException e) {
@@ -144,9 +144,7 @@ public class Example {
 	}
 
 	public Object reRunTestMethod() throws Exception {
-	    Constructor<?> constructor = jmethod.getDeclaringClass().getConstructor();
-	    constructor.setAccessible(true);
-		Object test = constructor.newInstance();
+		Object test = newTestClassInstance();
 		Object[] args = providers.getInjectionValues(policy, arity());
 		return this.jmethod.invoke(test, args);
 	}
@@ -180,7 +178,7 @@ public class Example {
 	private void runTestMethod(RunNotifier notifier) {
 		try {
 		    Object[] args = providers.getInjectionValues(policy, arity());
-			this.invokeMethod(newTestCase(), notifier, args);
+			this.invokeMethod(newTestClassInstance(), notifier, args);
 		} catch (InvocationTargetException e) {
 			notifier.testAborted(description, e.getCause());
 		} catch (Exception e) {
@@ -188,14 +186,10 @@ public class Example {
 		}
 	}
 
-    private Object newTestCase() throws NoSuchMethodException,
+    private Object newTestClassInstance() throws NoSuchMethodException,
             InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        Object test;
-        Constructor<?> constructor = this.jmethod.getDeclaringClass().getDeclaredConstructor();
-        constructor.setAccessible(true);
-        test = constructor.newInstance();
-        return test;
+        return TestClass.getConstructor(jmethod.getDeclaringClass()).newInstance();
     }
 
 

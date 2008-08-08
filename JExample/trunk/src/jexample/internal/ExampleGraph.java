@@ -49,7 +49,7 @@ public class ExampleGraph {
 	 * then added to the list of examples.
 	 */
 	public TestClass add(Class<?> javaClass) throws InitializationError {
-	    if (anyHasBeenRun) throw new InitializationError();
+	    if (anyHasBeenRun) throw new InitializationError("Cannot add test to running system.");
 	    TestClass $ = new TestClass(javaClass, this).validate();
 		Collection<Example> novel = new ExampleCollector($)
 		    .collect()

@@ -20,7 +20,7 @@ public class ExampleGraphAddTest {
     }
     
     @RunWith( JExampleRunner.class )
-    public static class A {
+    private static class A {
         @Test
         public void t() { }
     }
@@ -38,7 +38,7 @@ public class ExampleGraphAddTest {
     }
 
     @RunWith( JExampleRunner.class )
-    public static class B extends A {
+    private static class B extends A {
         @Override
         @Test
         public void t() { }
@@ -57,7 +57,7 @@ public class ExampleGraphAddTest {
     }
     
     @RunWith( JExampleRunner.class )
-    public static class C {
+    private static class C {
         @Test
         public Object provider() { return 42; }
         @Test 

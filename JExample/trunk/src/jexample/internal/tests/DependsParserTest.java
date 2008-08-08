@@ -71,7 +71,7 @@ public class DependsParserTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	public static class TestTestClass {
+	private static class TestTestClass {
 		@Test
 		public void annotatedMethod() {
 
@@ -89,7 +89,7 @@ public class DependsParserTest {
 	}
 	
 	@RunWith( JExampleRunner.class )
-	public static class B {
+	protected static class B {
 
 	    public B() {
 

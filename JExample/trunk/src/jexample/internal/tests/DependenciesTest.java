@@ -19,16 +19,16 @@ import org.junit.runner.RunWith;
 
 public class DependenciesTest {
 
-    public static class A {
+    private static class A {
         
     }
     
-    public static class B extends A {
+    private static class B extends A {
         
     }
     
     @RunWith( JExampleRunner.class )
-    public static class C {
+    private static class C {
         @Test
         public B empty() {
             return new B();
@@ -71,7 +71,7 @@ public class DependenciesTest {
     }
 
     @RunWith( JExampleRunner.class )
-    public static class D {
+    private static class D {
         @Test
         public B empty() {
             return new B();
@@ -110,7 +110,7 @@ public class DependenciesTest {
     }
 
     @RunWith( JExampleRunner.class )
-    public static class E_fail {
+    private static class E_fail {
         @Test
         public A empty() {
             return new A();
@@ -123,7 +123,7 @@ public class DependenciesTest {
     }
     
     @RunWith( JExampleRunner.class )
-    public static class F extends D {
+    private static class F extends D {
         @Test
         public A another() {
             return null;
@@ -172,7 +172,7 @@ public class DependenciesTest {
     }
     
     @RunWith( JExampleRunner.class )
-    public static class G {
+    private static class G {
         @Test( expected = Exception.class )
         public Object provider() throws Exception {
             throw new Exception();
@@ -198,7 +198,7 @@ public class DependenciesTest {
     }
     
     @RunWith( JExampleRunner.class )
-    public static class H {
+    private static class H {
         @Test
         public Object provider() {
             return new Object();
