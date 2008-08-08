@@ -1,4 +1,4 @@
-#Fri Aug 08 13:51:39 CEST 2008
+#Fri Aug 08 15:43:04 CEST 2008
 block_filters=Source Directive, assert, toString
 eclipse.preferences.version=1
 flush_interval=1000
@@ -7,7 +7,7 @@ include_filter=**/*.java
 init_string=
 init_string_default=true
 init_string_project_relative=true
-instrumentation_enabled=false
+instrumentation_enabled=true
 output_root=.clover/bin
 output_root_same_as_project=true
 regexp_filters[0]=true,0,-1,false,toString,public String toString()

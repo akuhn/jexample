@@ -480,4 +480,21 @@ public class JExampleRunnerTest {
 	    };
 	}
 	
+	@RunWith( JExampleRunner.class )
+	static class A_fail {
+	    @Test( expected = Exception.class )
+	    public void fail() {
+	        throw new Error();
+	    }
+	}
+	
+	@Test
+	public void unexpectedException() {
+	    Result $ = runJExampleTestCase( A_fail.class );
+	    assertEquals(1, $.getRunCount());
+	    assertEquals(false, $.wasSuccessful());
+	    assertEquals(1, $.getFailureCount());
+	    assertTrue($.getFailures().get(0).getMessage()
+	            .startsWith("Unexpected exception, expected"));
+	}
 }

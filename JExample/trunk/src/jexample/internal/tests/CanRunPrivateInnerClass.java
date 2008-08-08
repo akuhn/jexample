@@ -5,7 +5,6 @@ import jexample.JExampleRunner;
 import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;

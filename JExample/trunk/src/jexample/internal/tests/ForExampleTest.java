@@ -11,6 +11,11 @@ import org.junit.Test;
 
 public class ForExampleTest {
 
+    @Test(expected = Exception.class )
+    public void cannotInstantiate() throws Exception {
+        For.class.getDeclaredConstructor().newInstance();
+    }
+    
     @Test
     public void forExampleStackEmpty() {
         Stack stack = For.example(StackTest.class, "empty");

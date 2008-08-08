@@ -1,10 +1,7 @@
 package jexample.internal;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import jexample.Depends;
@@ -72,7 +69,7 @@ public class Example {
     }
 
 
-	public Collection<Method> collectDependencies() {
+	public Method[] collectDependencies() {
         Depends a = jmethod.getAnnotation( Depends.class );
         if (a != null) {
             try {
@@ -88,7 +85,7 @@ public class Example {
                 context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
             }
         }
-        return Collections.EMPTY_LIST;
+        return new Method[0];
     }
 
 	private boolean expectsException() {
@@ -214,17 +211,20 @@ public class Example {
 
     private void validateDependencyTypes() {
         Iterator<Example> tms = this.providers.iterator();
+        int position = 1;
         for (Class<?> t : jmethod.getParameterTypes()) {
             Example tm = tms.next();
             Class<?> r = tm.jmethod.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 context.throwNewError(Kind.PARAMETER_NOT_ASSIGNABLE,
-                        "Parameter (%s) in (%s) is not assignable from depedency (%s).", t, jmethod, tm.jmethod);
+                        "Parameter #%d in (%s) is not assignable from depedency (%s).",
+                        position, jmethod, tm.jmethod);
             }
             if (tm.expectsException()) {
                 context.throwNewError(Kind.PROVIDER_EXPECTS_EXCEPTION,
                         "(%s): invalid dependency (%s), provider must not expect exception.", jmethod, tm.jmethod);
             }
+            position++;
         }
     }
     

@@ -2,7 +2,6 @@ package jexample;
 
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
-import jexample.internal.TestClass;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.RunNotifier;
@@ -16,7 +15,7 @@ import org.junit.runner.notification.RunNotifier;
 public class For {
 
 	private For() {
-		throw new IllegalAccessError();
+		assert false : "Cannot instantiate.";
 	}
 	
 	public static <T> T example(Class jClass, String method) {

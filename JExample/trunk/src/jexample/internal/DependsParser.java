@@ -6,7 +6,6 @@ package jexample.internal;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import jexample.Depends;
 import jexample.internal.DependsScanner.Token;
@@ -35,15 +34,15 @@ public class DependsParser {
 	 * @param value String value of the {@link Depends} annotation.
 	 * @return list of all provider methods.
 	 */
-	public List<Method> collectProviderMethods(String value)
+	public Method[] collectProviderMethods(String value)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
-		LinkedList<Method> dependencies = new LinkedList<Method>();
+		LinkedList<Method> $ = new LinkedList<Method>();
 		Token[] tokens = DependsScanner.scan(value);
 		for (Token t : tokens) {
 			Method found = findProviderMethod(t);
-			dependencies.add(found);
+			$.add(found);
 		}
-		return dependencies;
+		return $.toArray(new Method[$.size()]);
 	}
 
 	
@@ -89,6 +88,7 @@ public class DependsParser {
 					 found = m;
 				}
 			}
+			if (found == null) throw new NoSuchMethodException(token.toString());
 			return found;
 		}
 		else {

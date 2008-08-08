@@ -11,7 +11,6 @@ import java.util.Map;
 
 import jexample.JExampleRunner;
 import jexample.internal.InvalidExampleError.Kind;
-import jexample.internal.tests.StackTest;
 
 import org.junit.internal.runners.CompositeRunner;
 import org.junit.internal.runners.InitializationError;
@@ -100,9 +99,9 @@ public class ExampleGraph {
         private Map<Method, Example> found;
         private Collection<Method> todo;
         
-        public ExampleCollector(TestClass testClass) {
+        public ExampleCollector(TestClass curr) {
             found = new HashMap();
-            todo = new HashSet(testClass.collectTestMethods());
+            todo = new HashSet(curr.collectTestMethods());
         }
         
         public ExampleCollector validate() {

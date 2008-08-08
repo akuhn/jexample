@@ -21,16 +21,16 @@ import org.junit.runner.RunWith;
 
 public class DependenciesTest {
 
-    private static class A {
+    static class A {
         
     }
     
-    private static class B extends A {
+    static class B extends A {
         
     }
     
     @RunWith( JExampleRunner.class )
-    private static class C {
+    static class C {
         @Test
         public B empty() {
             return new B();
@@ -73,7 +73,7 @@ public class DependenciesTest {
     }
 
     @RunWith( JExampleRunner.class )
-    private static class D {
+    static class D {
         @Test
         public B empty() {
             return new B();
@@ -112,7 +112,7 @@ public class DependenciesTest {
     }
 
     @RunWith( JExampleRunner.class )
-    private static class E_fail {
+    static class E_fail {
         @Test
         public A empty() {
             return new A();
@@ -125,9 +125,9 @@ public class DependenciesTest {
     }
     
     @RunWith( JExampleRunner.class )
-    private static class F extends D {
+    static class F extends D {
         @Test
-        public A another() {
+        public B another() {
             return null;
         }
         @Override
@@ -153,13 +153,13 @@ public class DependenciesTest {
     }
     
     @Test
-    @Ignore
+    @Ignore("JExample does not (yet) support inheritence and overrides.")
     public void testPolymorphicDepedency3() throws Exception {
         ExampleGraph $ = new ExampleGraph();
         $.add( F.class );
         
         //assertEquals( 1, $.getClasses().size() );
-        assertEquals( 3, $.getMethods().size() );
+        assertEquals( 5, $.getMethods().size() );
         
         Example a = $.findExample( F.class, "a" );
         Example b = $.findExample( F.class, "b" );
@@ -175,7 +175,7 @@ public class DependenciesTest {
     }
     
     @RunWith( JExampleRunner.class )
-    private static class G {
+    static class G {
         @Test( expected = Exception.class )
         public Object provider() throws Exception {
             throw new Exception();
@@ -202,7 +202,7 @@ public class DependenciesTest {
     }
     
     @RunWith( JExampleRunner.class )
-    private static class H {
+    static class H {
         @Test
         public Object provider() {
             return new Object();
