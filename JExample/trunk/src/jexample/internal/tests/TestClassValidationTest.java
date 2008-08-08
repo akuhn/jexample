@@ -5,7 +5,7 @@ import jexample.internal.ExampleGraph;
 import org.junit.Test;
 import org.junit.internal.runners.InitializationError;
 
-public class TestClassValidation {
+public class TestClassValidationTest {
 
     public class A {
         

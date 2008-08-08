@@ -11,7 +11,7 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.RunWith;
 
 
-public class GraphTest {
+public class ExampleGraphTest {
 
 	private ExampleGraph graph;
 
@@ -39,7 +39,7 @@ public class GraphTest {
 		assertEquals( 0, graph.getExample( OneClass.class.getMethod( "testMethod" ) ).providers.size() );
 		assertEquals( 1, graph.getExample( OneClass.class.getMethod( "anotherTestMethod" ) ).providers.size() );
 		assertEquals( 1, graph.getExample( OneClass.class.getMethod( "depOnOtherTest" ) ).providers.size() );
-		assertEquals( 0, graph.getExample( B.class.getMethod( "otherTest" ) ).providers.size() );
+		assertEquals( 0, graph.getExample( DependsParserTest.B.class.getMethod( "otherTest" ) ).providers.size() );
 	}
 
 	@Test( expected = InitializationError.class )
@@ -66,7 +66,7 @@ public class GraphTest {
 		}
 
 		@Test
-		@Depends( "B.otherTest" )
+		@Depends( "DependsParserTest$B.otherTest" )
 		public void depOnOtherTest() {
 
 		}

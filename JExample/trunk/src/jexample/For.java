@@ -2,8 +2,10 @@ package jexample;
 
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
+import jexample.internal.TestClass;
 
 import org.junit.internal.runners.InitializationError;
+import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 
 /**
@@ -15,33 +17,30 @@ import org.junit.runner.notification.RunNotifier;
 public class For {
 
 	private For() {
-		// TODO make non-static class
+		throw new IllegalAccessError();
 	}
 	
-	public static <T> T example(Class test, String method) {
-		ExampleGraph graph = createTestGraph(test);
-		for (Example each : graph.getExamples()) {
-			// TODO use dependency parser to find matching method
-			if (each.jmethod.getName().equals(method)) {
-				RunNotifier notifier = new RunNotifier();
-				each.run(notifier);
-				// TODO check notifier for errors/assertions
-				return (T) each.returnValue;
-			}
-		}
-		// TODO verbose error message
-		throw new IllegalArgumentException("Method not found");
+	public static <T> T example(Class jClass, String method) {
+	    try {
+	        ExampleGraph graph = new ExampleGraph();
+	        TestClass test = graph.add(jClass);
+	        for (Example e : graph.getExamples()) {
+	            if (test.contains(e) && e.jmethod.getName().equals(method)) {
+	                return (T) runExample(e);
+			    }
+		    }
+	    } catch(InitializationError ex) { throw new RuntimeException(ex); };    
+	    throw new IllegalArgumentException("Method not found");
 	}
 
-	private static ExampleGraph createTestGraph(Class test) {
-		try {
-			ExampleGraph graph = new ExampleGraph();
-			graph.add(test.getClass());
-			return graph;
-		} catch (InitializationError ex) {
-			// TODO verbose error message
-			throw new IllegalArgumentException(ex);
-		}
-	}
-	
+    private static Object runExample(Example e) {
+        Result r = new Result();
+        RunNotifier n = new RunNotifier();
+        n.addListener(r.createListener());
+        e.run(n);
+        // TODO should check if e was succesful. If no test failed is not the same.
+        if (!r.wasSuccessful()) throw new RuntimeException("Test failed.");
+        return e.returnValue;
+    }
+
 }

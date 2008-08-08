@@ -9,7 +9,7 @@ import jexample.internal.DependsScanner.Token;
 
 import org.junit.Test;
 
-public class DependencyScannerTest {
+public class DependsScannerTest {
 
 	@Test
 	public void simpleName() {

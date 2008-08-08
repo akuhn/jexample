@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
-public class DependencyValidatorTest {
+public class ExampleValidateTest {
 
 	private Method stringAsParam;
 

@@ -8,14 +8,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith( Suite.class )
 @SuiteClasses({
-        AddingClasses.class,
-		ComposedTestRunnerTest.class,
+        ExampleGraphAddTest.class,
+		JExampleRunnerTest.class,
 		CycleDetectorTest.class,
-		TestDependencies.class,
-		DependencyScannerTest.class,
-		DependencyParserTest.class,
-		DependencyValidatorTest.class,
-		GraphTest.class,
+		DependenciesTest.class,
+		DependsScannerTest.class,
+		DependsParserTest.class,
+		ExampleValidateTest.class,
+		ExampleGraphTest.class,
 		StackTest.class })
 public class AllTests {
     public static void main(String[] args) {

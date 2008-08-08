@@ -17,7 +17,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
-public class TestDependencies {
+public class DependenciesTest {
 
     public static class A {
         

@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  * 
  */
-public class ComposedTestRunnerTest {
+public class JExampleRunnerTest {
 
 	@RunWith( JExampleRunner.class )
 	static public class CycleMethods {
@@ -174,7 +174,7 @@ public class ComposedTestRunnerTest {
 		}
 
 		@Test
-		@Depends( "ComposedTestRunnerTest$SecondGoodTest.secondMethod" )
+		@Depends( "JExampleRunnerTest$SecondGoodTest.secondMethod" )
 		public void thirdMethod() {
 			assertTrue( true );
 		}
@@ -186,7 +186,7 @@ public class ComposedTestRunnerTest {
 		}
 
 		@Test
-		@Depends( "ComposedTestRunnerTest$FirstGoodTest.firstMethod" )
+		@Depends( "JExampleRunnerTest$FirstGoodTest.firstMethod" )
 		public void secondMethod() {
 			assertTrue( true );
 		}
@@ -408,7 +408,7 @@ public class ComposedTestRunnerTest {
 		}
 		
 		@Test
-		@Depends("second(jexample.internal.tests.ComposedTestRunnerTest$NotCloneRetVal$NoClone)")
+		@Depends("second")
 		public void fourth(NoClone aClone){
 			assertEquals( "original", aClone.getName() );
 			assertSame(NotCloneRetVal.rootClone, aClone);

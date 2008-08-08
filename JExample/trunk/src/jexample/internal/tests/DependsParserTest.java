@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import jexample.Depends;
 import jexample.JExampleRunner;
 import jexample.internal.DependsParser;
 import jexample.internal.TestClass;
@@ -20,7 +21,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
-public class DependencyParserTest {
+public class DependsParserTest {
 
 	private DependsParser parser;
 	private TestClass myClass;
@@ -52,7 +53,7 @@ public class DependencyParserTest {
 
 	@Test
 	public void testExternalDeps() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
-		List<Method> methods = this.parser.getDependencies( "B.otherTest" );
+		List<Method> methods = this.parser.getDependencies( "DependsParserTest$B.otherTest" );
 		assertEquals( 1, methods.size() );
 	}
 
@@ -70,7 +71,7 @@ public class DependencyParserTest {
 	}
 
 	@RunWith( JExampleRunner.class )
-	private class TestTestClass {
+	public static class TestTestClass {
 		@Test
 		public void annotatedMethod() {
 
@@ -86,5 +87,36 @@ public class DependencyParserTest {
 
 		}
 	}
+	
+	@RunWith( JExampleRunner.class )
+	public static class B {
+
+	    public B() {
+
+	    }
+
+	    @Test
+	    public void otherTest() {
+
+	    }
+
+	    @Test
+	    @Depends( "GraphTest$CyclicOverClasses.depOnOtherTest" )
+	    public void otherTestCyclic() {
+
+	    }
+
+	    @Test
+	    @Depends( "CycleDetectorTest$WithCycleOverClasses.bottomCyclicMethod" )
+	    public void cyclicMethod() {
+
+	    }
+
+	    @Test
+	    @Depends( "CycleDetectorTest$WithoutCycleOverClasses.rootMethod" )
+	    public void middleMethod() {
+
+	    }
+	}	
 
 }
