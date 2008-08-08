@@ -17,13 +17,13 @@ import org.junit.runner.notification.RunNotifier;
 
 
 /**
- * Java class with test methods.
+ * Java class with example methods.
  * 
  * @author Lea Haensenberger
  * @author Adrian Kuhn
  * 
  */
-public class TestClass {
+public class ExampleClass {
     
     public final Class jclass;
 
@@ -31,7 +31,7 @@ public class TestClass {
     private final ExampleGraph graph;
 	
 	
-    public TestClass(Class<?> jclass, ExampleGraph graph) {
+    public ExampleClass(Class<?> jclass, ExampleGraph graph) {
         this.errors = new JExampleError();
         this.graph = graph;
 		this.jclass = jclass;

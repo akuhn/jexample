@@ -9,6 +9,8 @@ import java.util.Stack;
 import jexample.InjectionPolicy;
 
 /**
+ * Manages the dependencies/providers of an example.
+ * 
  * 
  * @author Adrian Kuhn
  *

@@ -22,7 +22,7 @@ public class StackTest {
 	}
 	
 	@Test
-	@Depends("empty")
+	@Depends("#empty")
 	public Stack withValue(Stack $) {
 		$.push("boe");
 		assertEquals(1, $.size());
@@ -30,7 +30,7 @@ public class StackTest {
 	}
 	
 	@Test
-	@Depends("withValue")
+	@Depends("#withValue")
 	public Stack withManyValues(Stack $) {
 		$.push("foo");
 		$.push("bar");
@@ -39,7 +39,7 @@ public class StackTest {
 	}
 	
     @Test
-    @Depends("withValue;ListTest.withMoreValues")
+    @Depends("#withValue, ListTest#withMoreValues")
     public void testPushAll(Stack $, List l) {
         $.addAll(l);
         assertEquals("Dolor", $.peek());

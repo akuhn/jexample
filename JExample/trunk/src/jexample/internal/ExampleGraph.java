@@ -29,7 +29,7 @@ public class ExampleGraph {
 
     private static ExampleGraph GRAPH;
 	private Map<Method,Example> examples;
-	private Map<Class,TestClass> classes;
+	private Map<Class,ExampleClass> classes;
 	private boolean anyHasBeenRun = false;
 
 
@@ -45,9 +45,12 @@ public class ExampleGraph {
 	}
 
 
-    protected TestClass newTestClass(Class jclass) {
-        TestClass $ = classes.get(jclass);
-        if ($ == null) $ = new TestClass(jclass, this);
+    protected ExampleClass newExampleClass(Class jclass) {
+        ExampleClass $ = classes.get(jclass);
+        if ($ == null) { 
+            $ = new ExampleClass(jclass, this);
+            classes.put(jclass, $);
+        }
         return $;
     }
 
@@ -65,15 +68,15 @@ public class ExampleGraph {
         return e;
     }
 
-	public TestClass add(Class<?> jclass) throws JExampleError {
+	public ExampleClass add(Class<?> jclass) throws JExampleError {
 	    if (anyHasBeenRun) throw new RuntimeException("Cannot add test to running system.");
-	    TestClass $ = newTestClass(jclass);
+	    ExampleClass $ = newExampleClass(jclass);
 	    $.validate();
 	    $.initializeExamples();
         return $;
 	}
 
-    public void run(TestClass testClass, RunNotifier notifier) {
+    public void run(ExampleClass testClass, RunNotifier notifier) {
 	    anyHasBeenRun = true;
 		for (Example e : this.getExamples()) {
 			if (testClass.contains(e)) {
@@ -104,7 +107,7 @@ public class ExampleGraph {
         
     public Runner newJExampleRunner(Class<?> c) {
         try {
-            TestClass test = this.add(c);
+            ExampleClass test = this.add(c);
             return new JExample(test);
         } 
         catch (JExampleError err) { 

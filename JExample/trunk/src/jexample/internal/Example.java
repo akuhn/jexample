@@ -196,7 +196,7 @@ public class Example {
     private Object newTestClassInstance() throws NoSuchMethodException,
             InstantiationException, IllegalAccessException,
             InvocationTargetException {
-        return TestClass.getConstructor(jmethod.getDeclaringClass()).newInstance();
+        return ExampleClass.getConstructor(jmethod.getDeclaringClass()).newInstance();
     }
 
 

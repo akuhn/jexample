@@ -27,13 +27,6 @@ public class DependsParser {
 	}
 
 
-	/**
-	 * Name and arguments of the providers defined in <code>value</code> are extracted and used
-	 * to get the {@link Method} objects from which the specified dependent method depends.
-	 * 
-	 * @param value String value of the {@link Depends} annotation.
-	 * @return list of all provider methods.
-	 */
 	public Method[] collectProviderMethods(String value)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		LinkedList<Method> $ = new LinkedList<Method>();

@@ -13,7 +13,7 @@ import jexample.JExample;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith( JExample.class )
+@RunWith(JExample.class)
 public class ListTest {
 
     @Test
@@ -25,7 +25,7 @@ public class ListTest {
     }
     
     @Test
-    @Depends("empty")
+    @Depends("#empty")
     public List withValue(List $) {
         $.add("Lorem");
         assertFalse($.isEmpty());
@@ -34,7 +34,7 @@ public class ListTest {
     }
 
     @Test
-    @Depends("withValue")
+    @Depends("#withValue")
     public List withMoreValues(List $) {
         $.add("Ipsum");
         $.add("Dolor");

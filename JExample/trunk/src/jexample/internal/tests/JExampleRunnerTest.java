@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExample;
 import jexample.internal.Example;
+import jexample.internal.ExampleClass;
 import jexample.internal.ExampleGraph;
 import jexample.internal.JExampleError;
 import jexample.internal.JExampleError.Kind;
@@ -456,6 +457,15 @@ public class JExampleRunnerTest {
         assertEquals( 2, result.getFailureCount() );
         assertEquals( 0, result.getIgnoreCount() );
         assertEquals( 2, result.getRunCount() );
+    }
+    
+    @Test
+    public void exampleClassesAreUnique() throws JExampleError {
+        ExampleGraph g = new ExampleGraph();
+        ExampleClass aaa = g.add( StackTest.class );
+        ExampleClass bbb = g.add( StackTest.class );
+        
+        assertSame(aaa, bbb);
     }
     
 	
