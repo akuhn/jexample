@@ -8,7 +8,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
 import jexample.internal.InvalidExampleError;
@@ -31,7 +31,7 @@ import org.junit.runner.manipulation.NoTestsRemainException;
  */
 public class JExampleRunnerTest {
 
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class CycleMethods {
 
 		public CycleMethods() {
@@ -58,13 +58,13 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void cycleMethods() {
-		Result result = runJExampleTestCase( CycleMethods.class );
+		Result result = JExample.run( CycleMethods.class );
 		assertEquals( 1, result.getFailureCount() );
 		InvalidExampleError $ = (InvalidExampleError) result.getFailures().get(0).getException();
 		assertEquals(Kind.RECURSIVE_DEPENDENCIES, $.kind);
 	}
 
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class SkipMethods {
 
 		public SkipMethods() {
@@ -99,48 +99,13 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void skipMethods() {
-		Result result = runJExampleTestCase( SkipMethods.class );
+		Result result = JExample.run( SkipMethods.class );
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( 2, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
 	}
 
-	@RunWith( JExampleRunner.class )
-	private static class BadDependencies {
-
-		public BadDependencies() {
-		}
-
-		public void firstMethod() {
-			assertTrue( true );
-		}
-
-		@Test
-		@Depends( "firstMethod" )
-		public void secondMethod() {
-			assertTrue( false );
-		}
-
-		@Test
-		@Depends( "secondMethod" )
-		public void thirdMethod() {
-			assertTrue( true );
-		}
-	}
-
-	@Test
-	public void badDependencies() {
-		Result result = runJExampleTestCase( BadDependencies.class );
-		assertEquals( 1, result.getFailureCount() );
-		assertEquals( 1, result.getRunCount() );
-		//assertEquals( "Dependency firstMethod is not a test method.", result.getFailures().get( 0 ).getMessage() );
-	}
-
-	private Result runJExampleTestCase(Class<?>... classes) {
-        return new JUnitCore().run(new ExampleGraph().newJExampleRunner(classes));
-    }
-
-    @RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class GoodTest {
 		public GoodTest() {
 		}
@@ -165,13 +130,13 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void testGoodTest() {
-	    Result result = runJExampleTestCase(GoodTest.class);
+	    Result result = JExample.run(GoodTest.class);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class FirstGoodTest {
 		public FirstGoodTest() {
 		}
@@ -188,7 +153,7 @@ public class JExampleRunnerTest {
 		}
 	}
 
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class SecondGoodTest {
 		public SecondGoodTest() {
 		}
@@ -202,56 +167,15 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void testGoodTests() {
-		Result result = runJExampleTestCase( FirstGoodTest.class, SecondGoodTest.class );
+		Result result = JExample.run( FirstGoodTest.class, SecondGoodTest.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( JExampleRunner.class )
-	private static class FirstBadTest {
-		public FirstBadTest() {
-		}
 
-		@Test
-		public void firstMethod() {
 
-		}
-
-		@Test
-		@Depends( "ComposedTestRunnerTest$SecondBadTest.secondMethod" )
-		public void secondMethod() {
-			assertTrue( true );
-		}
-
-		@Test
-		@Depends( "secondMethod" )
-		public void thirdMethod() {
-			assertTrue( true );
-		}
-	}
-
-	@RunWith( JExampleRunner.class )
-	private static class SecondBadTest {
-		public SecondBadTest() {
-		}
-
-		@Test
-		@Depends( "ComposedTestRunnerTest$FirstBadTest.secondMethod" )
-		public void secondMethod() {
-			assertTrue( true );
-		}
-	}
-
-	@Test
-	public void testBadTests() {
-		Result result = runJExampleTestCase( FirstBadTest.class );
-		assertEquals( 1, result.getFailureCount() );
-		assertEquals( 0, result.getIgnoreCount() );
-		assertEquals( 1, result.getRunCount() );
-	}
-
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class WithAttributes {
 		public WithAttributes() {
 
@@ -296,13 +220,13 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void testWithAttributes() {
-		Result result = runJExampleTestCase( WithAttributes.class );
+		Result result = JExample.run( WithAttributes.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 6, result.getRunCount() );
 	}
 
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class DependsOnBeforeTest {
 
 		public DependsOnBeforeTest() {
@@ -329,13 +253,13 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void testDependsOnBefore() {
-		Result result = runJExampleTestCase( DependsOnBeforeTest.class );
+		Result result = JExample.run( DependsOnBeforeTest.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class CloneRetVal {
 
 		public CloneRetVal() {
@@ -376,13 +300,13 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void testCloneRetVal() {
-		Result result = runJExampleTestCase( CloneRetVal.class );
+		Result result = JExample.run( CloneRetVal.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
 	}
 	
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	private static class NotCloneRetVal {
 
 		private static NoClone rootClone, secondClone;
@@ -442,7 +366,7 @@ public class JExampleRunnerTest {
 
 	@Test
 	public void testNotCloneRetVal() {
-		Result result = runJExampleTestCase( NotCloneRetVal.class );
+		Result result = JExample.run( NotCloneRetVal.class );
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 4, result.getRunCount() );
@@ -480,7 +404,7 @@ public class JExampleRunnerTest {
 	    };
 	}
 	
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	static class A_fail {
 	    @Test( expected = Exception.class )
 	    public void fail() {
@@ -490,11 +414,56 @@ public class JExampleRunnerTest {
 	
 	@Test
 	public void unexpectedException() {
-	    Result $ = runJExampleTestCase( A_fail.class );
+	    Result $ = JExample.run( A_fail.class );
 	    assertEquals(1, $.getRunCount());
 	    assertEquals(false, $.wasSuccessful());
 	    assertEquals(1, $.getFailureCount());
 	    assertTrue($.getFailures().get(0).getMessage()
 	            .startsWith("Unexpected exception, expected"));
 	}
+	
+    @RunWith( JExample.class )
+    private static class B_fail {
+        public void missingAnnotation() { }
+        @Test
+        @Depends("#missingAnnotation")
+        public void provider() { }
+        @Test
+        @Depends("#provider" )
+        public void consumer() { }
+    }
+
+    @Test
+    public void dependsOnNonTestMethodFails() {
+        Result result = JExample.run( B_fail.class );
+        assertEquals( false, result.wasSuccessful() );
+        assertEquals( 2, result.getRunCount() );
+        assertEquals( 2, result.getFailureCount() );
+    }
+
+    @RunWith( JExample.class )
+    private static class C_fail {
+        @Test
+        @Depends( "D#test" )
+        public void test() {
+            assertTrue( true );
+        }
+    }
+
+    @RunWith( JExample.class )
+    private static class D_fail {
+        @Test
+        @Depends( "C#test" )
+        public void test() { }
+    }
+
+    @Test
+    public void testBadTests() {
+        Result result = JExample.run( D_fail.class, C_fail.class );
+        assertEquals( 2, result.getFailureCount() );
+        assertEquals( 0, result.getIgnoreCount() );
+        assertEquals( 2, result.getRunCount() );
+    }
+    
+	
 }

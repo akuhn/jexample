@@ -2,7 +2,7 @@ package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
 
@@ -19,7 +19,7 @@ public class ExampleGraphAddTest {
         g = new ExampleGraph();
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class A {
         @Test
         public void t() { }
@@ -37,7 +37,7 @@ public class ExampleGraphAddTest {
                 g.getExamples().iterator().next().jmethod);
     }
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class B extends A {
         @Override
         @Test
@@ -56,7 +56,7 @@ public class ExampleGraphAddTest {
                 g.getExamples().iterator().next().jmethod);
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class C {
         @Test
         public Object provider() { return 42; }

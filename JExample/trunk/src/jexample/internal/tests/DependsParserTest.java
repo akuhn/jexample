@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.Method;
 
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.DependsParser;
 
 import org.junit.Before;
@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
  */
 public class DependsParserTest {
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class A {
         @Test public void unique() { }
         @Test public void test() { }
@@ -185,7 +185,7 @@ public class DependsParserTest {
     }
 	
 	
-	@RunWith( JExampleRunner.class )
+	@RunWith( JExample.class )
 	static class B {
 
 	    @Test public void otherTest() {

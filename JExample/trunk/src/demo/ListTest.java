@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith( JExampleRunner.class )
+@RunWith( JExample.class )
 public class ListTest {
 
     @Test

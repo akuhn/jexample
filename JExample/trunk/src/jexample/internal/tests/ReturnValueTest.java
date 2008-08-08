@@ -2,7 +2,7 @@ package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
 
@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 public class ReturnValueTest {
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class Null {
         @Test
         public Object returnNull() {

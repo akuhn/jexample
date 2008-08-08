@@ -5,7 +5,7 @@ package jexample.internal.tests;
 
 import java.lang.reflect.Method;
 
-import jexample.JExampleRunner;
+import jexample.JExample;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -87,7 +87,7 @@ public class ExampleValidateTest {
 //		assertEquals( 1, this.validator.dependencyIsValid( this.returnsInt, this.returnsInt ).size() );
 	}
 
-	@RunWith(JExampleRunner.class)
+	@RunWith(JExample.class)
 	private class TestTestClass {
 
 		@Test

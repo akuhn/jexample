@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Stack;
 
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(JExampleRunner.class)
+@RunWith(JExample.class)
 public class StackTest {
 
 	@Test

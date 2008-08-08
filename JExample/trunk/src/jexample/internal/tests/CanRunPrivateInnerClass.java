@@ -1,7 +1,7 @@
 package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 
 public class CanRunPrivateInnerClass {
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class PrivateInnerClass {
         @Test public void success() { }
     }

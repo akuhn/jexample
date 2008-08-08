@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
 import jexample.internal.InvalidExampleError;
@@ -29,7 +29,7 @@ public class DependenciesTest {
         
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class C {
         @Test
         public B empty() {
@@ -72,7 +72,7 @@ public class DependenciesTest {
         assertNotSame( e.returnValue, t.returnValue );
     }
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class D {
         @Test
         public B empty() {
@@ -111,7 +111,7 @@ public class DependenciesTest {
         assertEquals( b, a.providers.iterator().next() );
     }
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class E_fail {
         @Test
         public A empty() {
@@ -124,7 +124,7 @@ public class DependenciesTest {
         }
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class F extends D {
         @Test
         public B another() {
@@ -139,17 +139,15 @@ public class DependenciesTest {
     }
     
     @Test
-    public void testParameterNotAssignableFromProvider() throws Exception {
-        try {
-            ExampleGraph $ = new ExampleGraph();
-            $.add( E_fail.class );
-            fail("InitializationError expected!");
-        }
-        catch (InitializationError ex) {
-            assertEquals(1, ex.getCauses().size());
-            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
-            assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, $.kind);
-        }
+    public void testParameterNotAssignableFromProvider() {
+        Result r = JExample.run( E_fail.class );
+        assertEquals( false, r.wasSuccessful() );
+        assertEquals( 2, r.getRunCount() );
+        assertEquals( 1, r.getFailureCount() );
+        InitializationError $ = (InitializationError) r.getFailures().get(0).getException();
+        assertEquals( 1, $.getCauses().size() );
+        InvalidExampleError ex = (InvalidExampleError) $.getCauses().get(0);
+        assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, ex.kind);
     }
     
     @Test
@@ -174,7 +172,7 @@ public class DependenciesTest {
         assertEquals( b, a.providers.iterator().next() );
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class G {
         @Test( expected = Exception.class )
         public Object provider() throws Exception {
@@ -189,19 +187,17 @@ public class DependenciesTest {
     
     @Test
     public void providerMustNotExpectException() {
-        try {
-            ExampleGraph $ = new ExampleGraph();
-            $.add( G.class );
-            fail("InitializationError expected!");
-        }
-        catch (InitializationError ex) {
-            assertEquals(1, ex.getCauses().size());
-            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
-            assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, $.kind);
-        }
+        Result r = JExample.run( G.class );
+        assertEquals( false, r.wasSuccessful() );
+        assertEquals( 2, r.getRunCount() );
+        assertEquals( 1, r.getFailureCount() );
+        InitializationError $ = (InitializationError) r.getFailures().get(0).getException();
+        assertEquals( 1, $.getCauses().size() );
+        InvalidExampleError ex = (InvalidExampleError) $.getCauses().get(0);
+        assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, ex.kind);
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     static class H {
         @Test
         public Object provider() {
@@ -216,16 +212,14 @@ public class DependenciesTest {
 
     @Test
     public void lesProvidersThanParameters() {
-        try {
-            ExampleGraph $ = new ExampleGraph();
-            $.add( H.class );
-            fail("InitializationError expected!");
-        }
-        catch (InitializationError ex) {
-            assertEquals(1, ex.getCauses().size());
-            InvalidExampleError $ = (InvalidExampleError) ex.getCauses().get(0);
-            assertEquals(Kind.MISSING_PROVIDERS, $.kind);
-        }
+        Result r = JExample.run( H.class );
+        assertEquals( false, r.wasSuccessful() );
+        assertEquals( 2, r.getRunCount() );
+        assertEquals( 1, r.getFailureCount() );
+        InitializationError $ = (InitializationError) r.getFailures().get(0).getException();
+        assertEquals( 1, $.getCauses().size() );
+        InvalidExampleError ex = (InvalidExampleError) $.getCauses().get(0);
+        assertEquals(Kind.MISSING_PROVIDERS, ex.kind);
     }
     
 }

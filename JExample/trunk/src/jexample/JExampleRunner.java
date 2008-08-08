@@ -1,51 +1,17 @@
 package jexample;
 
-import jexample.internal.ExampleGraph;
 import jexample.internal.TestClass;
 
 import org.junit.internal.runners.InitializationError;
-import org.junit.runner.Description;
-import org.junit.runner.Runner;
-import org.junit.runner.manipulation.Filter;
-import org.junit.runner.manipulation.Filterable;
-import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.notification.RunNotifier;
 
+public class JExampleRunner extends JExample {
 
-/**
- * Runs JExample tests. Delegates all logic to the singleton {@link ExampleGraph}. Assumes
- * that clients first create an instance for each classes under test, and only when all
- * instances are created start calling {@link #run(RunNotifier)} on any of these instances. Current versions
- * of JUnit's eclipse plug-in do so (as of Eclipse 3.4 and JUnit 4.4).
- *  
- * @author Lea Haensenberger 
- * @author Adrian Kuhn
- * 
- */
-public class JExampleRunner extends Runner implements Filterable {
-
-	private final TestClass testCase;
-	
 	public JExampleRunner(Class<?> testClass) throws InitializationError {
-		this.testCase = ExampleGraph.instance().add(testClass);
+		super(testClass);
 	}
 	
 	public JExampleRunner(TestClass testCase) {
-	    this.testCase = testCase;
+	    super(testCase);
 	}
-	
-	@Override
-	public Description getDescription() {
-	    return testCase.getDescription();
-	}
-
-	@Override
-	public void run( RunNotifier notifier ) {
-	    testCase.run(notifier);
-	}
-
-    public void filter(Filter filter) throws NoTestsRemainException {
-        testCase.filter(filter);
-    }
 
 }

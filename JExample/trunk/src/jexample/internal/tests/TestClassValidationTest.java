@@ -2,7 +2,7 @@ package jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.ExampleGraph;
 import jexample.internal.InvalidExampleError;
 import jexample.internal.InvalidExampleError.Kind;
@@ -18,13 +18,13 @@ public class TestClassValidationTest {
         @Test public void test() { }
     }
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class B {
         public B(Object... args) { }
         @Test public void test() { }
     }
 
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     private static class C {
         // no example methods
     }

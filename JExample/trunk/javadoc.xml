@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="javadoc">
-    <target name="javadoc">
-        <javadoc access="public" author="true" classpath="lib/commons-collections-3.2.jar:lib/jung-1.7.5.jar:lib/concurrent.jar:hamcrest-core-1.1.jar:/home/lea/tarz/eclipse/plugins/org.junit4_4.3.1/junit.jar:jmock-2.2.0-RC1.jar:cglib-nodep-2.2_beta1.jar:objenesis-1.0.jar" destdir="javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="extension.annotations,extension" source="1.6" sourcepath="UllmanOriginal:src" splitindex="true" use="true" version="true"/>
-    </target>
-</project>

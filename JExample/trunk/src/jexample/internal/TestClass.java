@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class TestClass {
 
     public TestClass validate() {
         RunWith run = javaClass.getAnnotation(RunWith.class);
-        if (run == null || run.value() != JExampleRunner.class ) {
+        if (run == null || run.value() != JExample.class ) {
             graph.throwNewError(Kind.MISSING_RUNWITH_ANNOTATION,
                     "Class %s is not a JExample test class, annotation @RunWith(JExampleRunner.class) missing.", this);
         }

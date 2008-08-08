@@ -3,7 +3,7 @@ package jexample.internal.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import jexample.Depends;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.ExampleGraph;
 import jexample.internal.InvalidExampleError;
 import jexample.internal.InvalidExampleError.Kind;
@@ -59,7 +59,7 @@ public class ExampleGraphTest {
         }
 	}
 
-	@RunWith(JExampleRunner.class)
+	@RunWith(JExample.class)
 	static private class OneClass {
 
 		public OneClass() {
@@ -84,7 +84,7 @@ public class ExampleGraphTest {
 		}
 	}
 
-    @RunWith(JExampleRunner.class)
+    @RunWith(JExample.class)
 	private static class Cyclic {
 		public Cyclic() {
 

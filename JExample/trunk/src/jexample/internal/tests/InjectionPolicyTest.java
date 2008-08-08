@@ -4,7 +4,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.InjectionPolicy;
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class InjectionPolicyTest {
         
     }
     
-    @RunWith( JExampleRunner.class )
+    @RunWith( JExample.class )
     @InjectionPolicy( keep = true )
     private static class B {
         

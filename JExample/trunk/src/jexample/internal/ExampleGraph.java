@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jexample.JExampleRunner;
+import jexample.JExample;
 import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.internal.runners.CompositeRunner;
@@ -170,7 +170,7 @@ public class ExampleGraph {
     public Runner newJExampleRunner(Class<?> c) {
         try {
             TestClass test = this.add(c);
-            return new JExampleRunner(test);
+            return new JExample(test);
         } 
         catch (InitializationError err) { 
             return Request.errorReport(c, err).getRunner();

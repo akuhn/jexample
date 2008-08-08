@@ -2,7 +2,11 @@ package jexample.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import jexample.Depends;
 import jexample.InjectionPolicy;
@@ -10,6 +14,7 @@ import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -28,7 +33,7 @@ import org.junit.runner.notification.RunNotifier;
  * <p>
  * An example method must have at least a {@link org.junit.Test @Test} annotation.
  * The enclosing class must use an {@link org.junit.RunWith @RunWith} annotation
- * to declare {@link jexample.JExampleRunner JExampleRunner} as test runner.
+ * to declare {@link jexample.JExample JExampleRunner} as test runner.
  * <p>
  * An example method may return an instance of its unit under test.
  * <p>
@@ -51,7 +56,8 @@ public class Example {
     public final Method jmethod;
     public final Dependencies providers;
     
-	private final ExampleGraph context;
+    private List<Throwable> validationError;
+	//private final ExampleGraph context;
     private TestResult result;
     private InjectionPolicy policy;
 
@@ -61,13 +67,26 @@ public class Example {
 	    jmethod.setAccessible(true);
         this.jmethod = jmethod;
         this.providers = new Dependencies();
-        this.result = TestResult.NOT_YET_RUN;
+        this.result = TestResult.VIRGIN;
         this.description = Description.createTestDescription(jmethod.getDeclaringClass(), jmethod.getName());
-        this.context = graph;
+        //this.context = graph;
         this.returnValue = new ReturnValue(this);
         this.policy = jmethod.getDeclaringClass().getAnnotation(InjectionPolicy.class);
+        this.validationError = null;
     }
 
+	
+	private void error(Kind kind, String message, Object... args) {
+	    if (validationError == null) validationError = new LinkedList();
+	    validationError.add(new InvalidExampleError(kind, message, args));
+	}
+	
+    private void error(Kind kind, Throwable cause) {
+        if (validationError == null) validationError = new LinkedList();
+        validationError.add(new InvalidExampleError(kind, cause, cause.getMessage()));
+    }
+	
+	
 
 	public Method[] collectDependencies() {
         Depends a = jmethod.getAnnotation( Depends.class );
@@ -76,13 +95,13 @@ public class Example {
                 DependsParser p = new DependsParser(jmethod.getDeclaringClass());
                 return p.collectProviderMethods(a.value());
             } catch (InvalidDeclarationError ex) {
-                context.throwNewError(Kind.INVALID_DEPENDS_DECLARATION, ex);
+                error(Kind.INVALID_DEPENDS_DECLARATION, ex);
             } catch (SecurityException ex) {
-                context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
+                error(Kind.PROVIDER_NOT_FOUND, ex);
             } catch (ClassNotFoundException ex) {
-                context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
+                error(Kind.PROVIDER_NOT_FOUND, ex);
             } catch (NoSuchMethodException ex) {
-                context.throwNewError(Kind.PROVIDER_NOT_FOUND, ex);
+                error(Kind.PROVIDER_NOT_FOUND, ex);
             }
         }
         return new Method[0];
@@ -102,7 +121,7 @@ public class Example {
 
 
 	private boolean hasBeenRun() {
-		return result != TestResult.NOT_YET_RUN;
+		return result != TestResult.VIRGIN;
 	}
 
 	public boolean wasSuccessful() {
@@ -162,6 +181,12 @@ public class Example {
 	 */
 	public void run(RunNotifier notifier) {
 		if (this.hasBeenRun()) return;
+		if (validationError != null) {
+		    notifier.fireTestStarted(description);
+		    notifier.fireTestFailure(new Failure(description, new InitializationError(validationError)));
+		    notifier.fireTestFinished(description);
+		    return;
+		}
 		boolean allParentsGreen = true;
 		for (Example dependency : this.providers) {
 			dependency.run(notifier);
@@ -196,12 +221,12 @@ public class Example {
 
     public void validate() {
         if (!jmethod.isAnnotationPresent(Test.class)) {
-            context.throwNewError(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.", toString());
+            error(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.", toString());
         }
         int d = providers.size();
         int p = arity();
         if (p > d) {
-            context.throwNewError(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p, d);
+            error(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p, d);
         }
         else {
             validateDependencyTypes();
@@ -216,12 +241,12 @@ public class Example {
             Example tm = tms.next();
             Class<?> r = tm.jmethod.getReturnType();
             if (!t.isAssignableFrom(r)) {
-                context.throwNewError(Kind.PARAMETER_NOT_ASSIGNABLE,
+                error(Kind.PARAMETER_NOT_ASSIGNABLE,
                         "Parameter #%d in (%s) is not assignable from depedency (%s).",
                         position, jmethod, tm.jmethod);
             }
             if (tm.expectsException()) {
-                context.throwNewError(Kind.PROVIDER_EXPECTS_EXCEPTION,
+                error(Kind.PROVIDER_EXPECTS_EXCEPTION,
                         "(%s): invalid dependency (%s), provider must not expect exception.", jmethod, tm.jmethod);
             }
             position++;
@@ -236,5 +261,5 @@ public class Example {
  * @author Lea Haensenberger
  */
 enum TestResult {
-	GREEN, NOT_YET_RUN, RED, WHITE
+	GREEN, VIRGIN, RED, WHITE
 }
