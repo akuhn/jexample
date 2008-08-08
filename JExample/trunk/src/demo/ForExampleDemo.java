@@ -7,11 +7,11 @@ import jexample.internal.tests.StackTest;
 
 public class ForExampleDemo {
 
-	public static void main(String[] args) {
+	public static void main(String... args) {
+
+	    Stack stack = For.example(StackTest.class, "withManyValues");
 		
-		Stack stack = For.example(StackTest.class, "withValue");
-		
-		System.out.println(stack);
+	    System.out.println(stack);
 		
 	}
 	

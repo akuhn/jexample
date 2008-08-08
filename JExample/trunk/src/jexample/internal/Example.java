@@ -3,11 +3,9 @@ package jexample.internal;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import jexample.Depends;
 import jexample.InjectionPolicy;
@@ -106,6 +104,9 @@ public class Example {
 		return result != TestResult.NOT_YET_RUN;
 	}
 
+	public boolean wasSuccessful() {
+	    return result == TestResult.GREEN;
+	}
 	
 	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);

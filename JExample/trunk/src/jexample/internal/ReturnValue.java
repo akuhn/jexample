@@ -49,6 +49,10 @@ public class ReturnValue {
         }
     }
     
+    public Object getValue() {
+        return returnValue;
+    }
+    
     public Object get(InjectionPolicy policy) throws Exception {
         if (returnValue == null) return null;
         if (isCloneable()) return getClone();

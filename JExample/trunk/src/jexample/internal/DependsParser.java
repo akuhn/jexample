@@ -60,24 +60,24 @@ public class DependsParser {
 
 
 	private Class<?> getProviderClass(Token token) throws ClassNotFoundException {
-		if (token.className == null) {
+		if (token.path == null) {
 			return testClass;
 		}
-		else if (!token.className.contains(".")) {
-			String fullName = testClass.getPackage().getName() + "." + token.className;
+		else if (!token.path.contains(".")) {
+			String fullName = testClass.getPackage().getName() + "." + token.path;
 			return Class.forName(fullName);
 		}
 		else {
-			return Class.forName(token.className);
+			return Class.forName(token.path);
 		}
 	}
 
 	private Method getProviderMethod(Class receiver, Token token)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
-		if (token.parameterNames == null) {
+		if (token.args == null) {
 			Method found = null;
 			for (Method m : receiver.getMethods()) { 
-				if (m.getName().equals(token.methodName)) {
+				if (m.getName().equals(token.simple)) {
 					 if (found != null) throw new NoSuchMethodException(
 							 "Ambigous depedency, please specify parameters: "
 							 + receiver.getName() + "." + m.getName());
@@ -87,7 +87,7 @@ public class DependsParser {
 			return found;
 		}
 		else {
-			return receiver.getMethod(token.methodName, this.getParameterClasses(token.parameterNames));
+			return receiver.getMethod(token.simple, this.getParameterClasses(token.args));
 		}
 	}
 	

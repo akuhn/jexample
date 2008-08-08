@@ -1,112 +1,136 @@
 package jexample.internal;
 
-import java.nio.CharBuffer;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static java.lang.Character.isJavaIdentifierPart;
+import static java.lang.Character.isJavaIdentifierStart;
+import static java.lang.Character.isWhitespace;
 
-/** Breaks a dependency expression into tokens. The grammar of dependency expressions is
+import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/** Breaks a dependency declaration into tokens. The grammar of dependency declarations is
  * <pre>
- *root = tokenlist
- *tokenlist = ( tokenlist ";" )? token
- *token = ( class "." )? method ( "(" paramlist ")" )?
- *paramlist = ( paramlist "," )? param
- *param = FULLNAME
- *class = FULLNAME
- *method = NAME
+ *Declaration = Tokenlist
+ *Tokenlist = ( Tokenlist ( ";" | "," ) ) ? Token
+ *Token = ( Class "." ) ? Method ( "(" Paramlist ")" ) ?
+ *Paramlist = ( Paramlist "," ) ? Param
+ *Param = FULLNAME
+ *Class = FULLNAME
+ *Method = NAME
  *
- *NAME = [$A-Za-z][$A-Za-z0-9]*
+ *NAME = [{@linkplain Character#isJavaIdentifierStart(char)}] [{@linkplain Character#isJavaIdentifierPart(char)}] *
  *FULLNAME = ( FULLNAME "." ) ? NAME
  *</pre>
  *
- * @author Adrian Kuhn (akuhn at iam.unibe.ch)
+ * @author Adrian Kuhn
  *
  */
 public class DependsScanner {
 
 	public static class Token {
-		public final String className;
-		public final String methodName;
-		public final String[] parameterNames;
-		public Token(String className, String methodName, String[] parameterNames) {
-			this.className = className;
-			this.methodName = methodName;
-			this.parameterNames = parameterNames;
+		public final String path;
+		public final String simple;
+		public final String[] args;
+		public Token(String full, String[] args) {
+		    int n = full.lastIndexOf('.');
+			this.path = n < 0 ? null : full.substring(0, n);
+			this.simple = n < 0 ? full : full.substring(n + 1);
+			this.args = args;
 		}
+        @Override
+        public String toString() {
+            return String.format("[%s,%s,%s]", path, simple,
+                    args == null ? null : Arrays.asList(args));
+        }
 		
 	}
 	
-	private static final Pattern CLASS_NAME =
-			Pattern.compile("([$A-Za-z][$A-Za-z0-9]*\\.)+");
-	private static final Pattern METHOD_NAME =
-			Pattern.compile("[$A-Za-z][$A-Za-z0-9]*");
-	private static final Pattern PARAMETER =
-			Pattern.compile("[$A-Za-z][$A-Za-z0-9]*(\\.[$A-Za-z][$A-Za-z0-9]*)*");
+	private String scanFullname() {
+        buf.mark();
+        while (true) {
+            if (!buf.hasRemaining()) return null;
+            if (!isJavaIdentifierStart(buf.charAt(0))) return null;
+            buf.get();
+            while (buf.hasRemaining() && isJavaIdentifierPart(buf.charAt(0))) buf.get();
+            if (!(buf.hasRemaining() && buf.charAt(0) == '.')) break;
+            buf.get();
+        }
+        return yank();
+	}
+	
+	private String[] scanParamlist() {
+	    ArrayList<String> $ = new ArrayList();
+	    while (true) {
+	        String param = scanFullname();
+	        if (param == null) return null;
+	        $.add(param);
+            skipWhitespace();
+	        if (!(buf.hasRemaining() && buf.charAt(0) == ',')) break;
+	        buf.get();
+	        skipWhitespace();
+	    }
+	    return $.toArray(new String[$.size()]);
+	}
+	
+	private Token scanMethodHandle() {
+        String[] names = null;
+	    String fullname = scanFullname();
+	    if (fullname == null) return null;
+        skipWhitespace();
+        if (buf.hasRemaining() && buf.charAt(0) == '(') {
+            buf.get();
+            skipWhitespace();
+            names = scanParamlist();
+            if (!(buf.hasRemaining() && buf.charAt(0) == ')')) throw error();
+            buf.get();
+            if (names == null) names = new String[0];
+        }
+        return new Token(fullname, names);
+	}
+	
+	private IllegalDeclaration error() {
+	    return new IllegalDeclaration(buf);
+    }
 
+    private Token[] scanDeclaration() {
+	    ArrayList<Token> $ = new ArrayList();
+	    skipWhitespace();
+	    while (true) {
+	        Token t = scanMethodHandle();
+	        if (t == null) break;
+	        $.add(t);
+	        skipWhitespace();
+	        if (!buf.hasRemaining()) break;
+	        char ch = buf.charAt(0);
+	        if (ch != ';' && ch != ',') throw error();
+	        buf.get();
+	        skipWhitespace();
+	    }
+	    if (buf.hasRemaining()) throw error();
+	    return $.toArray(new Token[$.size()]);
+	}
+
+    private void skipWhitespace() {
+        while (buf.hasRemaining() && isWhitespace(buf.charAt(0))) buf.get();
+    }
+
+    private String yank() {
+        int pos = buf.position();
+	    buf.reset();
+	    String $ = buf.subSequence(0, pos - buf.position()).toString();
+	    buf.position(pos);
+	    return $;
+    }
+	
 	private CharBuffer buf;
-	private LinkedList<Token> tokens;
 	
 	private DependsScanner(String string) {
 		buf = CharBuffer.wrap(string);
-		tokens = new LinkedList<Token>();
 	}
 	
 	public static Token[] scan(String string) {
-		DependsScanner scanner = new DependsScanner(string);
-		scanner.scanRoot();
-		return scanner.tokens.toArray(new Token[0]);
-	}
-	
-	private void scanRoot() {
-		while (buf.hasRemaining()) {
-			tokens.add(scanDepedency());
-		}
-	}
-
-	private Token scanDepedency() {
-		String className = scanClassName();
-		String methodName = scanMethodName();
-		String[] parameters = scanParameters();
-		if (buf.hasRemaining() && buf.charAt(0) == ';') buf.get();
-		return new Token(className, methodName, parameters);
-	}
-
-	private String[] scanParameters() {
-		if (buf.hasRemaining() && buf.charAt(0) == '(') {
-			Collection<String> params = new LinkedList<String>();
-			buf.get(); // consume '('
-			while (buf.charAt(0) != ')') {
-				Matcher m = PARAMETER.matcher(buf);
-				if (!m.lookingAt()) 
-					throw new IllegalArgumentException();
-				params.add(m.group());
-				buf.position(buf.position() + m.end());
-				if (buf.charAt(0) == ',') buf.get();
-			}
-			buf.get(); // consume ')'
-			return params.toArray(new String[0]);
-		}
-		return null;
-	}
-
-	private String scanMethodName() {
-		Matcher m = METHOD_NAME.matcher(buf);
-		if (!m.lookingAt())
-			throw new IllegalArgumentException(buf.toString());
-		String name = m.group();
-		buf.position(buf.position() + m.end());
-		return name; 
-	}
-
-	private String scanClassName() {
-		Matcher m = CLASS_NAME.matcher(buf);
-		String name = null;
-		if (m.lookingAt()) {
-			name = buf.subSequence(m.start(), m.end() - 1).toString();
-			buf.position(buf.position() + m.end());
-		}
-		return name;
+		DependsScanner $ = new DependsScanner(string);
+		return $.scanDeclaration();
 	}
 	
 }
