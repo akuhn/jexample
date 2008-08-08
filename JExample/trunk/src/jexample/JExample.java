@@ -1,9 +1,9 @@
 package jexample;
 
 import jexample.internal.ExampleGraph;
+import jexample.internal.JExampleError;
 import jexample.internal.TestClass;
 
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -28,7 +28,7 @@ public class JExample extends Runner implements Filterable {
 
 	private final TestClass testCase;
 	
-	public JExample(Class<?> testClass) throws InitializationError {
+	public JExample(Class<?> testClass) throws JExampleError {
 		this.testCase = ExampleGraph.instance().add(testClass);
 	}
 	

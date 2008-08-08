@@ -1,6 +1,6 @@
 package demo;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import jexample.JExample;
 
 import org.junit.Test;

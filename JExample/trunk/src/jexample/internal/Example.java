@@ -3,16 +3,14 @@ package jexample.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Stack;
 
 import jexample.Depends;
 import jexample.InjectionPolicy;
-import jexample.internal.InvalidExampleError.Kind;
+import jexample.internal.JExampleError.Kind;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -54,38 +52,24 @@ public class Example {
     public final Method jmethod;
     public final Dependencies providers;
     
-    private List<Throwable> validationError;
-	//private final ExampleGraph context;
+    private JExampleError errors;
     private TestResult result;
     private InjectionPolicy policy;
 
     
-	public Example(Method jmethod, ExampleGraph graph) {
-	    assert jmethod != null && graph != null;
+	public Example(Method jmethod) {
+	    assert jmethod != null;
 	    jmethod.setAccessible(true);
         this.jmethod = jmethod;
         this.providers = new Dependencies();
         this.result = TestResult.VIRGIN;
         this.description = Description.createTestDescription(jmethod.getDeclaringClass(), jmethod.getName());
-        //this.context = graph;
         this.returnValue = new ReturnValue(this);
         this.policy = jmethod.getDeclaringClass().getAnnotation(InjectionPolicy.class);
-        this.validationError = null;
+        this.errors = new JExampleError();
     }
 
 	
-	private void error(Kind kind, String message, Object... args) {
-	    if (validationError == null) validationError = new LinkedList();
-	    validationError.add(new InvalidExampleError(kind, message, args));
-	}
-	
-    private void error(Kind kind, Throwable cause) {
-        if (validationError == null) validationError = new LinkedList();
-        validationError.add(new InvalidExampleError(kind, cause, cause.getMessage()));
-    }
-	
-	
-
 	public Method[] collectDependencies() {
         Depends a = jmethod.getAnnotation( Depends.class );
         if (a != null) {
@@ -93,13 +77,13 @@ public class Example {
                 DependsParser p = new DependsParser(jmethod.getDeclaringClass());
                 return p.collectProviderMethods(a.value());
             } catch (InvalidDeclarationError ex) {
-                error(Kind.INVALID_DEPENDS_DECLARATION, ex);
+                errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
             } catch (SecurityException ex) {
-                error(Kind.PROVIDER_NOT_FOUND, ex);
+                errors.add(Kind.PROVIDER_NOT_FOUND, ex);
             } catch (ClassNotFoundException ex) {
-                error(Kind.PROVIDER_NOT_FOUND, ex);
+                errors.add(Kind.PROVIDER_NOT_FOUND, ex);
             } catch (NoSuchMethodException ex) {
-                error(Kind.PROVIDER_NOT_FOUND, ex);
+                errors.add(Kind.PROVIDER_NOT_FOUND, ex);
             }
         }
         return new Method[0];
@@ -179,9 +163,9 @@ public class Example {
 	 */
 	public void run(RunNotifier notifier) {
 		if (this.hasBeenRun()) return;
-		if (validationError != null) {
+		if (!errors.isEmpty()) {
 		    notifier.fireTestStarted(description);
-		    notifier.fireTestFailure(new Failure(description, new InitializationError(validationError)));
+		    notifier.fireTestFailure(new Failure(description, errors));
 		    notifier.fireTestFinished(description);
 		    return;
 		}
@@ -219,16 +203,19 @@ public class Example {
 
     public void validate() {
         if (!jmethod.isAnnotationPresent(Test.class)) {
-            error(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.", toString());
+            errors.add(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.", toString());
         }
         int d = providers.size();
         int p = arity();
         if (p > d) {
-            error(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p, d);
+            errors.add(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p, d);
         }
         else {
             validateDependencyTypes();
         }
+        //if (providers.transitiveClosure().contains(this)) {
+        //    errors.add(Kind.RECURSIVE_DEPENDENCIES, "Recursive dependency found.");
+        //}
     }
 
 
@@ -239,16 +226,21 @@ public class Example {
             Example tm = tms.next();
             Class<?> r = tm.jmethod.getReturnType();
             if (!t.isAssignableFrom(r)) {
-                error(Kind.PARAMETER_NOT_ASSIGNABLE,
+                errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
                         "Parameter #%d in (%s) is not assignable from depedency (%s).",
                         position, jmethod, tm.jmethod);
             }
             if (tm.expectsException()) {
-                error(Kind.PROVIDER_EXPECTS_EXCEPTION,
+                errors.add(Kind.PROVIDER_EXPECTS_EXCEPTION,
                         "(%s): invalid dependency (%s), provider must not expect exception.", jmethod, tm.jmethod);
             }
             position++;
         }
+    }
+
+
+    public void errorPartOfCycle(Stack<Example> cycle) {
+        errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
     }
     
 }

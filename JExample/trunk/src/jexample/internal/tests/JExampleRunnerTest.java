@@ -11,8 +11,8 @@ import jexample.Depends;
 import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
-import jexample.internal.InvalidExampleError;
-import jexample.internal.InvalidExampleError.Kind;
+import jexample.internal.JExampleError;
+import jexample.internal.JExampleError.Kind;
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -34,36 +34,27 @@ import demo.StackTest;
 public class JExampleRunnerTest {
 
 	@RunWith( JExample.class )
-	private static class CycleMethods {
-
-		public CycleMethods() {
-		}
-
+	private static class CycleOfThree {
 		@Test
-		@Depends( "thirdMethod" )
-		public void firstMethod() {
-			assertTrue( true );
-		}
-
+		@Depends( "ccc" )
+		public void aaa() { }
 		@Test
-		@Depends( "firstMethod" )
-		public void secondMethod() {
-			assertTrue( true );
-		}
-
+		@Depends( "aaa" )
+		public void bbb()  { }
 		@Test
-		@Depends( "secondMethod" )
-		public void thirdMethod() {
-			assertTrue( true );
-		}
+		@Depends( "bbb" )
+		public void ccc() { }
 	}
 
 	@Test
 	public void cycleMethods() {
-		Result result = JExample.run( CycleMethods.class );
-		assertEquals( 1, result.getFailureCount() );
-		InvalidExampleError $ = (InvalidExampleError) result.getFailures().get(0).getException();
-		assertEquals(Kind.RECURSIVE_DEPENDENCIES, $.kind);
+		Result result = JExample.run( CycleOfThree.class );
+        assertEquals( false, result.wasSuccessful() );
+        assertEquals( 3, result.getRunCount() );
+		assertEquals( 3, result.getFailureCount() );
+		JExampleError err = (JExampleError) result.getFailures().get(0).getException();
+        assertEquals(1, err.size());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
 	}
 
 	@RunWith( JExample.class )

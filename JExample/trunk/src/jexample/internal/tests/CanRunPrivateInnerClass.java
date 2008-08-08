@@ -5,7 +5,6 @@ import jexample.JExample;
 import jexample.internal.ExampleGraph;
 
 import org.junit.Test;
-import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
@@ -23,7 +22,7 @@ public class CanRunPrivateInnerClass {
     
     @Test
     public void testRunningPrivateInnerClass()  {
-        Result result = new JUnitCore().run(new ExampleGraph().newJExampleRunner( PrivateInnerClass.class ));;
+        Result result = JExample.run( PrivateInnerClass.class );
         assertEquals(true, result.wasSuccessful());
         assertEquals(1, result.getRunCount());
         assertEquals(0, result.getFailureCount());

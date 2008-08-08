@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Stack;
+
 import jexample.For;
+
 import org.junit.Test;
 
 import demo.StackTest;

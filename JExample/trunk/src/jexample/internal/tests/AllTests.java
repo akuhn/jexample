@@ -9,7 +9,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith( Suite.class )
 @SuiteClasses({
         CanRunPrivateInnerClass.class,
-        CycleDetectorTest.class,
         DependenciesTest.class,
         DependsParserTest.class,
         DependsScannerTest.class,

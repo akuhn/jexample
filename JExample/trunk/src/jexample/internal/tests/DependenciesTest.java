@@ -8,12 +8,11 @@ import jexample.Depends;
 import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
-import jexample.internal.InvalidExampleError;
-import jexample.internal.InvalidExampleError.Kind;
+import jexample.internal.JExampleError;
+import jexample.internal.JExampleError.Kind;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
@@ -143,10 +142,9 @@ public class DependenciesTest {
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 2, r.getRunCount() );
         assertEquals( 1, r.getFailureCount() );
-        InitializationError $ = (InitializationError) r.getFailures().get(0).getException();
-        assertEquals( 1, $.getCauses().size() );
-        InvalidExampleError ex = (InvalidExampleError) $.getCauses().get(0);
-        assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, ex.kind);
+        JExampleError err = (JExampleError) r.getFailures().get(0).getException();
+        assertEquals( 1, err.size() );
+        assertEquals( Kind.PARAMETER_NOT_ASSIGNABLE, err.kind() );
     }
     
     @Test
@@ -190,10 +188,9 @@ public class DependenciesTest {
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 2, r.getRunCount() );
         assertEquals( 1, r.getFailureCount() );
-        InitializationError $ = (InitializationError) r.getFailures().get(0).getException();
-        assertEquals( 1, $.getCauses().size() );
-        InvalidExampleError ex = (InvalidExampleError) $.getCauses().get(0);
-        assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, ex.kind);
+        JExampleError err = (JExampleError) r.getFailures().get(0).getException();
+        assertEquals( 1, err.size() );
+        assertEquals( Kind.PROVIDER_EXPECTS_EXCEPTION, err.kind() );
     }
     
     @RunWith( JExample.class )
@@ -215,10 +212,9 @@ public class DependenciesTest {
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 2, r.getRunCount() );
         assertEquals( 1, r.getFailureCount() );
-        InitializationError $ = (InitializationError) r.getFailures().get(0).getException();
-        assertEquals( 1, $.getCauses().size() );
-        InvalidExampleError ex = (InvalidExampleError) $.getCauses().get(0);
-        assertEquals(Kind.MISSING_PROVIDERS, ex.kind);
+        JExampleError err = (JExampleError) r.getFailures().get(0).getException();
+        assertEquals( 1, err.size() );
+        assertEquals( Kind.MISSING_PROVIDERS, err.kind() );
     }
     
 }

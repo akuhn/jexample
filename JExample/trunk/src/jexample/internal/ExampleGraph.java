@@ -4,16 +4,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import jexample.JExample;
-import jexample.internal.InvalidExampleError.Kind;
 
 import org.junit.internal.runners.CompositeRunner;
-import org.junit.internal.runners.InitializationError;
 import org.junit.runner.Request;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
@@ -30,60 +26,60 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class ExampleGraph {
 
-	private static ExampleGraph GRAPH;
+
+    private static ExampleGraph GRAPH;
 	private Map<Method,Example> examples;
-	private List<Throwable> initializationErrors;
+	private Map<Class,TestClass> classes;
 	private boolean anyHasBeenRun = false;
+
 
 
 	public ExampleGraph() {
 		this.examples = new HashMap();
-		this.initializationErrors = new ArrayList();
+		this.classes = new HashMap();
 	}
+
 
 	public static ExampleGraph instance() {
 		return GRAPH == null ? GRAPH = new ExampleGraph() : GRAPH;
 	}
 
-	/** All methods are collected, checked for cycles, validated and
-	 * then added to the list of examples.
-	 */
-	public TestClass add(Class<?> javaClass) throws InitializationError {
-	    if (anyHasBeenRun) throw new InitializationError("Cannot add test to running system.");
-	    TestClass $ = new TestClass(javaClass, this).validate();
-		Collection<Example> novel = new ExampleCollector($)
-		    .collect()
-		    .validate()
-		    .result();
-		List<Example> cycle = this.detectCycles(novel, examples.values());
-		if (cycle == null) 
-	        for (Example e : novel) examples.put(e.jmethod, e);
-		else
-		    this.throwNewError(Kind.RECURSIVE_DEPENDENCIES,
-		            "Recursive dependency in cycle %s", cycle); 
-       if (!initializationErrors.isEmpty())
-            throw new InitializationError(initializationErrors);
-        initializationErrors.clear();
+
+    protected TestClass newTestClass(Class jclass) {
+        TestClass $ = classes.get(jclass);
+        if ($ == null) $ = new TestClass(jclass, this);
+        return $;
+    }
+
+    protected Example newExample(Method jmethod) {
+        Example e = examples.get(jmethod);
+        if (e != null) return e;
+        e = new Example(jmethod);
+        examples.put(jmethod, e);
+        for (Method m : e.collectDependencies()) {
+            Example d = newExample(m);
+            e.providers.add(d);
+            e.providers.invalidateCycle(e);
+        }
+        e.validate();
+        return e;
+    }
+
+	public TestClass add(Class<?> jclass) throws JExampleError {
+	    if (anyHasBeenRun) throw new RuntimeException("Cannot add test to running system.");
+	    TestClass $ = newTestClass(jclass);
+	    $.validate();
+	    $.initializeExamples();
         return $;
 	}
 
-	public void run(TestClass testClass, RunNotifier notifier) {
+    public void run(TestClass testClass, RunNotifier notifier) {
 	    anyHasBeenRun = true;
 		for (Example e : this.getExamples()) {
 			if (testClass.contains(e)) {
 				e.run(notifier);
 			}
 		}
-	}
-
-	private List<Example> detectCycles(Collection<Example>... es) {
-		CycleDetector<Example> detector = new CycleDetector<Example>(es) {
-            @Override
-            public Collection<Example> getChildren(Example e) {
-                return e.providers;
-            }
-		};
-		return detector.getCycle();
 	}
 
 	public Collection<Method> getMethods() {
@@ -94,74 +90,13 @@ public class ExampleGraph {
 	    return this.examples.values();
 	}
 
-    private class ExampleCollector {
-        
-        private Map<Method, Example> found;
-        private Collection<Method> todo;
-        
-        public ExampleCollector(TestClass curr) {
-            found = new HashMap();
-            todo = new HashSet(curr.collectTestMethods());
-        }
-        
-        public ExampleCollector validate() {
-            for (Example e : found.values())
-                e.validate();
-            return this;
-        }
-
-        public ExampleCollector collect() {
-            while (!todo.isEmpty()) {
-                Method $ = todo.iterator().next();
-                process($);
-                todo.remove($);
-            }
-            return this;
-        }
-        
-        private void process(Method m) {
-            Example $ = makeExample(m);
-            for (Method d : $.collectDependencies()) {
-                $.providers.add(makeExample(d));
-            }
-        }
-
-        private Example makeExample(Method m) {
-            Example e = examples.get(m);
-            if (e != null) return e;
-            e = found.get(m);
-            if (e != null) return e;
-            Example $ = new Example(m, ExampleGraph.this);
-            found.put(m, $);
-            todo.add(m);
-            return $;
-        }
-
-        public Collection<Example> result() {
-            return found.values(); 
-        }
-        
-    }
-
     public Example getExample(Method m) {
         return examples.get(m);
     }
 
-    public void throwNewError(Kind kind, String message, Object... args) {
-        Exception $ = new InvalidExampleError(kind, message, args);
-        $.fillInStackTrace();
-        initializationErrors.add($);
-    }
-
-    public void throwNewError(Kind kind, Throwable cause) {
-        Exception $ = new InvalidExampleError(kind, cause, cause.getMessage());
-        $.fillInStackTrace();
-        initializationErrors.add($);
-    }
-    
-    public Runner newJExampleRunner(Class<?>... classes) {
+    public Runner newJExampleRunner(Class<?>... all) {
         CompositeRunner $ = new CompositeRunner("All");
-        for (Class<?> c : classes) {
+        for (Class<?> c : all) {
             $.add(newJExampleRunner(c));
         }
         return $;
@@ -172,7 +107,7 @@ public class ExampleGraph {
             TestClass test = this.add(c);
             return new JExample(test);
         } 
-        catch (InitializationError err) { 
+        catch (JExampleError err) { 
             return Request.errorReport(c, err).getRunner();
         }
     }
