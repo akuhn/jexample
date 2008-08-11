@@ -9,8 +9,7 @@ import java.util.Map;
 
 import jexample.JExample;
 
-import org.junit.internal.builders.AllDefaultPossibilitiesBuilder;
-import org.junit.internal.runners.ErrorReportingRunner;
+import org.junit.internal.runners.ErrorReportingRunner; // TODO
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
