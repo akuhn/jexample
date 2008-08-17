@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
-public class CanRunPrivateInnerClass {
+public class CanRunPrivateInnerClassTest {
 
     @RunWith( JExample.class )
     static class PrivateInnerClass {

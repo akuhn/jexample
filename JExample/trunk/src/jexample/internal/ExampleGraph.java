@@ -57,7 +57,7 @@ public class ExampleGraph {
     protected Example newExample(Method jmethod) {
         Example e = examples.get(jmethod);
         if (e != null) return e;
-        e = new Example(jmethod);
+        e = new Example(jmethod, newExampleClass(jmethod.getDeclaringClass()));
         examples.put(jmethod, e);
         for (Method m : e.collectDependencies()) {
             Example d = newExample(m);

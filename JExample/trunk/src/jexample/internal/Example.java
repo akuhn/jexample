@@ -51,15 +51,17 @@ public class Example {
     public final ReturnValue returnValue;
     public final Method jmethod;
     public final Dependencies providers;
+    public final ExampleClass owner;
     
     private JExampleError errors;
     private TestResult result;
     private InjectionPolicy policy;
 
     
-	public Example(Method jmethod) {
-	    assert jmethod != null;
+	public Example(Method jmethod, ExampleClass owner) {
+	    assert jmethod != null && owner != null;
 	    jmethod.setAccessible(true);
+	    this.owner = owner;
         this.jmethod = jmethod;
         this.providers = new Dependencies();
         this.result = TestResult.VIRGIN;
@@ -145,6 +147,7 @@ public class Example {
 	}
 
 	public Object reRunTestMethod() throws Exception {
+	    owner.runBefores();
 		Object test = newTestClassInstance();
 		Object[] args = providers.getInjectionValues(policy, arity());
 		return this.jmethod.invoke(test, args);
@@ -162,6 +165,7 @@ public class Example {
 	 *            the {@link RunNotifier}
 	 */
 	public void run(RunNotifier notifier) {
+        owner.runBefores();
 		if (this.hasBeenRun()) return;
 		if (!errors.isEmpty()) {
 		    notifier.fireTestStarted(description);
@@ -175,31 +179,23 @@ public class Example {
 			allParentsGreen &= dependency.result == TestResult.GREEN;
 		}
 		if (allParentsGreen && !this.toBeIgnored()) {
-			this.runTestMethod(notifier);
+			try {
+                Object[] args = this.providers.getInjectionValues(this.policy, this.arity());
+            	this.invokeMethod(this.newTestClassInstance(), notifier, args);
+            } catch (InvocationTargetException e) {
+            	notifier.testAborted(this.description, e.getCause());
+            } catch (Exception e) {
+            	notifier.testAborted(this.description, e);
+            }
 		} else {
 			this.result = TestResult.WHITE;
 			notifier.fireTestIgnored(this.description);
 		}
 	}
 
-	private void runTestMethod(RunNotifier notifier) {
-		try {
-		    Object[] args = providers.getInjectionValues(policy, arity());
-			this.invokeMethod(newTestClassInstance(), notifier, args);
-		} catch (InvocationTargetException e) {
-			notifier.testAborted(description, e.getCause());
-		} catch (Exception e) {
-			notifier.testAborted(description, e);
-		}
-	}
-
-    private Object newTestClassInstance() throws NoSuchMethodException,
-            InstantiationException, IllegalAccessException,
-            InvocationTargetException {
+	private Object newTestClassInstance() throws Exception {
         return ExampleClass.getConstructor(jmethod.getDeclaringClass()).newInstance();
     }
-
-
 
     public void validate() {
         if (!jmethod.isAnnotationPresent(Test.class)) {

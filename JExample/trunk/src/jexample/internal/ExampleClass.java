@@ -1,6 +1,7 @@
 package jexample.internal;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import jexample.JExample;
 import jexample.internal.JExampleError.Kind;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -29,6 +31,7 @@ public class ExampleClass {
 
     private final JExampleError errors;    
     private final ExampleGraph graph;
+    private boolean beforesRunned = false;
 	
 	
     public ExampleClass(Class<?> jclass, ExampleGraph graph) {
@@ -103,6 +106,23 @@ public class ExampleClass {
         for (Method m : collectTestMethods()) {
             graph.newExample(m);
         }
+    }
+    
+    public void runBefores() {
+        if (beforesRunned) return;
+        for (Method m : jclass.getMethods()) {
+            if (m.isAnnotationPresent(BeforeClass.class)) {
+                try {
+                    m.invoke(null);
+                } catch (IllegalArgumentException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InvocationTargetException ex) {
+              }
+            }
+        }
+        beforesRunned = true;
     }
 
 }
