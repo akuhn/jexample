@@ -22,7 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ReturnValueTest.class,
 		TestClassValidationTest.class,
         demo.StackTest.class,
-        demo.ListTest.class,})
+        demo.ListTest.class})
 public class AllTests {
     public static void main(String[] args) {
         JUnitCore junit = new JUnitCore();
