@@ -11,44 +11,52 @@ import jexample.InjectionPolicy;
 /**
  * Manages the dependencies/providers of an example.
  * 
- * 
  * @author Adrian Kuhn
  *
  */
 @SuppressWarnings("serial")
 public class Dependencies extends ArrayList<Example> {
 
-    public void invalidateCycle(Example self) {
-        invalidateCycle(self, new Stack<Example>(), new HashSet<Example>());
+    /** Checks if these dependencies are part of a cycle.
+     * For each detected cycle, invalidates all contained nodes.
+     * 
+     * @param $ consumer of these dependencies.
+     */
+    public void validateCycle(Example $) {
+        validateCycle($, new Stack<Example>(), new HashSet<Example>());
     }
 
-    private void invalidateCycle(Example self, Stack<Example> cycle, Set<Example> done) {
-        for (Example e : this) {
+    private void validateCycle(Example $, Stack<Example> cycle, Set<Example> done) {
+        for (Example e: this) {
             cycle.push(e);
-            if (e == self) for (Example $ : cycle) $.errorPartOfCycle(cycle);
-            if (done.add(e)) e.providers.invalidateCycle(self, cycle, done);
+            if ($ == e) invalidate(cycle);
+            if (done.add(e)) e.providers.validateCycle($, cycle, done);
             cycle.pop();
         }
     }
 
-    public Collection<Example> transitiveClosure() {
-        Collection<Example> $ = new HashSet();
-        this.collectTransitiveClosureInto($);
-        return $;
+    private void invalidate(Stack<Example> cycle) {
+        for (Example each: cycle) each.errorPartOfCycle(cycle);
     }
 
-    private void collectTransitiveClosureInto(Collection<Example> $) {
+    public Collection<Example> transitiveClosure() {
+        Collection<Example> all = new HashSet();
+        this.collectTransitiveClosureInto(all);
+        return all;
+    }
+
+    private void collectTransitiveClosureInto(Collection<Example> all) {
         for (Example e : this) {
-            if ($.add(e)) e.providers.collectTransitiveClosureInto($);
+            if (all.add(e)) e.providers.collectTransitiveClosureInto(all);
         }
     }
 
     public Object[] getInjectionValues(InjectionPolicy policy, int length) throws Exception {
-        Object[] $ = new Object[length];
+        Object[] values = new Object[length];
         for (int i = 0; i < length; i++) {
-            $[i] = this.get(i).returnValue.get(policy);
+            values[i] = this.get(i).returnValue.get(policy);
         }
-        return $;
+        return values;
     }
     
     

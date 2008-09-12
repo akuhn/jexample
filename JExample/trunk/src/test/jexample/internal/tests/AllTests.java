@@ -1,5 +1,8 @@
 package jexample.internal.tests;
 
+import jexample.demo.ListTest;
+import jexample.demo.StackTest;
+
 import org.junit.internal.runners.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
@@ -23,8 +26,8 @@ import org.junit.runners.Suite.SuiteClasses;
         JExampleRunnerTest.class,
         ReturnValueTest.class,
 		TestClassValidationTest.class,
-        jexample.demo.StackTest.class,
-        jexample.demo.ListTest.class})
+        StackTest.class,
+        ListTest.class})
 public class AllTests {
     public static void main(String[] args) {
         JUnitCore junit = new JUnitCore();

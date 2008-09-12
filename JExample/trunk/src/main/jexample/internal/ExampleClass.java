@@ -4,8 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import jexample.JExample;
 import jexample.internal.JExampleError.Kind;
@@ -41,14 +40,8 @@ public class ExampleClass {
 	}
 
 
-    public List<MethodReference> collectTestMethods() {
-		List<MethodReference> $ = new ArrayList<MethodReference>();
-        for (MethodReference m : MethodReference.all(jclass)) {
-            if (m.isAnnotationPresent(Test.class)) {
-                $.add(m);
-            }
-        }
-        return $;
+    public Collection<MethodReference> collectTestMethods() {
+		return MethodReference.all(jclass, Test.class);
 	}
 	
 
@@ -77,7 +70,7 @@ public class ExampleClass {
         RunWith run = (RunWith) jclass.getAnnotation(RunWith.class);
         if (run == null || run.value() != JExample.class ) {
             errors.add(Kind.MISSING_RUNWITH_ANNOTATION,
-                    "Class %s is not a JExample test class, annotation @RunWith(JExampleRunner.class) missing.", this);
+                    "Class %s is not a JExample test class, annotation @RunWith(JExample.class) missing.", this);
         }
         try {
             getConstructor(jclass);

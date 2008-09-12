@@ -44,7 +44,6 @@ public class DependenciesTest {
         ExampleGraph $ = new ExampleGraph();
         $.add( C.class );
         
-        //assertEquals( 1, $.getClasses().size() );
         assertEquals( 2, $.getMethods().size() );
         
         Example t = $.findExample( C.class, "test" );

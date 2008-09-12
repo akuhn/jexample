@@ -53,7 +53,7 @@ public class Example {
     public final ExampleClass owner;
     
     private JExampleError errors;
-    private TestResult result;
+    private ExampleState result;
     private InjectionPolicy policy;
 
     
@@ -62,13 +62,12 @@ public class Example {
 	    this.owner = owner;
         this.method = method;
         this.providers = new Dependencies();
-        this.result = TestResult.VIRGIN;
-        this.description = Description.createTestDescription(method.jclass, method.getName());
+        this.result = ExampleState.NONE;
+        this.description = method.createTestDescription();
         this.returnValue = new ReturnValue(this);
         this.policy = method.jclass.getAnnotation(InjectionPolicy.class);
         this.errors = new JExampleError();
     }
-
 	
 	public MethodReference[] collectDependencies() {
         Depends a = method.getAnnotation( Depends.class );
@@ -103,33 +102,33 @@ public class Example {
 
 
 	private boolean hasBeenRun() {
-		return result != TestResult.VIRGIN;
+		return result != ExampleState.NONE;
 	}
 
 	public boolean wasSuccessful() {
-	    return result == TestResult.GREEN;
+	    return result == ExampleState.GREEN;
 	}
 	
 	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
 			returnValue.assign(this.method.invoke(test, args));
-			this.result = TestResult.GREEN;
+			this.result = ExampleState.GREEN;
 		} catch (InvocationTargetException e) {
 			Throwable actual = e.getTargetException();
 			if (!this.expectsException()) {
 				notifier.fireTestFailure(new Failure(this.description, actual));
-                this.result = TestResult.RED;
+                this.result = ExampleState.RED;
 			} else if (this.isUnexpectedException(actual)) {
 				String message = "Unexpected exception, expected<"
 						+ this.getExpectedException().getName() + "> but was<"
 						+ actual.getClass().getName() + ">";
 				notifier.fireTestFailure(new Failure(this.description, new Exception(message, actual)));
-                this.result = TestResult.RED;
+                this.result = ExampleState.RED;
 			}
 		} catch (Throwable e) {
 			notifier.fireTestFailure(new Failure(this.description, e));
-            this.result = TestResult.RED;
+            this.result = ExampleState.RED;
 		} finally {
 			notifier.fireTestFinished(description);
 		}
@@ -174,7 +173,7 @@ public class Example {
 		boolean allParentsGreen = true;
 		for (Example dependency : this.providers) {
 			dependency.run(notifier);
-			allParentsGreen &= dependency.result == TestResult.GREEN;
+			allParentsGreen &= dependency.result == ExampleState.GREEN;
 		}
 		if (allParentsGreen && !this.toBeIgnored()) {
 			try {
@@ -186,7 +185,7 @@ public class Example {
             	notifier.testAborted(this.description, e);
             }
 		} else {
-			this.result = TestResult.WHITE;
+			this.result = ExampleState.WHITE;
 			notifier.fireTestIgnored(this.description);
 		}
 	}
@@ -241,14 +240,11 @@ public class Example {
     public String toString() {
         return "Example: " + method;
     }
+
+    public void validateCycle() {
+        providers.validateCycle(this);
+    }
     
 }
 
-/**
- * The states, a {@link Example} can have.
- * 
- * @author Lea Haensenberger
- */
-enum TestResult {
-	GREEN, VIRGIN, RED, WHITE
-}
+

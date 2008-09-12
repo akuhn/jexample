@@ -61,7 +61,7 @@ public class ExampleGraph {
         for (MethodReference m : e.collectDependencies()) {
             Example d = newExample(m);
             e.providers.add(d);
-            e.providers.invalidateCycle(e);
+            e.validateCycle();
         }
         e.validate();
         return e;

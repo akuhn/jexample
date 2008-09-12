@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import org.junit.runner.Description;
+
 public class MethodReference {
 
     private final Method jmethod;
@@ -29,14 +31,26 @@ public class MethodReference {
         return jmethod.hashCode() ^ jclass.hashCode();
     }
     
-    public static Collection<MethodReference> all(Class<?> klass) {
-        Collection<MethodReference> $ = new ArrayList();    
-        for (Method m : klass.getMethods()) {
-            $.add(new MethodReference(klass, m));
-        }
-        return $;
+    public static Collection<MethodReference> all(Class<?> jclass) {
+        Collection<MethodReference> all = new ArrayList();    
+        for (Method m : jclass.getMethods())
+            all.add(new MethodReference(jclass, m));
+        return all;
     }
     
+    public static Collection<MethodReference> all(Class<?> jclass, Class<? extends Annotation> anon) {
+        Collection<MethodReference> all = new ArrayList();    
+        for (Method m : jclass.getMethods())
+            if (m.isAnnotationPresent(anon))
+                all.add(new MethodReference(jclass, m));
+        return all;
+    }
+    
+    
+    public Description createTestDescription() {
+        return Description.createTestDescription(jclass, getName()); 
+    }
+
     public boolean equals(Class<?> c, String name) {
         return jclass == c && getName().equals(name);
     }
