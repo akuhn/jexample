@@ -56,11 +56,16 @@ public class ReturnValue {
     public Object get(InjectionPolicy policy) throws Exception {
         if (returnValue == null) return null;
         if (isCloneable()) return getClone();
-        if (keep(policy)) return returnValue;
+        if (isImmutable() || keep(policy)) return returnValue;
         returnValue = provider.reRunTestMethod();
         return returnValue;
     }
     
+    private boolean isImmutable() {
+        return returnValue instanceof String;
+        // TODO add more here ... maybe keep a list of classes somewhere
+    }
+
     private static boolean keep(InjectionPolicy policy) {
         return policy != null && policy.keep();
     }

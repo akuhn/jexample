@@ -18,6 +18,8 @@ import org.junit.runners.Suite.SuiteClasses;
         ExampleGraphTest.class,
         ForExampleTest.class,
         InjectionPolicyTest.class,
+        InheritanceTest.class,   
+        JExampleTest.class,
         JExampleRunnerTest.class,
         ReturnValueTest.class,
 		TestClassValidationTest.class,

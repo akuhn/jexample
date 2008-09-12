@@ -45,8 +45,10 @@ public class ExampleGraphTest {
 	}
 
 	@Test
-	public void detectCycles() {
-        Result r = JExample.run( Cyclic.class );
+	public void detectCycles() throws JExampleError {
+        Class<?>[] classes = { Cyclic.class };
+        ExampleGraph g = new ExampleGraph();
+        Result r = g.runJExample(classes);
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 3, r.getRunCount() );
         assertEquals( 2, r.getFailureCount() );

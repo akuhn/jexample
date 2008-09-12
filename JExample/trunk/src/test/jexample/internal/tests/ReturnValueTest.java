@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import jexample.JExample;
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
+import jexample.internal.JExampleError;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -21,22 +22,22 @@ public class ReturnValueTest {
     }
     
     @Test
-    public void returnValueIsNull() {
+    public void returnValueIsNull() throws JExampleError {
         Example e = runNullExample();
         
         assertTrue(e.wasSuccessful());
         assertEquals(null, e.returnValue.getValue());
     }
 
-    private Example runNullExample() {
+    private Example runNullExample() throws JExampleError {
         ExampleGraph $ = new ExampleGraph();
-        new JUnitCore().run($.newJExampleRunner( Null.class ));
+        $.runJExample( Null.class );
         Example e = $.findExample( Null.class , "returnNull" );
         return e;
     }
 
     @Test
-    public void nullIsCloneable() {
+    public void nullIsCloneable() throws JExampleError {
         Example e = runNullExample();
         
         assertEquals(null, e.returnValue.getValue());

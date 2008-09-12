@@ -48,8 +48,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void cycleMethods() {
-		Result result = JExample.run( CycleOfThree.class );
+	public void cycleMethods() throws JExampleError {
+		Class<?>[] classes = { CycleOfThree.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
         assertEquals( false, result.wasSuccessful() );
         assertEquals( 3, result.getRunCount() );
 		assertEquals( 3, result.getFailureCount() );
@@ -92,8 +94,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void skipMethods() {
-		Result result = JExample.run( SkipMethods.class );
+	public void skipMethods() throws JExampleError {
+		Class<?>[] classes = { SkipMethods.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 1, result.getFailureCount() );
 		assertEquals( 2, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
@@ -123,8 +127,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void testGoodTest() {
-	    Result result = JExample.run(GoodTest.class);
+	public void testGoodTest() throws JExampleError {
+	    Class<?>[] classes = { GoodTest.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
@@ -160,8 +166,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void testGoodTests() {
-		Result result = JExample.run( FirstGoodTest.class, SecondGoodTest.class );
+	public void testGoodTests() throws JExampleError {
+		Class<?>[] classes = { FirstGoodTest.class, SecondGoodTest.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
@@ -213,8 +221,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void testWithAttributes() {
-		Result result = JExample.run( WithAttributes.class );
+	public void testWithAttributes() throws JExampleError {
+		Class<?>[] classes = { WithAttributes.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 6, result.getRunCount() );
@@ -246,8 +256,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void testDependsOnBefore() {
-		Result result = JExample.run( DependsOnBeforeTest.class );
+	public void testDependsOnBefore() throws JExampleError {
+		Class<?>[] classes = { DependsOnBeforeTest.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 3, result.getRunCount() );
@@ -293,8 +305,10 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void testCloneRetVal() {
-		Result result = JExample.run( CloneRetVal.class );
+	public void testCloneRetVal() throws JExampleError {
+		Class<?>[] classes = { CloneRetVal.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 2, result.getRunCount() );
@@ -359,17 +373,19 @@ public class JExampleRunnerTest {
 	}
 
 	@Test
-	public void testNotCloneRetVal() {
-		Result result = JExample.run( NotCloneRetVal.class );
+	public void testNotCloneRetVal() throws JExampleError {
+		Class<?>[] classes = { NotCloneRetVal.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
 		assertEquals( 0, result.getFailureCount() );
 		assertEquals( 0, result.getIgnoreCount() );
 		assertEquals( 4, result.getRunCount() );
 	}
 	
 	@Test
-	public void filter() throws NoTestsRemainException {
+	public void filter() throws NoTestsRemainException, JExampleError {
 	    ExampleGraph g = new ExampleGraph();
-	    Runner r = g.newJExampleRunner( StackTest.class );
+	    Runner r = new JExample( g.add(StackTest.class) );
 	    Example e = g.findExample( StackTest.class, "withValue" );
 	    ((Filterable) r).filter(newFilter(e.description));
 	    Result $ = new JUnitCore().run(r);
@@ -407,8 +423,10 @@ public class JExampleRunnerTest {
 	}
 	
 	@Test
-	public void unexpectedException() {
-	    Result $ = JExample.run( A_fail.class );
+	public void unexpectedException() throws JExampleError {
+	    Class<?>[] classes = { A_fail.class };
+        ExampleGraph g = new ExampleGraph();
+        Result $ = g.runJExample(classes);
 	    assertEquals(1, $.getRunCount());
 	    assertEquals(false, $.wasSuccessful());
 	    assertEquals(1, $.getFailureCount());
@@ -428,8 +446,10 @@ public class JExampleRunnerTest {
     }
 
     @Test
-    public void dependsOnNonTestMethodFails() {
-        Result result = JExample.run( B_fail.class );
+    public void dependsOnNonTestMethodFails() throws JExampleError {
+        Class<?>[] classes = { B_fail.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
         assertEquals( false, result.wasSuccessful() );
         assertEquals( 2, result.getRunCount() );
         assertEquals( 2, result.getFailureCount() );
@@ -452,8 +472,10 @@ public class JExampleRunnerTest {
     }
 
     @Test
-    public void testBadTests() {
-        Result result = JExample.run( D_fail.class, C_fail.class );
+    public void testBadTests() throws JExampleError {
+        Class<?>[] classes = { D_fail.class, C_fail.class };
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(classes);
         assertEquals( 2, result.getFailureCount() );
         assertEquals( 0, result.getIgnoreCount() );
         assertEquals( 2, result.getRunCount() );

@@ -6,6 +6,7 @@ import jexample.Depends;
 import jexample.InjectionPolicy;
 import jexample.JExample;
 import jexample.internal.ExampleGraph;
+import jexample.internal.JExampleError;
 
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -47,8 +48,8 @@ public class InjectionPolicyTest {
     }
     
     @Test
-    public void runCloneDetection() {
-        Result $ = new JUnitCore().run(new ExampleGraph().newJExampleRunner( B.class ));
+    public void runCloneDetection() throws JExampleError {
+        Result $ = new ExampleGraph().runJExample( B.class );
         assertTrue( $.wasSuccessful() );
     }
     

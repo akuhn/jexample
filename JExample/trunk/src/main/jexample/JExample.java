@@ -5,8 +5,6 @@ import jexample.internal.JExampleError;
 import jexample.internal.ExampleClass;
 
 import org.junit.runner.Description;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
@@ -48,13 +46,6 @@ public class JExample extends Runner implements Filterable {
 
     public void filter(Filter filter) throws NoTestsRemainException {
         testCase.filter(filter);
-    }
-
-    public static Result run(Class<?>... classes) {
-        ExampleGraph g = new ExampleGraph();
-        Runner r = g.newJExampleRunner(classes);
-        JUnitCore junit = new JUnitCore();
-        return junit.run(r);
     }
  
 }

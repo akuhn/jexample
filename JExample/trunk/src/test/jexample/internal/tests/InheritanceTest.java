@@ -11,33 +11,34 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-public class InheritanceTest {
+public class InheritanceTest extends JExampleTest {
 
     @Before
     public void setup() {
-        Trace.reset();
+        resetTrace();
     }
     
     @RunWith( JExample.class )
     public static class A {
         @Test
         public String m() {
-            Trace.record();
-            return "A";
+            trace(this);
+            return "A delivers";
         }
         @Test
         @Depends("m()")
         public void test(String arg) {
-            Trace.record(arg);
+            trace(this,arg);
         }
     }
 
     @RunWith( JExample.class )
-    public static class B {
+    public static class B extends A {
         @Test
+        @Override
         public String m() {
-            Trace.record();
-            return "B";
+            trace(this);
+            return "B delivers";
         }
     }
     
@@ -89,8 +90,39 @@ public class InheritanceTest {
         test = g.findExample(B.class, "test");
         
         assertEquals( 1, test.providers.size() );
-        assertEquals( m, test.providers.iterator().next() );
-        
+        assertEquals( m, test.providers.iterator().next() );        
+    }
+    
+    @Test
+    public void runA() throws JExampleError {
+        ExampleGraph g = new ExampleGraph();
+        assertTraceSize( 0 );
+        g.runJExample(A.class);
+        assertTraceSize( 2 );
+        assertTrace( "A#m", "A#test" );
+        assertTraceArgument( "A#test", "A delivers" );
+    }
+
+    @Test
+    public void runB() throws JExampleError {
+        ExampleGraph g = new ExampleGraph();
+        assertTraceSize( 0 );
+        g.runJExample(B.class);
+        assertTraceSize( 2 );
+        assertTrace( "B#m", "B#test" );
+        assertTraceArgument( "B#test", "B delivers" );
+    }
+
+    @Test
+    public void runAB() throws JExampleError {
+        ExampleGraph g = new ExampleGraph();
+        assertTraceSize( 0 );
+        g.runJExample(A.class, B.class);
+        assertTraceSize( 4 );
+        assertTrace( "A#m", "A#test" );
+        assertTraceArgument( "A#test", "A delivers" );
+        assertTrace( "B#m", "B#test" );
+        assertTraceArgument( "B#test", "B delivers" );
     }
     
 }

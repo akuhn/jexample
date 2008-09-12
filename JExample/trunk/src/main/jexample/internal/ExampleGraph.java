@@ -9,8 +9,8 @@ import java.util.Map;
 import jexample.JExample;
 
 import org.junit.internal.runners.CompositeRunner;
-import org.junit.runner.Request;
-import org.junit.runner.Runner;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
@@ -92,22 +92,17 @@ public class ExampleGraph {
 	    return this.examples.values();
 	}
 
-    public Runner newJExampleRunner(Class<?>... all) {
-        CompositeRunner $ = new CompositeRunner("All");
-        for (Class<?> c : all) {
-            $.add(newJExampleRunner(c));
+    public Result runJExample() {
+        CompositeRunner runner = new CompositeRunner("All");
+        for (ExampleClass eg : classes.values()) {
+            runner.add(new JExample(eg));
         }
-        return $;
-    }    
-        
-    public Runner newJExampleRunner(Class<?> c) {
-        try {
-            ExampleClass test = this.add(c);
-            return new JExample(test);
-        } 
-        catch (JExampleError err) { 
-            return Request.errorReport(c, err).getRunner();
-        }
+        return new JUnitCore().run(runner);
+    }  
+    
+    public Result runJExample(Class<?>... tests) throws JExampleError {
+        for (Class<?> each : tests) add(each);
+        return runJExample();
     }
     
     public Example findExample(Class<?> c, String name) {
@@ -136,5 +131,6 @@ public class ExampleGraph {
             }
         }
     }
+
 
 }

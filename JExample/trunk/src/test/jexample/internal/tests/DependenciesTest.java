@@ -59,13 +59,13 @@ public class DependenciesTest {
     
     @Test
     public void runPolymorphicDepedency() throws Exception {
-        ExampleGraph $ = new ExampleGraph();
-        Result result = new JUnitCore().run($.newJExampleRunner(C.class));
+        ExampleGraph g = new ExampleGraph();
+        Result result = g.runJExample(C.class);
         assertTrue( result.wasSuccessful() );
         assertEquals( 2, result.getRunCount() );
         
-        Example t = $.findExample( C.class, "test" );
-        Example e = $.findExample( C.class, "empty" );
+        Example t = g.findExample( C.class, "test" );
+        Example e = g.findExample( C.class, "empty" );
  
         assertNotSame( e.returnValue, t.returnValue );
     }
@@ -137,8 +137,10 @@ public class DependenciesTest {
     }
     
     @Test
-    public void testParameterNotAssignableFromProvider() {
-        Result r = JExample.run( E_fail.class );
+    public void testParameterNotAssignableFromProvider() throws JExampleError {
+        Class<?>[] classes = { E_fail.class };
+        ExampleGraph g = new ExampleGraph();
+        Result r = g.runJExample(classes);
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 2, r.getRunCount() );
         assertEquals( 1, r.getFailureCount() );
@@ -183,8 +185,10 @@ public class DependenciesTest {
     }
     
     @Test
-    public void providerMustNotExpectException() {
-        Result r = JExample.run( G.class );
+    public void providerMustNotExpectException() throws JExampleError {
+        Class<?>[] classes = { G.class };
+        ExampleGraph g = new ExampleGraph();
+        Result r = g.runJExample(classes);
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 2, r.getRunCount() );
         assertEquals( 1, r.getFailureCount() );
@@ -207,8 +211,10 @@ public class DependenciesTest {
     }    
 
     @Test
-    public void lesProvidersThanParameters() {
-        Result r = JExample.run( H.class );
+    public void lesProvidersThanParameters() throws JExampleError {
+        Class<?>[] classes = { H.class };
+        ExampleGraph g = new ExampleGraph();
+        Result r = g.runJExample(classes);
         assertEquals( false, r.wasSuccessful() );
         assertEquals( 2, r.getRunCount() );
         assertEquals( 1, r.getFailureCount() );
