@@ -6,11 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Stack;
 
 import jexample.For;
+import jexample.demo.StackTest;
+import jexample.demo.YouFail;
 
 import org.junit.Test;
 
-import demo.StackTest;
-import demo.YouFail;
 
 public class ForExampleTest {
 

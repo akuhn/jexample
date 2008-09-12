@@ -1,4 +1,4 @@
-package demo;
+package jexample.demo;
 
 import java.util.Stack;
 

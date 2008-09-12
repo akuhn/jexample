@@ -1,4 +1,4 @@
-package demo;
+package jexample.demo;
 
 import static org.junit.Assert.assertEquals;
 

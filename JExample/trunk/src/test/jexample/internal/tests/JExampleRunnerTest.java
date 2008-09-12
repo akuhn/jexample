@@ -9,6 +9,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExample;
+import jexample.demo.StackTest;
 import jexample.internal.Example;
 import jexample.internal.ExampleClass;
 import jexample.internal.ExampleGraph;
@@ -25,7 +26,6 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
 
-import demo.StackTest;
 
 
 /**

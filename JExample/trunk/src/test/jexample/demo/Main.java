@@ -1,4 +1,4 @@
-package demo;
+package jexample.demo;
 
 import org.junit.internal.runners.TextListener;
 import org.junit.runner.JUnitCore;
