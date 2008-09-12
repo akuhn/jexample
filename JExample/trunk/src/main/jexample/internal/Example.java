@@ -1,7 +1,6 @@
 package jexample.internal;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Stack;
 
@@ -49,7 +48,7 @@ public class Example {
 
     public final Description description;
     public final ReturnValue returnValue;
-    public final Method jmethod;
+    public final MethodReference method;
     public final Dependencies providers;
     public final ExampleClass owner;
     
@@ -58,25 +57,24 @@ public class Example {
     private InjectionPolicy policy;
 
     
-	public Example(Method jmethod, ExampleClass owner) {
-	    assert jmethod != null && owner != null;
-	    jmethod.setAccessible(true);
+	public Example(MethodReference method, ExampleClass owner) {
+	    assert method != null && owner != null;
 	    this.owner = owner;
-        this.jmethod = jmethod;
+        this.method = method;
         this.providers = new Dependencies();
         this.result = TestResult.VIRGIN;
-        this.description = Description.createTestDescription(jmethod.getDeclaringClass(), jmethod.getName());
+        this.description = Description.createTestDescription(method.jclass, method.getName());
         this.returnValue = new ReturnValue(this);
-        this.policy = jmethod.getDeclaringClass().getAnnotation(InjectionPolicy.class);
+        this.policy = method.jclass.getAnnotation(InjectionPolicy.class);
         this.errors = new JExampleError();
     }
 
 	
-	public Method[] collectDependencies() {
-        Depends a = jmethod.getAnnotation( Depends.class );
+	public MethodReference[] collectDependencies() {
+        Depends a = method.getAnnotation( Depends.class );
         if (a != null) {
             try {
-                DependsParser p = new DependsParser(jmethod.getDeclaringClass());
+                DependsParser p = new DependsParser(method.jclass);
                 return p.collectProviderMethods(a.value());
             } catch (InvalidDeclarationError ex) {
                 errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
@@ -88,7 +86,7 @@ public class Example {
                 errors.add(Kind.PROVIDER_NOT_FOUND, ex);
             }
         }
-        return new Method[0];
+        return new MethodReference[0];
     }
 
 	private boolean expectsException() {
@@ -97,7 +95,7 @@ public class Example {
 
 
 	private Class<? extends Throwable> getExpectedException() {
-		Test a = this.jmethod.getAnnotation(Test.class);
+		Test a = this.method.getAnnotation(Test.class);
 		if (a == null) return null;
 		if (a.expected() == org.junit.Test.None.class) return null;
 		return a.expected();
@@ -115,7 +113,7 @@ public class Example {
 	private void invokeMethod(Object test, RunNotifier notifier, Object... args) {
 		notifier.fireTestStarted(description);
 		try {
-			returnValue.assign(this.jmethod.invoke(test, args));
+			returnValue.assign(this.method.invoke(test, args));
 			this.result = TestResult.GREEN;
 		} catch (InvocationTargetException e) {
 			Throwable actual = e.getTargetException();
@@ -139,7 +137,7 @@ public class Example {
 
 	
 	private boolean toBeIgnored() {
-		return this.jmethod.getAnnotation(Ignore.class) != null;
+		return this.method.getAnnotation(Ignore.class) != null;
 	}
 
 	private boolean isUnexpectedException(Throwable actual) {
@@ -150,12 +148,12 @@ public class Example {
 	    owner.runBefores();
 		Object test = newTestClassInstance();
 		Object[] args = providers.getInjectionValues(policy, arity());
-		return this.jmethod.invoke(test, args);
+		return this.method.invoke(test, args);
 	}
 
 
     private int arity() {
-        return jmethod.getParameterTypes().length;
+        return method.arity();
     }
 
 	/**
@@ -194,11 +192,11 @@ public class Example {
 	}
 
 	private Object newTestClassInstance() throws Exception {
-        return ExampleClass.getConstructor(jmethod.getDeclaringClass()).newInstance();
+        return ExampleClass.getConstructor(method.jclass).newInstance();
     }
 
     public void validate() {
-        if (!jmethod.isAnnotationPresent(Test.class)) {
+        if (!method.isAnnotationPresent(Test.class)) {
             errors.add(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.", toString());
         }
         int d = providers.size();
@@ -218,17 +216,17 @@ public class Example {
     private void validateDependencyTypes() {
         Iterator<Example> tms = this.providers.iterator();
         int position = 1;
-        for (Class<?> t : jmethod.getParameterTypes()) {
+        for (Class<?> t : method.getParameterTypes()) {
             Example tm = tms.next();
-            Class<?> r = tm.jmethod.getReturnType();
+            Class<?> r = tm.method.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
                         "Parameter #%d in (%s) is not assignable from depedency (%s).",
-                        position, jmethod, tm.jmethod);
+                        position, method, tm.method);
             }
             if (tm.expectsException()) {
                 errors.add(Kind.PROVIDER_EXPECTS_EXCEPTION,
-                        "(%s): invalid dependency (%s), provider must not expect exception.", jmethod, tm.jmethod);
+                        "(%s): invalid dependency (%s), provider must not expect exception.", method, tm.method);
             }
             position++;
         }
@@ -237,6 +235,11 @@ public class Example {
 
     public void errorPartOfCycle(Stack<Example> cycle) {
         errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
+    }
+    
+    @Override
+    public String toString() {
+        return "Example: " + method;
     }
     
 }

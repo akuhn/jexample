@@ -29,12 +29,9 @@ public class ExampleGraphAddTest {
     public void simpleClass() throws Throwable {
         g.add(A.class);
         
-        //assertEquals(1, g.getClasses().size());
         assertEquals(1, g.getExamples().size());
-        //assertEquals(A.class,
-        //        g.getClasses().iterator().next().getJavaClass());
-        assertEquals(A.class.getMethod("t"), 
-                g.getExamples().iterator().next().jmethod);
+        assertEquals(A.class, g.getExamples().iterator().next().method.jclass);
+        assertEquals("t", g.getExamples().iterator().next().method.getName());
     }
 
     @RunWith( JExample.class )
@@ -48,12 +45,9 @@ public class ExampleGraphAddTest {
     public void simpleOverride() throws Throwable {
         g.add(B.class);
         
-        //assertEquals(1, g.getClasses().size());
         assertEquals(1, g.getExamples().size());
-        //assertEquals(B.class,
-        //        g.getClasses().iterator().next().getJavaClass());
-        assertEquals(B.class.getMethod("t"), 
-                g.getExamples().iterator().next().jmethod);
+        assertEquals(B.class, g.getExamples().iterator().next().method.jclass);
+        assertEquals("t", g.getExamples().iterator().next().method.getName());
     }
     
     @RunWith( JExample.class )
@@ -74,8 +68,8 @@ public class ExampleGraphAddTest {
         //assertEquals(C.class,
         //        g.getClasses().iterator().next().getJavaClass());
         
-        Example p = g.getExample(C.class.getMethod("provider"));
-        Example c = g.getExample(C.class.getMethod("consumer", Object.class));
+        Example p = g.findExample(C.class, "provider");
+        Example c = g.findExample(C.class, "consumer");
         assertEquals(0, p.providers.size());
         assertEquals(1, c.providers.size());
         assertEquals(p, c.providers.iterator().next());

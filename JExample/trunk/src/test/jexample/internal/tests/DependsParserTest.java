@@ -6,11 +6,10 @@ package jexample.internal.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Method;
-
 import jexample.Depends;
 import jexample.JExample;
 import jexample.internal.DependsParser;
+import jexample.internal.MethodReference;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,7 @@ public class DependsParserTest {
 
 	@Test
 	public void uniqueSimpleName() throws Exception {
-	    Method[] $ = p.collectProviderMethods( "unique" );
+	    MethodReference[] $ = p.collectProviderMethods( "unique" );
 	    assertEquals(1, $.length);
 	    assertEquals("unique", $[0].getName());
 	}
@@ -64,7 +63,7 @@ public class DependsParserTest {
 	
     @Test
     public void testWithoutParameters() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test()" );
+        MethodReference[] $ = p.collectProviderMethods( "test()" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(0, $[0].getParameterTypes().length);
@@ -72,7 +71,7 @@ public class DependsParserTest {
 
     @Test
     public void testWithString() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(String)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(String)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -81,7 +80,7 @@ public class DependsParserTest {
 
     @Test
     public void testWithInt() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(int)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(int)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -90,7 +89,7 @@ public class DependsParserTest {
     
     @Test
     public void testWithLong() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(long)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(long)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -99,7 +98,7 @@ public class DependsParserTest {
     
     @Test
     public void testWithFloat() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(float)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(float)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -108,7 +107,7 @@ public class DependsParserTest {
     
     @Test
     public void testWithDouble() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(double)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(double)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -117,7 +116,7 @@ public class DependsParserTest {
     
     @Test
     public void testWithChar() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(char)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(char)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -126,7 +125,7 @@ public class DependsParserTest {
     
     @Test
     public void testWithBoolean() throws Exception {
-        Method[] $ = p.collectProviderMethods( "test(boolean)" );
+        MethodReference[] $ = p.collectProviderMethods( "test(boolean)" );
         assertEquals(1, $.length);
         assertEquals("test", $[0].getName());
         assertEquals(1, $[0].getParameterTypes().length);
@@ -141,7 +140,7 @@ public class DependsParserTest {
     @Test
     public void packageLookup() throws Exception {
         p = new DependsParser( AllTests.class ); // same package
-        Method[] $ = p.collectProviderMethods( "DependsParserTest$A.unique" );
+        MethodReference[] $ = p.collectProviderMethods( "DependsParserTest$A.unique" );
         assertEquals(1, $.length);
         assertEquals("unique", $[0].getName());
     }
@@ -149,7 +148,7 @@ public class DependsParserTest {
     @Test
     public void innerclassLookup() throws Exception {
         p = new DependsParser( DependsParserTest.class ); // same package
-        Method[] $ = p.collectProviderMethods( "A.unique" );
+        MethodReference[] $ = p.collectProviderMethods( "A.unique" );
         assertEquals(1, $.length);
         assertEquals("unique", $[0].getName());
     }
@@ -158,7 +157,7 @@ public class DependsParserTest {
     @Test
     public void qualifiedLookup() throws Exception {
         p = new DependsParser( Void.class ); // totally different package 
-        Method[] $ = p.collectProviderMethods(
+        MethodReference[] $ = p.collectProviderMethods(
                 "jexample.internal.tests.DependsParserTest$A.unique");
         assertEquals(1, $.length);
         assertEquals("unique", $[0].getName());

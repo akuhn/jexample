@@ -15,9 +15,10 @@ import org.junit.runner.RunWith;
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
  */
+@SuppressWarnings("unused")
 public class ExampleValidateTest {
 
-	private Method stringAsParam;
+    private Method stringAsParam;
 
 	private Method twoParams;
 

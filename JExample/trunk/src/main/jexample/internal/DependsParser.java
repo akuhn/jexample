@@ -3,11 +3,9 @@
  */
 package jexample.internal;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import jexample.Depends;
 import jexample.internal.DependsScanner.Token;
 
 
@@ -27,19 +25,19 @@ public class DependsParser {
 	}
 
 
-	public Method[] collectProviderMethods(String value)
+	public MethodReference[] collectProviderMethods(String value)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
-		LinkedList<Method> $ = new LinkedList<Method>();
+		LinkedList<MethodReference> $ = new LinkedList<MethodReference>();
 		Token[] tokens = DependsScanner.scan(value);
 		for (Token t : tokens) {
-			Method found = findProviderMethod(t);
+		    MethodReference found = findProviderMethod(t);
 			$.add(found);
 		}
-		return $.toArray(new Method[$.size()]);
+		return $.toArray(new MethodReference[$.size()]);
 	}
 
 	
-	private Method findProviderMethod(Token token)
+	private MethodReference findProviderMethod(Token token)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		Class providerClass = findProviderClass(token);
 		return findProviderMethod(providerClass, token);
@@ -69,12 +67,12 @@ public class DependsParser {
         }
 	}
 
-	private Method findProviderMethod(Class receiver, Token token)
+	private MethodReference findProviderMethod(Class receiver, Token token)
 			throws ClassNotFoundException, SecurityException, NoSuchMethodException {
 		if (token.args == null) {
-			Method found = null;
-			for (Method m : receiver.getMethods()) { 
-				if (m.getName().equals(token.simple)) {
+		    MethodReference found = null;
+			for (MethodReference m : MethodReference.all(receiver)) { 
+				if (m.equals(receiver, token.simple)) {
 					 if (found != null) throw new NoSuchMethodException(
 							 "Ambigous depedency, please specify parameters: "
 							 + receiver.getName() + "." + m.getName());
@@ -85,7 +83,8 @@ public class DependsParser {
 			return found;
 		}
 		else {
-			return receiver.getMethod(token.simple, this.getParameterClasses(token.args));
+			return new MethodReference(receiver, 
+			        receiver.getMethod(token.simple, this.getParameterClasses(token.args)));
 		}
 	}
 	

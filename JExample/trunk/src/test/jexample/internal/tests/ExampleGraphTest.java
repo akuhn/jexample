@@ -38,10 +38,10 @@ public class ExampleGraphTest {
 	@Test
 	public void testAddDependenciesOfOneClass() throws JExampleError, SecurityException, NoSuchMethodException {
 		graph.add( OneClass.class );
-		assertEquals( 0, graph.getExample( OneClass.class.getMethod( "testMethod" ) ).providers.size() );
-		assertEquals( 1, graph.getExample( OneClass.class.getMethod( "anotherTestMethod" ) ).providers.size() );
-		assertEquals( 1, graph.getExample( OneClass.class.getMethod( "depOnOtherTest" ) ).providers.size() );
-		assertEquals( 0, graph.getExample( DependsParserTest.B.class.getMethod( "otherTest" ) ).providers.size() );
+		assertEquals( 0, graph.findExample( OneClass.class, "testMethod" ).providers.size() );
+		assertEquals( 1, graph.findExample( OneClass.class, "anotherTestMethod" ).providers.size() );
+		assertEquals( 1, graph.findExample( OneClass.class, "depOnOtherTest" ).providers.size() );
+		assertEquals( 0, graph.findExample( DependsParserTest.B.class, "otherTest" ).providers.size() );
 	}
 
 	@Test
@@ -94,7 +94,8 @@ public class ExampleGraphTest {
 		public void aaa() { }
 	}
 
-	private static class CyclicOverClasses {
+	@SuppressWarnings("unused")
+    private static class CyclicOverClasses {
 		public CyclicOverClasses() {
 
 		}

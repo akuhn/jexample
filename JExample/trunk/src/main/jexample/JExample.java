@@ -56,5 +56,5 @@ public class JExample extends Runner implements Filterable {
         JUnitCore junit = new JUnitCore();
         return junit.run(r);
     }
-
+ 
 }

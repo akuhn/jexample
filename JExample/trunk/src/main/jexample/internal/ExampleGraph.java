@@ -1,6 +1,5 @@
 package jexample.internal;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class ExampleGraph {
 
 
     private static ExampleGraph GRAPH;
-	private Map<Method,Example> examples;
+	private Map<MethodReference,Example> examples;
 	private Map<Class,ExampleClass> classes;
 	private boolean anyHasBeenRun = false;
 
@@ -54,12 +53,12 @@ public class ExampleGraph {
         return $;
     }
 
-    protected Example newExample(Method jmethod) {
-        Example e = examples.get(jmethod);
+    protected Example newExample(MethodReference method) {
+        Example e = examples.get(method);
         if (e != null) return e;
-        e = new Example(jmethod, newExampleClass(jmethod.getDeclaringClass()));
-        examples.put(jmethod, e);
-        for (Method m : e.collectDependencies()) {
+        e = new Example(method, newExampleClass(method.jclass));
+        examples.put(method, e);
+        for (MethodReference m : e.collectDependencies()) {
             Example d = newExample(m);
             e.providers.add(d);
             e.providers.invalidateCycle(e);
@@ -85,17 +84,13 @@ public class ExampleGraph {
 		}
 	}
 
-	public Collection<Method> getMethods() {
+	public Collection<MethodReference> getMethods() {
 		return this.examples.keySet();
 	}
 	
 	public Collection<Example> getExamples() {
 	    return this.examples.values();
 	}
-
-    public Example getExample(Method m) {
-        return examples.get(m);
-    }
 
     public Runner newJExampleRunner(Class<?>... all) {
         CompositeRunner $ = new CompositeRunner("All");
@@ -114,11 +109,11 @@ public class ExampleGraph {
             return Request.errorReport(c, err).getRunner();
         }
     }
-
+    
     public Example findExample(Class<?> c, String name) {
         Example found = null;
         for (Example e : getExamples()) {
-            if (e.jmethod.getDeclaringClass() == c && e.jmethod.getName().equals(name)) {
+            if (e.method.equals(c, name)) {
                 if (found != null) throw new RuntimeException();
                 found = e;
             }
@@ -137,7 +132,7 @@ public class ExampleGraph {
         Collection<Example> copy = new ArrayList(examples.values()); 
         for (Example e : copy) {
             for (Example dependency : e.providers.transitiveClosure()) {
-                examples.put(dependency.jmethod, dependency);
+                examples.put(dependency.method, dependency);
             }
         }
     }

@@ -41,9 +41,9 @@ public class ExampleClass {
 	}
 
 
-    public List<Method> collectTestMethods() {
-		List<Method> $ = new ArrayList<Method>();
-        for (Method m : jclass.getMethods()) {
+    public List<MethodReference> collectTestMethods() {
+		List<MethodReference> $ = new ArrayList<MethodReference>();
+        for (MethodReference m : MethodReference.all(jclass)) {
             if (m.isAnnotationPresent(Test.class)) {
                 $.add(m);
             }
@@ -99,11 +99,11 @@ public class ExampleClass {
     }
     
     public boolean contains(Example m) {
-       return m.jmethod.getDeclaringClass().equals(jclass);
+       return m.method.jclass.equals(jclass);
     }
 
     public void initializeExamples() {
-        for (Method m : collectTestMethods()) {
+        for (MethodReference m : collectTestMethods()) {
             graph.newExample(m);
         }
     }
