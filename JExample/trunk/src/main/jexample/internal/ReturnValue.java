@@ -62,8 +62,10 @@ public class ReturnValue {
     }
     
     private boolean isImmutable() {
-        return returnValue instanceof String;
-        // TODO add more here ... maybe keep a list of classes somewhere
+        return returnValue instanceof String
+            || returnValue instanceof Number // assume all subclasses are immutable
+            || returnValue instanceof Boolean;
+            // TODO add more classes
     }
 
     private static boolean keep(InjectionPolicy policy) {
