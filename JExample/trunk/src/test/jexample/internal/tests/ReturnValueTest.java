@@ -1,10 +1,9 @@
 package jexample.internal.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Stack;
 
 import jexample.Depends;
 import jexample.JExample;
@@ -15,10 +14,39 @@ import jexample.internal.JExampleError;
 import jexample.internal.Util;
 
 import org.junit.Test;
+import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
 public class ReturnValueTest {
 
+    @RunWith(JExample.class)
+    @JExampleOptions(cloneTestCase = true)
+    private static class WithStackField {
+        
+        private Stack stack;
+        
+        @Test
+        public void setUp() {
+            stack = new Stack();
+        }
+        
+        @Test
+        @Depends("#setUp")
+        public void first() {
+            assertNotNull(stack);
+            assertEquals(0, stack.size());
+            stack.push(42);
+        }
+        
+        @Test
+        @Depends("#setUp;#first")
+        public void second() {
+            assertNotNull(stack);
+            assertEquals(0, stack.size());
+        }
+        
+    }
+    
     @RunWith(JExample.class)
     @JExampleOptions(cloneTestCase = true)
     private static class WithField {
@@ -64,7 +92,7 @@ public class ReturnValueTest {
     public void nullIsCloneable() throws JExampleError {
         Example e = runNullExample();        
         assertEquals(null, e.returnValue.getValue());
-        assertTrue(e.returnValue.isCloneable());
+        assertTrue(Util.isCloneable(e.returnValue.getValue()));
     }
     
     @Test
@@ -86,6 +114,12 @@ public class ReturnValueTest {
         $.runJExample( WithField.class );
         Example e = $.findExample( WithField.class , example );
         return e;
+    }
+    
+    @Test
+    public void deepCloneOfTestCase() throws JExampleError {
+        Result result = new ExampleGraph().runJExample(WithStackField.class);
+        assertTrue( result.wasSuccessful() );
     }
     
     

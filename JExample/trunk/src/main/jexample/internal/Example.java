@@ -199,11 +199,11 @@ public class Example {
     }
 
     private Object newTestClassInstance() throws Exception {
-        if (providers.hasFirstProviderImplementedIn(this)) {
+        if (Util.cloneTestCase(this.policy) 
+                && providers.hasFirstProviderImplementedIn(this)) {
             return providers.get( 0 ).returnValue.getTestCaseInstance();
-        } else {
-            return Util.getConstructor( method.jclass ).newInstance();
         }
+        return Util.getConstructor( method.jclass ).newInstance();
     }
 
     public void validate() {
