@@ -1,5 +1,6 @@
 package jexample.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -14,6 +15,7 @@ public class ReturnValue {
 
     public final Example provider;
     private Object returnValue;
+    private Object testCaseInstance;
 
     public ReturnValue(Example provider) {
         this.provider = provider;
@@ -74,6 +76,35 @@ public class ReturnValue {
 
     void assign(Object value) {
         this.returnValue = value;
+    }
+
+    public Object getTestCaseInstance() throws InstantiationException, IllegalAccessException {
+        return this.cloneTestCaseInstance();
+    }
+
+    private Object cloneTestCaseInstance() throws InstantiationException, IllegalAccessException {
+        Class<? extends Object> clazz = this.testCaseInstance.getClass();
+        Object clone = clazz.newInstance();
+        
+        Field[] fields = clazz.getFields();
+        Field field;
+        Object fieldValue;
+        for ( int i = 0; i < fields.length; i++ ) {
+            field = fields[i];
+            fieldValue = field.get( this.testCaseInstance );
+            field.set( clone , fieldValue );
+        }
+        
+        return clone;
+    }
+
+    public void assignInstance( Object test ) {
+        assert this.provider.owner.jclass.equals( test.getClass() );
+        this.testCaseInstance = test;
+    }
+
+    public boolean hasTestCaseInstance() {
+        return this.testCaseInstance != null;
     }
     
 }
