@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Stack;
 
 import jexample.Depends;
-import jexample.InjectionPolicy;
+import jexample.JExampleOptions;
 import jexample.internal.JExampleError.Kind;
 
 import org.junit.Ignore;
@@ -26,7 +26,7 @@ import org.junit.runner.notification.RunNotifier;
  * value. If an example method declares dependencies and has arguments, the
  * framework will inject the cache return values of the dependencies as
  * parameters into the method execution. For more details, please refer to
- * {@link jexample.InjectionPolicy @InjectionPolicy}.
+ * {@link jexample.JExampleOptions @InjectionPolicy}.
  * <p>
  * An example method must have at least a {@link org.junit.Test @Test}
  * annotation. The enclosing class must use an {@link org.junit.RunWith
@@ -54,7 +54,7 @@ public class Example {
 
     private JExampleError        errors;
     private ExampleState         result;
-    private InjectionPolicy      policy;
+    private JExampleOptions      policy;
 
 
     public Example( MethodReference method , ExampleClass owner ) {
@@ -65,7 +65,7 @@ public class Example {
         this.result = ExampleState.NONE;
         this.description = method.createTestDescription();
         this.returnValue = new ReturnValue( this );
-        this.policy = method.jclass.getAnnotation( InjectionPolicy.class );
+        this.policy = method.jclass.getAnnotation( JExampleOptions.class );
         this.errors = new JExampleError();
     }
 
@@ -199,10 +199,10 @@ public class Example {
     }
 
     private Object newTestClassInstance() throws Exception {
-        if (!providers.isEmpty() && providers.get( 0 ).returnValue.hasTestCaseInstance() ) {
+        if (providers.hasFirstProviderImplementedIn(this)) {
             return providers.get( 0 ).returnValue.getTestCaseInstance();
         } else {
-            return ExampleClass.getConstructor( method.jclass ).newInstance();
+            return Util.getConstructor( method.jclass ).newInstance();
         }
     }
 

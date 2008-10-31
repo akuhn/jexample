@@ -15,8 +15,10 @@ import java.lang.annotation.Target;
 @Documented
 @Target( { ElementType.TYPE } )
 @Retention( RetentionPolicy.RUNTIME )
-public @interface InjectionPolicy {
+public @interface JExampleOptions {
 
-    public boolean keep() default false;
+    public boolean cloneReturnValues() default true; 
+    
+    public boolean cloneTestCase() default false;
     
 }

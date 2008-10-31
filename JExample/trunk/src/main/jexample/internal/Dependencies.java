@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import jexample.InjectionPolicy;
+import jexample.JExampleOptions;
 
 /**
  * Manages the dependencies/providers of an example.
@@ -51,7 +51,7 @@ public class Dependencies extends ArrayList<Example> {
         }
     }
 
-    public Object[] getInjectionValues(InjectionPolicy policy, int length) throws Exception {
+    public Object[] getInjectionValues(JExampleOptions policy, int length) throws Exception {
         Object[] values = new Object[length];
         for (int i = 0; i < length; i++) {
             values[i] = this.get(i).returnValue.get(policy);
@@ -59,6 +59,8 @@ public class Dependencies extends ArrayList<Example> {
         return values;
     }
     
-    
+    public boolean hasFirstProviderImplementedIn(Example $) {
+        return !isEmpty() && get(0).returnValue.hasTestCaseInstance($.method.jclass);
+    }
     
 }

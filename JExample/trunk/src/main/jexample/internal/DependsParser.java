@@ -58,7 +58,7 @@ public class DependsParser {
 		throw new ClassNotFoundException(token.path);
 	}
 	
-	private static Class findClass(String fullname) {
+	private Class findClass(String fullname) {
 	    try {
             return Class.forName(fullname);
         } 

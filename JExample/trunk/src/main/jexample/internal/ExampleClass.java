@@ -1,9 +1,7 @@
 package jexample.internal;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 import jexample.JExample;
@@ -57,15 +55,6 @@ public class ExampleClass {
         graph.run(this, notifier);
     }
     
-    public static Constructor getConstructor(Class jClass) throws SecurityException, NoSuchMethodException {
-        if (!Modifier.isPublic(jClass.getModifiers())) {
-            Constructor $ = jClass.getDeclaredConstructor();
-            $.setAccessible(true);
-            return $;
-        }
-        return jClass.getConstructor();
-    }
-
     public void validate() throws JExampleError {
         RunWith run = (RunWith) jclass.getAnnotation(RunWith.class);
         if (run == null || run.value() != JExample.class ) {
@@ -73,7 +62,7 @@ public class ExampleClass {
                     "Class %s is not a JExample test class, annotation @RunWith(JExample.class) missing.", this);
         }
         try {
-            getConstructor(jclass);
+            Util.getConstructor(jclass);
         }
         catch (NoSuchMethodException ex) {
             errors.add(Kind.MISSING_CONSTRUCTOR, ex);

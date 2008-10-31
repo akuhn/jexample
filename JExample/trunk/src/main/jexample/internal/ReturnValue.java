@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import jexample.InjectionPolicy;
+import jexample.JExampleOptions;
 
 /**
  * 
@@ -55,10 +55,10 @@ public class ReturnValue {
         return returnValue;
     }
     
-    public Object get(InjectionPolicy policy) throws Exception {
+    public Object get(JExampleOptions options) throws Exception {
         if (returnValue == null) return null;
         if (isCloneable()) return getClone();
-        if (isImmutable() || keep(policy)) return returnValue;
+        if (isImmutable() || !Util.cloneReturnValue(options)) return returnValue;
         returnValue = provider.reRunTestMethod();
         return returnValue;
     }
@@ -70,32 +70,12 @@ public class ReturnValue {
             // TODO add more classes
     }
 
-    private static boolean keep(InjectionPolicy policy) {
-        return policy != null && policy.keep();
-    }
-
     void assign(Object value) {
         this.returnValue = value;
     }
 
-    public Object getTestCaseInstance() throws InstantiationException, IllegalAccessException {
-        return this.cloneTestCaseInstance();
-    }
-
-    private Object cloneTestCaseInstance() throws InstantiationException, IllegalAccessException {
-        Class<? extends Object> clazz = this.testCaseInstance.getClass();
-        Object clone = clazz.newInstance();
-        
-        Field[] fields = clazz.getFields();
-        Field field;
-        Object fieldValue;
-        for ( int i = 0; i < fields.length; i++ ) {
-            field = fields[i];
-            fieldValue = field.get( this.testCaseInstance );
-            field.set( clone , fieldValue );
-        }
-        
-        return clone;
+    public Object getTestCaseInstance() throws InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+        return Util.forceClone(testCaseInstance);
     }
 
     public void assignInstance( Object test ) {
@@ -103,8 +83,8 @@ public class ReturnValue {
         this.testCaseInstance = test;
     }
 
-    public boolean hasTestCaseInstance() {
-        return this.testCaseInstance != null;
+    public boolean hasTestCaseInstance(Class<?> jclass) {
+        return testCaseInstance != null && testCaseInstance.getClass() == jclass;
     }
     
 }

@@ -3,7 +3,7 @@ package jexample.internal.tests;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
-import jexample.InjectionPolicy;
+import jexample.JExampleOptions;
 import jexample.JExample;
 import jexample.internal.ExampleGraph;
 import jexample.internal.JExampleError;
@@ -19,7 +19,7 @@ public class InjectionPolicyTest {
     }
     
     @RunWith( JExample.class )
-    @InjectionPolicy( keep = true )
+    @JExampleOptions( cloneReturnValues = false )
     static class B {
         
         @Test
