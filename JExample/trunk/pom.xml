@@ -37,15 +37,15 @@
         <repository>
                 <uniqueVersion>false</uniqueVersion>
                 <id>ssh-jexample</id>
-                <url>scpexe://shell.sf.net/home/groups/j/je/jexample/htdocs/maven2</url>
+                <url>scpexe://web.sourceforge.net/home/groups/j/je/jexample/htdocs/maven2</url>
         </repository>
         <snapshotRepository>
                 <uniqueVersion>true</uniqueVersion>
                 <id>ssh-jexample-snapshot</id>
-                <url>scpexe://shell.sf.net/home/groups/j/je/jexample/htdocs/maven2-snapshot</url>
+                <url>scpexe://web.sourceforge.net/home/groups/j/je/jexample/htdocs/maven2-snapshot</url>
         </snapshotRepository>
 </distributionManagement>
-  
+
   <developers>
     <developer>
       <id>haense</id>
@@ -264,5 +264,6 @@
   <properties>
     <jdk.version>1.5</jdk.version>
   </properties>
-  
+
 </project>
+
