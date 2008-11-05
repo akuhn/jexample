@@ -1,0 +1,1 @@
+export SVNVERSION="-r`svnversion`"
