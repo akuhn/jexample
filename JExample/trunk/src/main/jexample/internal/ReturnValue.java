@@ -31,9 +31,12 @@ public class ReturnValue {
     }
     
     public Object get(JExampleOptions options) throws Exception {
-        if (isImmutable(returnValue)) return returnValue;
-        if (!options.cloneReturnValues()) return returnValue;
-        if (isCloneable(returnValue)) return Util.clone(returnValue);
+        if (isImmutable(returnValue)) 
+            return returnValue;
+        if (!options.cloneReturnValues()) 
+            return returnValue;
+        if (isCloneable(returnValue)) 
+            return Util.clone(returnValue);
         return provider.reRunTestMethod();
     }
     

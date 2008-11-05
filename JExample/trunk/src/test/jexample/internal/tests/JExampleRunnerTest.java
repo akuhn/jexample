@@ -266,55 +266,6 @@ public class JExampleRunnerTest {
 		assertEquals( 3, result.getRunCount() );
 	}
 
-	@RunWith( JExample.class )
-	private static class CloneRetVal {
-
-		public CloneRetVal() {
-		}
-
-		@Test
-		public Clone root() {
-			return new Clone( "original" );
-		}
-
-		@Test
-		@Depends( "root" )
-		public void second( Clone aClone ) {
-			assertEquals( "clone", aClone.getName() );
-		}
-
-		static public class Clone implements Cloneable {
-			private final String name;
-
-			public Clone() {
-				this.name = "";
-			}
-
-			public Clone( String name ) {
-				this.name = name;
-			}
-
-			@Override
-            public Object clone() {
-				return new Clone( "clone" );
-			}
-
-			public String getName() {
-				return this.name;
-			}
-		}
-	}
-
-	@Test
-	public void testCloneRetVal() throws JExampleError {
-		Class<?>[] classes = { CloneRetVal.class };
-        ExampleGraph g = new ExampleGraph();
-        Result result = g.runJExample(classes);
-		assertEquals( 0, result.getFailureCount() );
-		assertEquals( 0, result.getIgnoreCount() );
-		assertEquals( 2, result.getRunCount() );
-	}
-	
 	@Test
 	public void filter() throws NoTestsRemainException, JExampleError {
 	    ExampleGraph g = new ExampleGraph();

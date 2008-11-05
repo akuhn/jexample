@@ -14,6 +14,10 @@ public abstract class Util {
         public IsCloneable(String name) {
             this.name = name;
         }
+        @Override
+        public Object clone() throws CloneNotSupportedException {
+            return new IsCloneable("clone of " + name);
+        }
     }
     
     
