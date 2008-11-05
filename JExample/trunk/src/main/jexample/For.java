@@ -7,11 +7,17 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.RunNotifier;
 
 /**
- * Exercises test methods as sophisticated constructor to create example instances.
+ * Creates example instances. Sometimes, when you are writing a script or
+ * hacking on spike-prototype you might need examples instances of objects.
+ * You can use this class to create them:
  * 
- *
+ * <pre>
+ *     Stack stack = For.example(Stack.class, "withManyValues");
+ * </pre>
+ * 
+ * @author Adrian Kuhn, 2007-2008
+ * 
  */
-
 public abstract class For {
 
 	public static <T> T example(Class jClass, String method) {

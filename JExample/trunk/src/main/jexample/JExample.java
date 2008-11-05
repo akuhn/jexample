@@ -13,13 +13,17 @@ import org.junit.runner.notification.RunNotifier;
 
 
 /**
- * Runs JExample tests. Delegates all logic to the singleton {@link ExampleGraph}. Assumes
- * that clients first create an instance for each classes under test, and only when all
- * instances are created start calling {@link #run(RunNotifier)} on any of these instances. Current versions
- * of JUnit's eclipse plug-in do so (as of Eclipse 3.4 and JUnit 4.4).
+ * Runs JExample tests. Delegates all logic to the singleton {@link ExampleGraph}.
+ * Assumes that JUnit first creates an instance of each classes under test, and
+ * only when all instances are created starts calling {@link #run(RunNotifier)}
+ * on any of these instances. Current versions of JUnit's eclipse plug-in do so
+ * (as of Eclipse 3.4 and JUnit 4.4).
+ * <p>
+ * All test classes passed to this Runner must be annotated with 
+ * &#64;{@link RunWith}(JExample.class) annotations.
  *  
- * @author Lea Haensenberger 
- * @author Adrian Kuhn
+ * @author Adrian Kuhn, 2007-2008
+ * @author Lea Haensenberger, 2007
  * 
  */
 public class JExample extends Runner implements Filterable {
