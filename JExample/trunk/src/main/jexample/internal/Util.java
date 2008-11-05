@@ -19,14 +19,6 @@ public class Util {
         return jClass.getConstructor();
     }
 
-    public static boolean cloneReturnValue(JExampleOptions $) {
-        return $ != null && $.cloneReturnValues();
-    }
-    
-    public static boolean cloneTestCase(JExampleOptions $) {
-        return $ != null && $.cloneTestCase();
-    }
-    
     public static <T> T getField(Object $, String name) {
         try {
             Field f = $.getClass().getDeclaredField(name);

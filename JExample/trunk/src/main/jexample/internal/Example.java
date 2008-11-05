@@ -65,8 +65,14 @@ public class Example {
         this.result = ExampleState.NONE;
         this.description = method.createTestDescription();
         this.returnValue = new ReturnValue( this );
-        this.policy = method.jclass.getAnnotation( JExampleOptions.class );
+        this.policy = getJExampleOptions(method.jclass);
         this.errors = new JExampleError();
+    }
+
+    private JExampleOptions getJExampleOptions(Class jclass) {
+        final JExampleOptions options = (JExampleOptions) jclass.getAnnotation( JExampleOptions.class );
+        if (options == null) return JExampleOptions.class.getAnnotation(JExampleOptions.class);
+        return options;
     }
 
     public MethodReference[] collectDependencies() {
@@ -199,7 +205,7 @@ public class Example {
     }
 
     private Object newTestClassInstance() throws Exception {
-        if (Util.cloneTestCase(this.policy) 
+        if (this.policy.cloneTestCase()
                 && providers.hasFirstProviderImplementedIn(this)) {
             return providers.get( 0 ).returnValue.getTestCaseInstance();
         }

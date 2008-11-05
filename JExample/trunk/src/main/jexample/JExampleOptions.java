@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
  */
 
 @Documented
+@JExampleOptions
 @Target( { ElementType.TYPE } )
 @Retention( RetentionPolicy.RUNTIME )
 public @interface JExampleOptions {

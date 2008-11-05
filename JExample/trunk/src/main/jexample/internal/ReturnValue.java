@@ -1,5 +1,9 @@
 package jexample.internal;
 
+import static jexample.internal.Util.forceClone;
+import static jexample.internal.Util.isCloneable;
+import static jexample.internal.Util.isImmutable;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,11 +31,10 @@ public class ReturnValue {
     }
     
     public Object get(JExampleOptions options) throws Exception {
-        if (Util.isImmutable(returnValue)) return returnValue;
-        if (Util.isCloneable(returnValue)) return Util.clone(returnValue);
-        if (!Util.cloneReturnValue(options)) return returnValue;
-        returnValue = provider.reRunTestMethod();
-        return returnValue;
+        if (isImmutable(returnValue)) return returnValue;
+        if (!options.cloneReturnValues()) return returnValue;
+        if (isCloneable(returnValue)) return Util.clone(returnValue);
+        return provider.reRunTestMethod();
     }
     
     void assign(Object value) {
@@ -39,7 +42,7 @@ public class ReturnValue {
     }
 
     public Object getTestCaseInstance() throws InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
-        return Util.forceClone(testCaseInstance);
+        return forceClone(testCaseInstance);
     }
 
     public void assignInstance( Object test ) {
