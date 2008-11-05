@@ -9,6 +9,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import jexample.Depends;
 import jexample.JExample;
+import jexample.JExampleOptions;
 import jexample.demo.StackTest;
 import jexample.internal.Example;
 import jexample.internal.ExampleClass;
@@ -315,6 +316,7 @@ public class JExampleRunnerTest {
 	}
 	
 	@RunWith( JExample.class )
+	@JExampleOptions( cloneReturnValues = true )
 	private static class NotCloneRetVal {
 
 		private static NoClone rootClone, secondClone;
