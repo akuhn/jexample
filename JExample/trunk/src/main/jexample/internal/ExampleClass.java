@@ -90,7 +90,7 @@ public class ExampleClass {
         }
     }
     
-    public void runBefores() {
+    public void runBeforeClassBefores() {
         if (beforesRunned) return;
         for (Method m : jclass.getMethods()) {
             if (m.isAnnotationPresent(BeforeClass.class)) {

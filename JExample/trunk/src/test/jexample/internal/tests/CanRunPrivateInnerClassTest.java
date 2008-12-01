@@ -23,9 +23,7 @@ public class CanRunPrivateInnerClassTest {
     
     @Test
     public void testRunningPrivateInnerClass() throws JExampleError  {
-        Class<?>[] classes = { PrivateInnerClass.class };
-        ExampleGraph g = new ExampleGraph();
-        Result result = g.runJExample(classes);
+    	Result result = Util.runAllExamples(PrivateInnerClass.class);
         assertEquals(true, result.wasSuccessful());
         assertEquals(1, result.getRunCount());
         assertEquals(0, result.getFailureCount());

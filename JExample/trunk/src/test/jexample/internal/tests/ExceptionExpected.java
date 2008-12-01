@@ -1,5 +1,6 @@
 package jexample.internal.tests;
 
+import static jexample.internal.tests.Util.runExample;
 import static org.junit.Assert.assertEquals;
 import jexample.JExample;
 import jexample.internal.Example;
@@ -27,7 +28,7 @@ public class ExceptionExpected {
 		
 		@Test(expected=CustomException.class)
 		public void noExceptionPresent() {
-			// dont thorw
+			// don't throw
 		}
 		
 		@Test(expected=CustomException.class)
@@ -64,27 +65,27 @@ public class ExceptionExpected {
 	
 	@Test
 	public void testExceptionPresent() {
-		assertEquals(true, Util.runExample(A.class, "exceptionPresent").wasSuccessful());
+		assertEquals(true, runExample(A.class, "exceptionPresent").wasSuccessful());
 	}
 	
 	@Test
 	public void testNoExceptionPresent() {
-		assertEquals(false, Util.runExample(A.class, "noExceptionPresent").wasSuccessful());
+		assertEquals(false, runExample(A.class, "noExceptionPresent").wasSuccessful());
 	}
 	
 	@Test
 	public void testWrongExceptionPresent() {
-		assertEquals(false, Util.runExample(A.class, "wrongExceptionPresent").wasSuccessful());
+		assertEquals(false, runExample(A.class, "wrongExceptionPresent").wasSuccessful());
 	}
 	
 	@Test
 	public void testSuperclassIsPresent() {
-		assertEquals(false, Util.runExample(A.class, "superclassIsPresent").wasSuccessful());
+		assertEquals(false, runExample(A.class, "superclassIsPresent").wasSuccessful());
 	}
 	
 	@Test
 	public void testSubclassIsPresent() {
-		assertEquals(true, Util.runExample(A.class, "subclassIsPresent").wasSuccessful());
+		assertEquals(true, runExample(A.class, "subclassIsPresent").wasSuccessful());
 	}
 	
 }

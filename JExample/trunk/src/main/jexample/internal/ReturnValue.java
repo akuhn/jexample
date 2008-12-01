@@ -37,7 +37,7 @@ public class ReturnValue {
             return returnValue;
         if (isCloneable(returnValue)) 
             return Util.clone(returnValue);
-        return provider.reRunTestMethod();
+        return provider.bareInvoke();
     }
     
     void assign(Object value) {

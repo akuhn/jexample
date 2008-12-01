@@ -14,30 +14,19 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
 /**
- * Invokes an example, caches the result and notifies JUnit.
+ * Runs an example, reports to JUnit and returns test color.
  * 
  * @author Adrian Kuhn
  *
  */
-class ExampleInvoker {
+class ExampleRunner {
 
 	private final Example $;
 	private final RunNotifier notifier;
 
-	public ExampleInvoker(Example example, RunNotifier notifier) {
+	public ExampleRunner(Example example, RunNotifier notifier) {
 		this.$ = example;
 		this.notifier = notifier;
-	}
-
-	private void executeExample() throws InvocationTargetException,
-			Exception {
-		Object[] args = $.providers.getInjectionValues($.policy, $.method.arity());
-		Object container = $.getContainerInstance();
-		Object result = $.method.invoke(container, args);
-		if ($.expectedException == null) {
-			$.returnValue.assign(result);
-			$.returnValue.assignInstance(container);
-		}
 	}
 
 	private ExampleState fail(Throwable e) {
@@ -70,18 +59,17 @@ class ExampleInvoker {
 		return !$.expectedException.isAssignableFrom(exception.getClass());
 	}
 
+	/** Runs the example and returns test color.
+	 * 
+	 * @return 
+	 *		{@link GREEN} if the example was successful,<br>
+	 *	 	{@link RED} if the example is invalid or failed, and<br>
+	 *		{@link WHITE} if any of the dependencies failed.
+	 */
 	public ExampleState run() {
-		$.owner.runBefores();
-		if (!$.errors.isEmpty()) {
-			started();
-			fail($.errors);
-			finished();
-			return RED;
-		}
-		if (toBeIgnored())
-			return ignore();
-		if (!runDependencies())
-			return ignore();
+		if ($.errors.size() > 0) return abort($.errors);
+		if (toBeIgnored()) return ignore();
+		if (!runDependencies())	return ignore();
 		started();
 		try {
 			return runExample();
@@ -89,18 +77,37 @@ class ExampleInvoker {
 			finished();
 		}
 	}
-
+	
+	private ExampleState abort(Throwable ex) {
+		notifier.testAborted($.description, ex);
+		return RED;
+	}
+	
+	/** Runs dependencies and returns success.
+	 * Dependencies are runned in order of declaration. 
+	 * 
+	 * @return If all dependencies succeed return <code>true</code>.<br>
+	 * 		If any fails, abort and return <code>false</code>.
+	 */
 	private boolean runDependencies() {
-		for (Example provider : $.providers) {
-			provider.run(notifier);
-			if (!provider.wasSuccessful()) return false;
+		for (Example each : $.providers) {
+			each.run(notifier);
+			if (!each.wasSuccessful()) { 
+				return false;
+			}
 		}
 		return true;
 	}
 	
+	/** Runs the bare example and handles exceptions.
+	 * 
+	 * @return
+	 * 		{@link GREEN} if the example runs without exception (or throws an expected exception).<br>
+	 * 		{@link RED} if the example fails (or if an exception was expected, does not throw the expected exception).
+	 */
 	private ExampleState runExample() {
 		try {
-			executeExample();
+			$.bareInvoke();
 			if ($.expectedException != null) return failExpectedException();
 			return success();
 		} catch (InvocationTargetException e) {

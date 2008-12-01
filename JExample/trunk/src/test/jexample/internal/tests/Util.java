@@ -5,6 +5,7 @@ import jexample.internal.ExampleGraph;
 import jexample.internal.JExampleError;
 import jexample.internal.tests.ExceptionExpected.A;
 
+import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 
 public abstract class Util {
@@ -38,5 +39,14 @@ public abstract class Util {
 		e.run(new RunNotifier());    
 		return e;
 	}
+    
+    public static Result runAllExamples(Class<?>... constainers) {
+    	ExampleGraph g = new ExampleGraph();
+		try {
+			return g.runJExample(constainers);
+		} catch (JExampleError ex) {
+			throw new RuntimeException(ex);
+		}
+    }
     
 }

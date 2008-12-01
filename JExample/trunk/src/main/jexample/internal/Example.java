@@ -27,7 +27,7 @@ import org.junit.runner.notification.RunNotifier;
  * <p>
  * An example method must have at least a {@link org.junit.Test @Test}
  * annotation. The enclosing class must use an {@link org.junit.RunWith
- * @RunWith} annotation to declare {@link jexample.JExample JExampleRunner} as
+ * &#64;RunWith} annotation to declare {@link jexample.JExample JExampleRunner} as
  * test runner.
  * <p>
  * An example method may return an instance of its unit under test.
@@ -48,8 +48,8 @@ public class Example {
 	public final MethodReference method;
 	public final Dependencies providers;
 	public final ExampleClass owner;
-
 	public final Class<? extends Throwable> expectedException;
+	
 	protected JExampleError errors;
 	private ExampleState result;
 	protected JExampleOptions policy;
@@ -67,7 +67,7 @@ public class Example {
 		this.expectedException = initExpectedException();
 	}
 
-	public MethodReference[] collectDependencies() {
+	protected MethodReference[] collectDependencies() {
 		Depends a = method.getAnnotation(Depends.class);
 		if (a != null) {
 			try {
@@ -86,7 +86,7 @@ public class Example {
 		return new MethodReference[0];
 	}
 
-	public void errorPartOfCycle(Stack<Example> cycle) {
+	protected void errorPartOfCycle(Stack<Example> cycle) {
 		errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
 	}
 
@@ -107,7 +107,7 @@ public class Example {
 		return options;
 	}
 
-	protected Object getContainerInstance() throws Exception {
+	private Object getContainerInstance() throws Exception {
 		if (this.policy.cloneTestCase()
 				&& providers.hasFirstProviderImplementedIn(this)) {
 			return providers.get(0).returnValue.getTestCaseInstance();
@@ -115,23 +115,28 @@ public class Example {
 		return Util.getConstructor(method.jclass).newInstance();
 	}
 
-	public Object reRunTestMethod() throws Exception {
-		owner.runBefores();
-		Object test = getContainerInstance();
+	protected Object bareInvoke() throws Exception {
+		owner.runBeforeClassBefores();
 		Object[] args = providers.getInjectionValues(policy, method.arity());
-		return this.method.invoke(test, args);
+		Object container = getContainerInstance();
+		Object $ = method.invoke(container, args);
+		if (result == NONE) {
+			returnValue.assign($);
+			returnValue.assignInstance(container);
+		}
+		return $;
 	}
 
 	public void run(RunNotifier notifier) {
-		if (result == NONE) result = new ExampleInvoker(this, notifier).run();
+		if (result == NONE) result = new ExampleRunner(this, notifier).run();
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Example: " + method;
 	}
 
-	public void validate() {
+	protected void validate() {
 		if (!method.isAnnotationPresent(Test.class)) {
 			errors
 					.add(
@@ -154,7 +159,7 @@ public class Example {
 		// }
 	}
 
-	public void validateCycle() {
+	protected void validateCycle() {
 		providers.validateCycle(this);
 	}
 
