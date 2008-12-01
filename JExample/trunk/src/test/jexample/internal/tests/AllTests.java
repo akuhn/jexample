@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ExampleValidateTest.class,
         ExampleGraphAddTest.class,
         ExampleGraphTest.class,
+        ExceptionExpected.class,
         ForExampleTest.class,
         InheritanceTest.class,   
         JExampleOptionsDefault.class,

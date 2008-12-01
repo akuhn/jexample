@@ -51,6 +51,7 @@ public class Example {
     public final MethodReference method;
     public final Dependencies    providers;
     public final ExampleClass    owner;
+    public final Class<? extends Throwable> expectedException;
 
     private JExampleError        errors;
     private ExampleState         result;
@@ -65,11 +66,12 @@ public class Example {
         this.result = ExampleState.NONE;
         this.description = method.createTestDescription();
         this.returnValue = new ReturnValue( this );
-        this.policy = getJExampleOptions(method.jclass);
+        this.policy = initJExampleOptions(method.jclass);
         this.errors = new JExampleError();
+        this.expectedException = initExpectedException();
     }
 
-    private JExampleOptions getJExampleOptions(Class jclass) {
+    private JExampleOptions initJExampleOptions(Class<?> jclass) {
         final JExampleOptions options = (JExampleOptions) jclass.getAnnotation( JExampleOptions.class );
         if (options == null) return JExampleOptions.class.getAnnotation(JExampleOptions.class);
         return options;
@@ -94,12 +96,7 @@ public class Example {
         return new MethodReference[0];
     }
 
-    private boolean expectsException() {
-        return this.getExpectedException() != null;
-    }
-
-
-    private Class<? extends Throwable> getExpectedException() {
+    private Class<? extends Throwable> initExpectedException() {
         Test a = this.method.getAnnotation( Test.class );
         if ( a == null )
             return null;
@@ -117,27 +114,35 @@ public class Example {
         return result == ExampleState.GREEN;
     }
 
-    private void invokeMethod( Object test , RunNotifier notifier ,
-                               Object... args ) {
+    private void invokeMethod(Object container, RunNotifier notifier, Object... args ) {
         notifier.fireTestStarted( description );
         try {
-            returnValue.assign( this.method.invoke( test , args ) );
-            returnValue.assignInstance( test );
-            this.result = ExampleState.GREEN;
+        	Object result = this.method.invoke(container, args);
+        	if (this.expectedException == null) {
+        		returnValue.assign(result);
+        		returnValue.assignInstance(container);
+        		this.result = ExampleState.GREEN;
+        	} else {
+                notifier.fireTestFailure(new Failure(this.description, new Exception()));        		
+        		this.result = ExampleState.RED;
+        	}
         } catch ( InvocationTargetException e ) {
             Throwable actual = e.getTargetException();
-            if ( !this.expectsException() ) {
+            if ( this.expectedException == null ) {
                 notifier.fireTestFailure( new Failure( this.description ,
                         actual ) );
                 this.result = ExampleState.RED;
-            } else if ( this.isUnexpectedException( actual ) ) {
+            } else if ( !this.expectedException.isAssignableFrom(actual.getClass())) {
                 String message = "Unexpected exception, expected<"
-                                 + this.getExpectedException().getName()
+                                 + this.expectedException.getName()
                                  + "> but was<" + actual.getClass().getName()
                                  + ">";
                 notifier.fireTestFailure( new Failure( this.description ,
                         new Exception( message , actual ) ) );
                 this.result = ExampleState.RED;
+            }
+            else {
+        		this.result = ExampleState.GREEN;
             }
         } catch ( Throwable e ) {
             notifier.fireTestFailure( new Failure( this.description , e ) );
@@ -150,10 +155,6 @@ public class Example {
 
     private boolean toBeIgnored() {
         return this.method.getAnnotation( Ignore.class ) != null;
-    }
-
-    private boolean isUnexpectedException( Throwable actual ) {
-        return this.getExpectedException() != actual.getClass();
     }
 
     public Object reRunTestMethod() throws Exception {
@@ -182,12 +183,17 @@ public class Example {
             notifier.fireTestFinished( description );
             return;
         }
+        if (this.toBeIgnored()) {
+        	this.result = ExampleState.WHITE;
+            notifier.fireTestIgnored( this.description );
+            return;
+        }
         boolean allParentsGreen = true;
         for ( Example dependency : this.providers ) {
             dependency.run( notifier );
             allParentsGreen &= dependency.result == ExampleState.GREEN;
         }
-        if ( allParentsGreen && !this.toBeIgnored() ) {
+        if ( allParentsGreen ) {
             try {
                 Object[] args = this.providers.getInjectionValues( this.policy ,
                         this.arity() );
@@ -199,8 +205,8 @@ public class Example {
                 notifier.testAborted( this.description , e );
             }
         } else {
-            this.result = ExampleState.WHITE;
-            notifier.fireTestIgnored( this.description );
+        	this.result = ExampleState.WHITE;
+            notifier.fireTestIgnored( this.description );            
         }
     }
 
@@ -249,7 +255,7 @@ public class Example {
                                 "Parameter #%d in (%s) is not assignable from depedency (%s)." ,
                                 position , method , tm.method );
             }
-            if ( tm.expectsException() ) {
+            if ( tm.expectedException != null ) {
                 errors
                         .add(
                                 Kind.PROVIDER_EXPECTS_EXCEPTION ,
