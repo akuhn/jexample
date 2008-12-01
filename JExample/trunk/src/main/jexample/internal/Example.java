@@ -9,7 +9,6 @@ import jexample.Depends;
 import jexample.JExampleOptions;
 import jexample.internal.JExampleError.Kind;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
@@ -51,10 +50,9 @@ public class Example {
 	public final ExampleClass owner;
 
 	public final Class<? extends Throwable> expectedException;
-	JExampleError errors;
-	ExampleState result;
-
-	JExampleOptions policy;
+	protected JExampleError errors;
+	private ExampleState result;
+	protected JExampleOptions policy;
 
 	public Example(MethodReference method, ExampleClass owner) {
 		assert method != null && owner != null;

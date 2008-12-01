@@ -29,15 +29,6 @@ class ExampleInvoker {
 		this.notifier = notifier;
 	}
 
-	private boolean runDependencies() {
-		for (Example provider : $.providers) {
-			provider.run(notifier);
-			if (provider.result != GREEN)
-				return false;
-		}
-		return true;
-	}
-
 	private void executeExample() throws InvocationTargetException,
 			Exception {
 		Object[] args = $.providers.getInjectionValues($.policy, $.method.arity());
@@ -52,6 +43,18 @@ class ExampleInvoker {
 	private ExampleState fail(Throwable e) {
 		notifier.fireTestFailure(new Failure($.description, e));
 		return RED;
+	}
+
+	private ExampleState failExpectedException() {
+		return fail(new AssertionError("Expected exception: "
+				+ $.expectedException.getName()));
+	}
+
+	private ExampleState failUnexpectedException(Throwable ex) {
+		String message = "Unexpected exception, expected<"
+			+ $.expectedException.getName() + "> but was<"
+			+ ex.getClass().getName() + ">";
+		return fail(new Exception(message, ex));
 	}
 
 	private void finished() {
@@ -87,6 +90,14 @@ class ExampleInvoker {
 		}
 	}
 
+	private boolean runDependencies() {
+		for (Example provider : $.providers) {
+			provider.run(notifier);
+			if (!provider.wasSuccessful()) return false;
+		}
+		return true;
+	}
+	
 	private ExampleState runExample() {
 		try {
 			executeExample();
@@ -100,18 +111,6 @@ class ExampleInvoker {
 		} catch (Throwable e) {
 			return fail(e);
 		}
-	}
-
-	private ExampleState failExpectedException() {
-		return fail(new AssertionError("Expected exception: "
-				+ $.expectedException.getName()));
-	}
-	
-	private ExampleState failUnexpectedException(Throwable ex) {
-		String message = "Unexpected exception, expected<"
-			+ $.expectedException.getName() + "> but was<"
-			+ ex.getClass().getName() + ">";
-		return fail(new Exception(message, ex));
 	}
 
 	private void started() {
