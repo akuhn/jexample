@@ -1,6 +1,8 @@
 
 package jexample.internal;
 
+import static jexample.internal.ExampleState.*;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Stack;
@@ -114,44 +116,6 @@ public class Example {
         return result == ExampleState.GREEN;
     }
 
-    private void invokeMethod(Object container, RunNotifier notifier, Object... args ) {
-        notifier.fireTestStarted( description );
-        try {
-        	Object result = this.method.invoke(container, args);
-        	if (this.expectedException == null) {
-        		returnValue.assign(result);
-        		returnValue.assignInstance(container);
-        		this.result = ExampleState.GREEN;
-        	} else {
-                notifier.fireTestFailure(new Failure(this.description, new Exception()));        		
-        		this.result = ExampleState.RED;
-        	}
-        } catch ( InvocationTargetException e ) {
-            Throwable actual = e.getTargetException();
-            if ( this.expectedException == null ) {
-                notifier.fireTestFailure( new Failure( this.description ,
-                        actual ) );
-                this.result = ExampleState.RED;
-            } else if ( !this.expectedException.isAssignableFrom(actual.getClass())) {
-                String message = "Unexpected exception, expected<"
-                                 + this.expectedException.getName()
-                                 + "> but was<" + actual.getClass().getName()
-                                 + ">";
-                notifier.fireTestFailure( new Failure( this.description ,
-                        new Exception( message , actual ) ) );
-                this.result = ExampleState.RED;
-            }
-            else {
-        		this.result = ExampleState.GREEN;
-            }
-        } catch ( Throwable e ) {
-            notifier.fireTestFailure( new Failure( this.description , e ) );
-            this.result = ExampleState.RED;
-        } finally {
-            notifier.fireTestFinished( description );
-        }
-    }
-
 
     private boolean toBeIgnored() {
         return this.method.getAnnotation( Ignore.class ) != null;
@@ -168,47 +132,164 @@ public class Example {
     private int arity() {
         return method.arity();
     }
+    
+   private class Invoker {
+	   
+	   private RunNotifier notifier;
+	   
+	   public Invoker(RunNotifier notifier) {
+		   this.notifier = notifier;
+	   }
 
-    /**
-     * Runs this {@link Example} after it run all of its dependencies.
-     * @param notifier the {@link RunNotifier}
-     */
-    public void run( RunNotifier notifier ) {
-        owner.runBefores();
-        if ( this.hasBeenRun() )
-            return;
-        if ( !errors.isEmpty() ) {
-            notifier.fireTestStarted( description );
-            notifier.fireTestFailure( new Failure( description , errors ) );
-            notifier.fireTestFinished( description );
-            return;
-        }
-        if (this.toBeIgnored()) {
-        	this.result = ExampleState.WHITE;
-            notifier.fireTestIgnored( this.description );
-            return;
-        }
-        boolean allParentsGreen = true;
-        for ( Example dependency : this.providers ) {
-            dependency.run( notifier );
-            allParentsGreen &= dependency.result == ExampleState.GREEN;
-        }
-        if ( allParentsGreen ) {
-            try {
-                Object[] args = this.providers.getInjectionValues( this.policy ,
-                        this.arity() );
-                this.invokeMethod( this.newTestClassInstance() , notifier ,
-                        args );
-            } catch ( InvocationTargetException e ) {
-                notifier.testAborted( this.description , e.getCause() );
-            } catch ( Exception e ) {
-                notifier.testAborted( this.description , e );
-            }
-        } else {
-        	this.result = ExampleState.WHITE;
-            notifier.fireTestIgnored( this.description );            
-        }
-    }
+	private ExampleState fail(Throwable e) {
+		   notifier.fireTestFailure(new Failure(description,e));
+		   return RED;
+	   }
+	   
+	   private ExampleState ignore() {
+  			notifier.fireTestIgnored(description);
+  			return WHITE;
+	   }
+	   
+	   private ExampleState success() {
+		   return GREEN;
+	   }
+	   
+	   public ExampleState run() {
+    	   owner.runBefores();
+    	   if (!errors.isEmpty()) {
+    		   started();
+    		   fail(errors);
+    		   finished();
+    		   return RED;
+    	   }
+    	   if (toBeIgnored()) return ignore();
+	       if (!allProviderAreGreen()) return ignore();
+	       started();
+	       try {	   
+	    	   return runExample();
+	       }
+	       finally {
+	    	   finished();
+	       }
+	   }	   
+
+	   private boolean allProviderAreGreen() {
+		   for (Example provider : providers) {
+			   provider.run(notifier);
+			   if (provider.result != GREEN) return false;
+	       }
+	       return true;
+	   }
+
+	   private void finished() {
+		   notifier.fireTestFinished(description);
+	   }
+
+	   private void started() {
+		   notifier.fireTestStarted(description);
+	   }
+
+	   private ExampleState runExample() {
+		   try {
+			   executeExample();
+			   if (expectedException == null) return success();
+			   return fail(new AssertionError("Expected exception: "+expectedException.getName()));
+		   } 
+		   catch (InvocationTargetException e) {
+			   Throwable actual= e.getTargetException();
+			   if (expectedException == null) return fail(actual);
+			   if (!isUnexpected(actual)) return success();
+			   String message= "Unexpected exception, expected<" + expectedException.getName() + "> but was<" + actual.getClass().getName() + ">";
+			   return fail(new Exception(message, actual));
+		   }
+		   catch (Throwable e) {
+			   return fail(e);
+		   }
+	   }
+	   
+	   private void executeExample() throws InvocationTargetException, Exception {
+		   Object[] args = providers.getInjectionValues(policy,arity());
+		   Object container = newTestClassInstance();
+		   Object result = method.invoke(container, args);
+		   if (expectedException == null) {
+			   returnValue.assign(result);
+			   returnValue.assignInstance(container);
+		   }
+	   }
+
+
+	   private boolean isUnexpected(Throwable exception) {
+		   return ! expectedException.isAssignableFrom(exception.getClass());
+	   }	   
+	   
+//	    /**
+//	     * Runs this {@link Example} after it run all of its dependencies.
+//	     * @param notifier the {@link RunNotifier}
+//	     */
+//	    public void run( RunNotifier notifier ) {
+//	        owner.runBefores();
+//	        if ( this.hasBeenRun() )
+//	            return;
+//	        if ( !errors.isEmpty() ) {
+//	            notifier.fireTestStarted( description );
+//	            notifier.fireTestFailure( new Failure( description , errors ) );
+//	            notifier.fireTestFinished( description );
+//	            return;
+//	        }
+//	        if (this.toBeIgnored()) {
+//	        	this.result = ExampleState.WHITE;
+//	            notifier.fireTestIgnored( this.description );
+//	            return;
+//	        }
+//	        boolean allParentsGreen = true;
+//	        for ( Example dependency : this.providers ) {
+//	            dependency.run( notifier );
+//	            allParentsGreen &= dependency.result == ExampleState.GREEN;
+//	        }
+//	        if ( allParentsGreen ) {
+//	            try {
+//	                Object[] args = this.providers.getInjectionValues( this.policy ,
+//	                        this.arity() );
+//	                this.invokeMethod( this.newTestClassInstance() , notifier ,
+//	                        args );
+//	            } catch ( InvocationTargetException e ) {
+//	                notifier.testAborted( this.description , e.getCause() );
+//	            } catch ( Exception e ) {
+//	                notifier.testAborted( this.description , e );
+//	            }
+//	        } else {
+//	        	this.result = ExampleState.WHITE;
+//	            notifier.fireTestIgnored( this.description );            
+//	        }
+//	    }
+	    
+
+   
+   		
+		
+   }
+    
+//	@Override
+//	protected void runUnprotected() {
+//		try {
+//			executeMethodBody();
+//			if (expectsException())
+//				addFailure(new AssertionError("Expected exception: " + expectedException().getName()));
+//		} catch (InvocationTargetException e) {
+//			Throwable actual= e.getTargetException();
+//			if (!expectsException())
+//				addFailure(actual);
+//			else if (isUnexpected(actual)) {
+//				String message= "Unexpected exception, expected<" + expectedException().getName() + "> but was<"
+//					+ actual.getClass().getName() + ">";
+//				addFailure(new Exception(message, actual));
+//			}
+//		} catch (Throwable e) {
+//			addFailure(e);
+//		}
+//	}    
+    
 
     private Object newTestClassInstance() throws Exception {
         if (this.policy.cloneTestCase()
@@ -218,7 +299,12 @@ public class Example {
         return Util.getConstructor( method.jclass ).newInstance();
     }
 
-    public void validate() {
+    public void run(RunNotifier notifier) {
+    	if (hasBeenRun()) return;
+    	result = new Invoker(notifier).run();
+    }
+
+	public void validate() {
         if ( !method.isAnnotationPresent( Test.class ) ) {
             errors
                     .add(

@@ -335,8 +335,8 @@ public class JExampleRunnerTest {
         ExampleGraph g = new ExampleGraph();
         Result result = g.runJExample(classes);
         assertEquals( false, result.wasSuccessful() );
-        assertEquals( 2, result.getRunCount() );
-        assertEquals( 2, result.getFailureCount() );
+        assertEquals( 1, result.getRunCount() );
+        assertEquals( 1, result.getFailureCount() );
     }
 
     @RunWith( JExample.class )
