@@ -32,6 +32,13 @@ public class ForExampleTest {
     }
 
     @Test
+    public void forExampleStackEmpty2() {
+        Stack stack = For.example("jexample.demo.StackTest#empty");
+        assertNotNull(null,stack);
+        assertEquals(0, stack.size());
+    }
+
+    @Test
     public void forExampleStackWithValue() {
         Stack stack = For.example(StackTest.class, "withValue");
         assertNotNull(null,stack);

@@ -2,6 +2,9 @@ package jexample.internal;
 
 import static jexample.internal.ExampleState.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Stack;
 
@@ -67,23 +70,23 @@ public class Example {
 		this.expectedException = initExpectedException();
 	}
 
-	protected MethodReference[] collectDependencies() {
+	protected Iterable<MethodReference> collectDependencies() {
+		Collection<MethodReference> all = new ArrayList<MethodReference>();
 		Depends a = method.getAnnotation(Depends.class);
-		if (a != null) {
-			try {
-				DependsParser p = new DependsParser(method.jclass);
-				return p.collectProviderMethods(a.value());
-			} catch (InvalidDeclarationError ex) {
-				errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
-			} catch (SecurityException ex) {
-				errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-			} catch (ClassNotFoundException ex) {
-				errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-			} catch (NoSuchMethodException ex) {
-				errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-			}
+		if (a == null) return all;
+		try {
+			for (MethodLocator each : MethodLocator.parseAll(a.value())) 
+				all.add(each.resolve(method.jclass));
+		} catch (InvalidDeclarationError ex) {
+			errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
+		} catch (SecurityException ex) {
+			errors.add(Kind.PROVIDER_NOT_FOUND, ex);
+		} catch (ClassNotFoundException ex) {
+			errors.add(Kind.PROVIDER_NOT_FOUND, ex);
+		} catch (NoSuchMethodException ex) {
+			errors.add(Kind.PROVIDER_NOT_FOUND, ex);
 		}
-		return new MethodReference[0];
+		return all;
 	}
 
 	protected void errorPartOfCycle(Stack<Example> cycle) {

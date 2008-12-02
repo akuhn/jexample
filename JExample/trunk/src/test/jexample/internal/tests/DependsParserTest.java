@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import jexample.Depends;
 import jexample.JExample;
-import jexample.internal.DependsParser;
+import jexample.internal.MethodLocator;
 import jexample.internal.MethodReference;
 
 import org.junit.Before;
@@ -35,152 +35,142 @@ public class DependsParserTest {
         @Test public void test(boolean x) { }
         @Test public void test(char x) { }
     }
-    
-	private DependsParser p;
-
-	@Before
-	public void setUp() throws Exception {
-		p = new DependsParser( A.class );
-	}
 
 	@Test
 	public void uniqueSimpleName() throws Exception {
-	    MethodReference[] $ = p.collectProviderMethods( "unique" );
-	    assertEquals(1, $.length);
-	    assertEquals("unique", $[0].getName());
+		MethodLocator loc = MethodLocator.parse("unique");
+	    MethodReference ref = loc.resolve(A.class); 
+	    assertEquals(A.class, ref.jclass);
+	    assertEquals("unique", ref.getName());
 	}
 	
-    @Test
-    public void ambigousSimpleName() throws Exception {
-        try {
-            p.collectProviderMethods( "test" );
-        }
+	@Test
+	public void ambigousSimpleName() throws Exception {
+		try {
+			MethodLocator.parse("test").resolve(A.class); 
+		}
         catch (NoSuchMethodException ex) {
             assertTrue(ex.getMessage().startsWith("Ambigous depedency"));
         }
     }
 	
-	
     @Test
     public void testWithoutParameters() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test()" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(0, $[0].getParameterTypes().length);
+        MethodReference ref = MethodLocator.parse("test()").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(0, ref.getParameterTypes().length);
     }
 
     @Test
     public void testWithString() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(String)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(String.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(String)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(String.class, ref.getParameterTypes()[0]);
     }
 
     @Test
     public void testWithInt() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(int)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(int.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(int)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(int.class, ref.getParameterTypes()[0]);
     }
     
     @Test
     public void testWithLong() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(long)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(long.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(long)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(long.class, ref.getParameterTypes()[0]);
     }
     
     @Test
     public void testWithFloat() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(float)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(float.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(float)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(float.class, ref.getParameterTypes()[0]);
     }
     
     @Test
     public void testWithDouble() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(double)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(double.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(double)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(double.class, ref.getParameterTypes()[0]);
     }
     
     @Test
     public void testWithChar() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(char)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(char.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(char)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(char.class, ref.getParameterTypes()[0]);
     }    
     
     @Test
     public void testWithBoolean() throws Exception {
-        MethodReference[] $ = p.collectProviderMethods( "test(boolean)" );
-        assertEquals(1, $.length);
-        assertEquals("test", $[0].getName());
-        assertEquals(1, $[0].getParameterTypes().length);
-        assertEquals(boolean.class, $[0].getParameterTypes()[0]);
+        MethodReference ref = MethodLocator.parse("test(boolean)").resolve(A.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("test", ref.getName());
+        assertEquals(1, ref.getParameterTypes().length);
+        assertEquals(boolean.class, ref.getParameterTypes()[0]);
     }
-
-	@Test( expected = ClassNotFoundException.class )
-	public void testExtDepWithoutPackageNotFound() throws Exception {
-		p.collectProviderMethods( "Zork.method" );
-	}
 
     @Test
     public void packageLookup() throws Exception {
-        p = new DependsParser( AllTests.class ); // same package
-        MethodReference[] $ = p.collectProviderMethods( "DependsParserTest$A.unique" );
-        assertEquals(1, $.length);
-        assertEquals("unique", $[0].getName());
+        MethodReference ref = MethodLocator
+        		.parse("DependsParserTest$A.unique")
+        		.resolve(AllTests.class);
+	    assertEquals(A.class, ref.jclass);
+        assertEquals("unique", ref.getName());
     }
 
     @Test
     public void innerclassLookup() throws Exception {
-        p = new DependsParser( DependsParserTest.class ); // same package
-        MethodReference[] $ = p.collectProviderMethods( "A.unique" );
-        assertEquals(1, $.length);
-        assertEquals("unique", $[0].getName());
+        MethodReference ref = MethodLocator
+				.parse("DependsParserTest$A.unique")
+				.resolve(DependsParserTest.class);
+        assertEquals(A.class, ref.jclass);
+        assertEquals("unique", ref.getName());
     }
     
     
     @Test
     public void qualifiedLookup() throws Exception {
-        p = new DependsParser( Void.class ); // totally different package 
-        MethodReference[] $ = p.collectProviderMethods(
-                "jexample.internal.tests.DependsParserTest$A.unique");
-        assertEquals(1, $.length);
-        assertEquals("unique", $[0].getName());
+        MethodReference ref = MethodLocator
+				.parse("jexample.internal.tests.DependsParserTest$A.unique")
+				.resolve(Void.class);
+        assertEquals(A.class, ref.jclass);
+        assertEquals("unique", ref.getName());
     }
     
     @Test( expected = ClassNotFoundException.class )
     public void classNotFound() throws Exception {
-        p.collectProviderMethods( "Zork.method" );
+    	MethodLocator.parse( "Zork.method" ).resolve(A.class);
     }
     
     @Test( expected = NoSuchMethodException.class )
     public void noSuchMethod() throws Exception {
-        p.collectProviderMethods( "zork()" );
+    	MethodLocator.parse( "zork()" ).resolve(A.class);
     }
  
     @Test( expected = NoSuchMethodException.class )
     public void noSuchUniqueMethod() throws Exception {
-        p.collectProviderMethods( "zork" );
+    	MethodLocator.parse( "zork" ).resolve(A.class);
     }
     
     @Test( expected = ClassNotFoundException.class )
     public void parameterTypeNotFound() throws Exception {
-        p.collectProviderMethods( "test(zork)" );
+    	MethodLocator.parse( "test(zork)" ).resolve(A.class);
     }
 	
 	

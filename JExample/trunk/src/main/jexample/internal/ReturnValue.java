@@ -4,9 +4,7 @@ import static jexample.internal.Util.forceClone;
 import static jexample.internal.Util.isCloneable;
 import static jexample.internal.Util.isImmutable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import jexample.JExampleOptions;
 

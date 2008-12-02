@@ -2,6 +2,9 @@ package jexample;
 
 import jexample.internal.Example;
 import jexample.internal.ExampleGraph;
+import jexample.internal.JExampleError;
+import jexample.internal.MethodLocator;
+import jexample.internal.MethodReference;
 
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.RunNotifier;
@@ -18,8 +21,27 @@ import org.junit.runner.notification.RunNotifier;
  * @author Adrian Kuhn, 2007-2008
  * 
  */
+@SuppressWarnings("unchecked")
 public abstract class For {
 
+	public static <T> T example(String reference) {
+		try {
+			MethodReference ref = MethodLocator.parse(reference).resolve();
+			ExampleGraph g = new ExampleGraph();
+			g.add(ref.jclass);
+			Example e = g.findExample(ref);
+			return (T) runExample(e);
+		} catch (SecurityException ex) {
+			throw new RuntimeException(ex);
+		} catch (JExampleError ex) {
+			throw new RuntimeException(ex);
+		} catch (ClassNotFoundException ex) {
+			throw new RuntimeException(ex);
+		} catch (NoSuchMethodException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+	
 	public static <T> T example(Class jClass, String method) {
 	    Example e = findExample(jClass, method);
 	    if (e == null) throw new NoSuchMethodError("Method not found.");

@@ -133,4 +133,11 @@ public class ExampleGraph {
     }
 
 
+	public Example findExample(MethodReference ref) {
+		for (Example eg : getExamples()) {
+            if (ref.equals(eg.method)) return eg;
+		}
+		return null;
+	}
+
 }
