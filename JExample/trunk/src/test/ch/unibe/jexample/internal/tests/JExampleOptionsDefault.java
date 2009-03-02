@@ -8,7 +8,8 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.internal.tests.Util.*;
+import ch.unibe.jexample.internal.tests.Util.IsCloneable;
+import ch.unibe.jexample.internal.tests.Util.NotCloneable;
 
 @RunWith(JExample.class)
 public class JExampleOptionsDefault {
@@ -24,7 +25,7 @@ public class JExampleOptionsDefault {
         assertNotSame(a, b);
         assertEquals(a.name, b.name);
     }
-    
+
     @Test
     @Given("#notCloneable")
     public NotCloneable left(NotCloneable a) {
@@ -38,10 +39,10 @@ public class JExampleOptionsDefault {
         assertEquals("root", a.name);
         return a;
     }
-    
+
     @Test
     @Given("#left,#right")
-    public void testRerunning2(NotCloneable a, NotCloneable b){
+    public void testRerunning2(NotCloneable a, NotCloneable b) {
         assertNotSame(a, b);
         assertEquals(a.name, b.name);
     }
@@ -58,7 +59,7 @@ public class JExampleOptionsDefault {
         assertEquals("clone of root", a.name);
         assertEquals("clone of root", b.name);
     }
-    
+
     @Test
     @Given("#isCloneable")
     public IsCloneable leftClone(IsCloneable a) {
@@ -72,13 +73,13 @@ public class JExampleOptionsDefault {
         assertEquals("clone of root", a.name);
         return a;
     }
-    
+
     @Test
     @Given("#leftClone,#rightClone")
-    public void testCloning2(IsCloneable a, IsCloneable b){
+    public void testCloning2(IsCloneable a, IsCloneable b) {
         assertNotSame(a, b);
         assertEquals("clone of clone of root", a.name);
         assertEquals("clone of clone of root", b.name);
     }
-    
+
 }

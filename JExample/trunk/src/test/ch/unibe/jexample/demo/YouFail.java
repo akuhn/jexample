@@ -7,12 +7,17 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.JExample;
 
-@RunWith( JExample.class )
+@RunWith(JExample.class)
 public class YouFail {
 
     @Test
     public void fail() {
-        assertEquals( true, false );
+        assertEquals(true, false);
+    }
+
+    @Test(expected=Error.class)
+    public void fail2() {
+        // do nothing
     }
     
 }

@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,30 +17,30 @@ import ch.unibe.jexample.JExample;
 public class ListTest {
 
     @Test
-    public List empty() {
-        List $ = new ArrayList();
-        assertTrue($.isEmpty());
-        assertEquals(0, $.size());
-        return $;
+    public List<String> emptyList() {
+        List<String> list = new ArrayList<String>();
+        assertTrue(list.isEmpty());
+        assertEquals(0, list.size());
+        return list;
     }
-    
+
     @Test
-    @Given("#empty")
-    public List withValue(List $) {
-        $.add("Lorem");
-        assertFalse($.isEmpty());
-        assertEquals(1, $.size());
-        return $;
+    @Given("#emptyList")
+    public List<String> withValue(List<String> list) {
+        list.add("Lorem");
+        assertFalse(list.isEmpty());
+        assertEquals(1, list.size());
+        return list;
     }
 
     @Test
     @Given("#withValue")
-    public List withMoreValues(List $) {
-        $.add("Ipsum");
-        $.add("Dolor");
-        assertFalse($.isEmpty());
-        assertEquals(3, $.size());
-        return $;
+    public List<String> withMoreValues(List<String> list) {
+        list.add("Ipsum");
+        list.add("Dolor");
+        assertFalse(list.isEmpty());
+        assertEquals(3, list.size());
+        return list;
     }
-    
+
 }

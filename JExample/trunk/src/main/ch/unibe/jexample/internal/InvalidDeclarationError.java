@@ -13,11 +13,9 @@ public class InvalidDeclarationError extends RuntimeException {
         this.position = buf.position();
         this.string = buf.rewind().toString();
     }
-    
+
     private static String message(CharBuffer buf) {
-        String message = buf.hasRemaining()
-                ? "Illegal charater at %d."
-                : "Unexpected end of declaration.";
+        String message = buf.hasRemaining() ? "Illegal charater at %d." : "Unexpected end of declaration.";
         return String.format(message, buf.position());
     }
 

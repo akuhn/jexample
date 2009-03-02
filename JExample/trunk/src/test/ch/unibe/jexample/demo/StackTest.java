@@ -15,14 +15,14 @@ import ch.unibe.jexample.JExample;
 public class StackTest {
 
     @Test
-    public Stack<String> empty() {
+    public Stack<String> emptyStack() {
         Stack<String> stack = new Stack<String>();
         assertEquals(0, stack.size());
         return stack;
     }
 
     @Test
-    @Given("#empty")
+    @Given("#emptyStack")
     public Stack<String> withValue(Stack<String> stack) {
         stack.push("boe");
         assertEquals(1, stack.size());
@@ -39,7 +39,7 @@ public class StackTest {
     }
 
     @Test
-    @Given("#withValue, ListTest#withMoreValues")
+    @Given("#withValue;ListTest#withMoreValues")
     public void testPushAll(Stack<String> stack, List<String> list) {
         stack.addAll(list);
         assertEquals("Dolor", stack.peek());

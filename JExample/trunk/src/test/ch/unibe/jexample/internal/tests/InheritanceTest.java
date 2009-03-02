@@ -1,6 +1,6 @@
 package ch.unibe.jexample.internal.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,22 +18,23 @@ public class InheritanceTest extends JExampleTest {
     public void setup() {
         resetTrace();
     }
-    
-    @RunWith( JExample.class )
+
+    @RunWith(JExample.class)
     public static class A {
         @Test
         public String m() {
             trace(this);
             return "A delivers";
         }
+
         @Test
         @Given("m()")
         public void test(String arg) {
-            trace(this,arg);
+            trace(this, arg);
         }
     }
 
-    @RunWith( JExample.class )
+    @RunWith(JExample.class)
     public static class B extends A {
         @Test
         @Override
@@ -42,35 +43,35 @@ public class InheritanceTest extends JExampleTest {
             return "B delivers";
         }
     }
-    
+
     @Test
     public void addB() throws JExampleError {
         ExampleGraph g = new ExampleGraph();
         g.add(B.class);
-        
-        assertEquals( 2, g.getExamples().size() );
-        
+
+        assertEquals(2, g.getExamples().size());
+
         Example m = g.findExample(B.class, "m");
         Example test = g.findExample(B.class, "test");
-        
-        assertEquals( 1, test.providers.size() );
-        assertEquals( m, test.providers.iterator().next() );
-        
+
+        assertEquals(1, test.providers.size());
+        assertEquals(m, test.providers.iterator().next());
+
     }
-    
+
     @Test
     public void addA() throws JExampleError {
         ExampleGraph g = new ExampleGraph();
         g.add(A.class);
-        
-        assertEquals( 2, g.getExamples().size() );
-        
+
+        assertEquals(2, g.getExamples().size());
+
         Example m = g.findExample(A.class, "m");
         Example test = g.findExample(A.class, "test");
-        
-        assertEquals( 1, test.providers.size() );
-        assertEquals( m, test.providers.iterator().next() );
-        
+
+        assertEquals(1, test.providers.size());
+        assertEquals(m, test.providers.iterator().next());
+
     }
 
     @Test
@@ -78,52 +79,52 @@ public class InheritanceTest extends JExampleTest {
         ExampleGraph g = new ExampleGraph();
         g.add(A.class);
         g.add(B.class);
-        
-        assertEquals( 4, g.getExamples().size() );
-        
+
+        assertEquals(4, g.getExamples().size());
+
         Example m = g.findExample(A.class, "m");
         Example test = g.findExample(A.class, "test");
-        
-        assertEquals( 1, test.providers.size() );
-        assertEquals( m, test.providers.iterator().next() );
+
+        assertEquals(1, test.providers.size());
+        assertEquals(m, test.providers.iterator().next());
 
         m = g.findExample(B.class, "m");
         test = g.findExample(B.class, "test");
-        
-        assertEquals( 1, test.providers.size() );
-        assertEquals( m, test.providers.iterator().next() );        
+
+        assertEquals(1, test.providers.size());
+        assertEquals(m, test.providers.iterator().next());
     }
-    
+
     @Test
     public void runA() throws JExampleError {
         ExampleGraph g = new ExampleGraph();
-        assertTraceSize( 0 );
+        assertTraceSize(0);
         g.runJExample(A.class);
-        assertTraceSize( 2 );
-        assertTrace( "A#m", "A#test" );
-        assertTraceArgument( "A#test", "A delivers" );
+        assertTraceSize(2);
+        assertTrace("A#m", "A#test");
+        assertTraceArgument("A#test", "A delivers");
     }
 
     @Test
     public void runB() throws JExampleError {
         ExampleGraph g = new ExampleGraph();
-        assertTraceSize( 0 );
+        assertTraceSize(0);
         g.runJExample(B.class);
-        assertTraceSize( 2 );
-        assertTrace( "B#m", "B#test" );
-        assertTraceArgument( "B#test", "B delivers" );
+        assertTraceSize(2);
+        assertTrace("B#m", "B#test");
+        assertTraceArgument("B#test", "B delivers");
     }
 
     @Test
     public void runAB() throws JExampleError {
         ExampleGraph g = new ExampleGraph();
-        assertTraceSize( 0 );
+        assertTraceSize(0);
         g.runJExample(A.class, B.class);
-        assertTraceSize( 4 );
-        assertTrace( "A#m", "A#test" );
-        assertTraceArgument( "A#test", "A delivers" );
-        assertTrace( "B#m", "B#test" );
-        assertTraceArgument( "B#test", "B delivers" );
+        assertTraceSize(4);
+        assertTrace("A#m", "A#test");
+        assertTraceArgument("A#test", "A delivers");
+        assertTrace("B#m", "B#test");
+        assertTraceArgument("B#test", "B delivers");
     }
-    
+
 }

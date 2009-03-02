@@ -1,13 +1,11 @@
 package ch.unibe.jexample.internal;
 
-import static ch.unibe.jexample.internal.ExampleState.*;
+import static ch.unibe.jexample.internal.ExampleState.NONE;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Stack;
-
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -31,8 +29,8 @@ import ch.unibe.jexample.internal.JExampleError.Kind;
  * <p>
  * An example method must have at least a {@link org.junit.Test @Test}
  * annotation. The enclosing class must use an {@link org.junit.RunWith
- * &#64;RunWith} annotation to declare {@link ch.unibe.jexample.JExample JExampleRunner} as
- * test runner.
+ * &#64;RunWith} annotation to declare {@link ch.unibe.jexample.JExample
+ * JExampleRunner} as test runner.
  * <p>
  * An example method may return an instance of its unit under test.
  * <p>
@@ -42,157 +40,144 @@ import ch.unibe.jexample.internal.JExampleError.Kind;
  * dependencies may have method parameters. The number of parameters must be
  * less than or equal to the number of dependencies. The type of the n-th
  * parameter must match the return type of the n-th dependency.
+ * 
  * @author Lea Haensenberger
  * @author Adrian Kuhn
  */
 public class Example {
 
-	public final Description description;
-	public final ReturnValue returnValue;
-	public final MethodReference method;
-	public final Dependencies providers;
-	public final ExampleClass owner;
-	public final Class<? extends Throwable> expectedException;
-	
-	protected JExampleError errors;
-	private ExampleState result;
-	protected JExampleOptions policy;
+    public final Description description;
+    public final ReturnValue returnValue;
+    public final MethodReference method;
+    public final Dependencies providers;
+    public final ExampleClass owner;
+    public final Class<? extends Throwable> expectedException;
 
-	public Example(MethodReference method, ExampleClass owner) {
-		assert method != null && owner != null;
-		this.owner = owner;
-		this.method = method;
-		this.providers = new Dependencies();
-		this.result = ExampleState.NONE;
-		this.description = method.createTestDescription();
-		this.returnValue = new ReturnValue(this);
-		this.policy = initJExampleOptions(method.jclass);
-		this.errors = new JExampleError();
-		this.expectedException = initExpectedException();
-	}
+    protected JExampleError errors;
+    private ExampleState result;
+    protected JExampleOptions policy;
 
-	protected Iterable<MethodReference> collectDependencies() {
-		Collection<MethodReference> all = new ArrayList<MethodReference>();
-		Given a = method.getAnnotation(Given.class);
-		if (a == null) return all;
-		try {
-			for (MethodLocator each : MethodLocator.parseAll(a.value())) 
-				all.add(each.resolve(method.jclass));
-		} catch (InvalidDeclarationError ex) {
-			errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
-		} catch (SecurityException ex) {
-			errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-		} catch (ClassNotFoundException ex) {
-			errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-		} catch (NoSuchMethodException ex) {
-			errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-		}
-		return all;
-	}
+    public Example(MethodReference method, ExampleClass owner) {
+        assert method != null && owner != null;
+        this.owner = owner;
+        this.method = method;
+        this.providers = new Dependencies();
+        this.result = ExampleState.NONE;
+        this.description = method.createTestDescription();
+        this.returnValue = new ReturnValue(this);
+        this.policy = initJExampleOptions(method.jclass);
+        this.errors = new JExampleError();
+        this.expectedException = initExpectedException();
+    }
 
-	protected void errorPartOfCycle(Stack<Example> cycle) {
-		errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
-	}
+    protected Iterable<MethodReference> collectDependencies() {
+        Collection<MethodReference> all = new ArrayList<MethodReference>();
+        Given a = method.getAnnotation(Given.class);
+        if (a == null) return all;
+        try {
+            for (MethodLocator each: MethodLocator.parseAll(a.value()))
+                all.add(each.resolve(method.jclass));
+        } catch (InvalidDeclarationError ex) {
+            errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
+        } catch (SecurityException ex) {
+            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
+        } catch (ClassNotFoundException ex) {
+            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
+        } catch (NoSuchMethodException ex) {
+            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
+        }
+        return all;
+    }
 
-	private Class<? extends Throwable> initExpectedException() {
-		Test a = this.method.getAnnotation(Test.class);
-		if (a == null)
-			return null;
-		if (a.expected() == org.junit.Test.None.class)
-			return null;
-		return a.expected();
-	}
+    protected void errorPartOfCycle(Stack<Example> cycle) {
+        errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
+    }
 
-	private JExampleOptions initJExampleOptions(Class<?> jclass) {
-		final JExampleOptions options = (JExampleOptions) jclass
-				.getAnnotation(JExampleOptions.class);
-		if (options == null)
-			return JExampleOptions.class.getAnnotation(JExampleOptions.class);
-		return options;
-	}
+    private Class<? extends Throwable> initExpectedException() {
+        Test a = this.method.getAnnotation(Test.class);
+        if (a == null) return null;
+        if (a.expected() == org.junit.Test.None.class) return null;
+        return a.expected();
+    }
 
-	private Object getContainerInstance() throws Exception {
-		if (this.policy.cloneTestCase()
-				&& providers.hasFirstProviderImplementedIn(this)) {
-			return providers.get(0).returnValue.getTestCaseInstance();
-		}
-		return Util.getConstructor(method.jclass).newInstance();
-	}
+    private JExampleOptions initJExampleOptions(Class<?> jclass) {
+        final JExampleOptions options = (JExampleOptions) jclass.getAnnotation(JExampleOptions.class);
+        if (options == null) return JExampleOptions.class.getAnnotation(JExampleOptions.class);
+        return options;
+    }
 
-	protected Object bareInvoke() throws Exception {
-		owner.runBeforeClassBefores();
-		Object[] args = providers.getInjectionValues(policy, method.arity());
-		Object container = getContainerInstance();
-		Object $ = method.invoke(container, args);
-		if (result == NONE) {
-			returnValue.assign($);
-			returnValue.assignInstance(container);
-		}
-		return $;
-	}
+    private Object getContainerInstance() throws Exception {
+        if (this.policy.cloneTestCase() && providers.hasFirstProviderImplementedIn(this)) {
+            return providers.get(0).returnValue.getTestCaseInstance();
+        }
+        return Util.getConstructor(method.jclass).newInstance();
+    }
 
-	public void run(RunNotifier notifier) {
-		if (result == NONE) result = new ExampleRunner(this, notifier).run();
-	}
-	
-	@Override
-	public String toString() {
-		return "Example: " + method;
-	}
+    protected Object bareInvoke() throws Exception {
+        owner.runBeforeClassBefores();
+        Object[] args = providers.getInjectionValues(policy, method.arity());
+        Object container = getContainerInstance();
+        Object newResult = method.invoke(container, args);
+        if (result == NONE) { 
+         // XXX why do we store the first result, and not the most recent one? 
+            returnValue.assign(newResult);
+            returnValue.assignInstance(container);
+        }
+        return newResult;
+    }
 
-	protected void validate() {
-		if (!method.isAnnotationPresent(Test.class)) {
-			errors
-					.add(
-							Kind.MISSING_TEST_ANNOTATION,
-							"Method %s is not a test method, missing @Test annotation.",
-							toString());
-		}
-		int d = providers.size();
-		int p = method.arity();
-		if (p > d) {
-			errors.add(Kind.MISSING_PROVIDERS,
-					"Method %s has %d parameters but only %d dependencies.",
-					toString(), p, d);
-		} else {
-			validateDependencyTypes();
-		}
-		// if (providers.transitiveClosure().contains(this)) {
-		// errors.add(Kind.RECURSIVE_DEPENDENCIES,
-		// "Recursive dependency found.");
-		// }
-	}
+    public void run(RunNotifier notifier) {
+        if (result == NONE) result = new ExampleRunner(this, notifier).run();
+    }
 
-	protected void validateCycle() {
-		providers.validateCycle(this);
-	}
+    @Override
+    public String toString() {
+        return "Example: " + method;
+    }
 
-	private void validateDependencyTypes() {
-		Iterator<Example> tms = this.providers.iterator();
-		int position = 1;
-		for (Class<?> t : method.getParameterTypes()) {
-			Example tm = tms.next();
-			Class<?> r = tm.method.getReturnType();
-			if (!t.isAssignableFrom(r)) {
-				errors
-						.add(
-								Kind.PARAMETER_NOT_ASSIGNABLE,
-								"Parameter #%d in (%s) is not assignable from depedency (%s).",
-								position, method, tm.method);
-			}
-			if (tm.expectedException != null) {
-				errors
-						.add(
-								Kind.PROVIDER_EXPECTS_EXCEPTION,
-								"(%s): invalid dependency (%s), provider must not expect exception.",
-								method, tm.method);
-			}
-			position++;
-		}
-	}
+    protected void validate() {
+        if (!method.isAnnotationPresent(Test.class)) {
+            errors.add(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.",
+                    toString());
+        }
+        int d = providers.size();
+        int p = method.arity();
+        if (p > d) {
+            errors.add(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p,
+                    d);
+        } else {
+            validateDependencyTypes();
+        }
+        // if (providers.transitiveClosure().contains(this)) {
+        // errors.add(Kind.RECURSIVE_DEPENDENCIES,
+        // "Recursive dependency found.");
+        // }
+    }
 
-	public boolean wasSuccessful() {
-		return result == ExampleState.GREEN;
-	}
+    protected void validateCycle() {
+        providers.validateCycle(this);
+    }
+
+    private void validateDependencyTypes() {
+        Iterator<Example> tms = this.providers.iterator();
+        int position = 1;
+        for (Class<?> t: method.getParameterTypes()) {
+            Example tm = tms.next();
+            Class<?> r = tm.method.getReturnType();
+            if (!t.isAssignableFrom(r)) {
+                errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
+                        "Parameter #%d in (%s) is not assignable from depedency (%s).", position, method, tm.method);
+            }
+            if (tm.expectedException != null) {
+                errors.add(Kind.PROVIDER_EXPECTS_EXCEPTION,
+                        "(%s): invalid dependency (%s), provider must not expect exception.", method, tm.method);
+            }
+            position++;
+        }
+    }
+
+    public boolean wasSuccessful() {
+        return result == ExampleState.GREEN;
+    }
 
 }

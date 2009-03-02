@@ -12,23 +12,25 @@ import ch.unibe.jexample.internal.JExampleError;
 
 public class CanRunPrivateInnerClassTest {
 
-    @RunWith( JExample.class )
+    @RunWith(JExample.class)
     static class PrivateInnerClass {
-        @Test public void success() { }
+        @Test
+        public void success() {
+        }
     }
-    
+
     @Test
     public void createJExampleRunner() throws JExampleError {
-        new JExample( new ExampleGraph().add( PrivateInnerClass.class ));
+        new JExample(new ExampleGraph().add(PrivateInnerClass.class));
     }
-    
+
     @Test
-    public void testRunningPrivateInnerClass() throws JExampleError  {
-    	Result result = Util.runAllExamples(PrivateInnerClass.class);
+    public void testRunningPrivateInnerClass() throws JExampleError {
+        Result result = Util.runAllExamples(PrivateInnerClass.class);
         assertEquals(true, result.wasSuccessful());
         assertEquals(1, result.getRunCount());
         assertEquals(0, result.getFailureCount());
         assertEquals(0, result.getIgnoreCount());
     }
-    
+
 }

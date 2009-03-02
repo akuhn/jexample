@@ -6,58 +6,55 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import ch.unibe.jexample.JExampleOptions;
-
-
 public class Util {
 
-    public static Constructor getConstructor(Class jClass) throws SecurityException, NoSuchMethodException {
+    public static Constructor<?> getConstructor(Class<?> jClass) throws SecurityException, NoSuchMethodException {
         if (!Modifier.isPublic(jClass.getModifiers())) {
-            Constructor $ = jClass.getDeclaredConstructor();
+            Constructor<?> $ = jClass.getDeclaredConstructor();
             $.setAccessible(true);
             return $;
         }
         return jClass.getConstructor();
     }
 
-    public static <T> T getField(Object $, String name) {
+    @SuppressWarnings("unchecked")
+    public static <T> T getField(Object object, String name) {
         try {
-            Field f = $.getClass().getDeclaredField(name);
+            Field f = object.getClass().getDeclaredField(name);
             f.setAccessible(true);
-            return (T) f.get($);
-        }
-        catch (Exception ex) {
+            return (T) f.get(object);
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
-    
-    public static <T> T forceClone(T $) throws InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
-        if (isImmutable($)) return $;
-        if (isCloneable($)) return clone($);
-        Class<?> jclass = $.getClass();
+
+    @SuppressWarnings("unchecked")
+    public static <T> T forceClone(T object) throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+        if (isImmutable(object)) return object;
+        if (isCloneable(object)) return clone(object);
+        Class<?> jclass = object.getClass();
         Object clone = Util.getConstructor(jclass).newInstance();
-        for ( Field field : jclass.getDeclaredFields()) {
+        for (Field field: jclass.getDeclaredFields()) {
             if (Modifier.isFinal(field.getModifiers())) continue;
             if (Modifier.isStatic(field.getModifiers())) continue;
             field.setAccessible(true);
-            field.set(clone, forceClone(field.get($)));
+            field.set(clone, forceClone(field.get(object)));
         }
         return (T) clone;
     }
-    
+
     public static boolean isImmutable(Object $) {
-        return $ == null
-            || $ instanceof String
-            || $ instanceof Number // assume all subclasses are immutable
-            || $ instanceof Boolean;
-            // TODO add more classes
+        return $ == null || $ instanceof String || $ instanceof Boolean
+                || $ instanceof Number;
+        // TODO add more classes
     }
-    
+
     public static boolean isCloneable(Object $) {
         if ($ == null) return true;
         if (!($ instanceof Cloneable)) return false;
         try {
-            // False friend: the interface Cloneable does not specify the method 
+            // False friend: the interface Cloneable does not specify the method
             // clone, it is a tagging interface only, hence we must check here
             // if #clone is actually implemented!
             $.getClass().getMethod("clone");
@@ -68,7 +65,8 @@ public class Util {
         }
         return true;
     }
-       
+
+    @SuppressWarnings("unchecked")
     public static <T> T clone(T $) {
         try {
             Method cloneMethod = $.getClass().getMethod("clone");
@@ -85,6 +83,5 @@ public class Util {
             throw new RuntimeException(ex);
         }
     }
-    
-    
+
 }

@@ -1,6 +1,6 @@
 package ch.unibe.jexample.internal.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -9,12 +9,11 @@ import org.junit.runner.RunWith;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 
-
-@RunWith( JExample.class )
+@RunWith(JExample.class)
 public class BeforeClassTest {
 
     static int n = 0;
- 
+
     @BeforeClass
     public static void init() {
         n++;
@@ -30,5 +29,5 @@ public class BeforeClassTest {
     public void noMoreThanOnce() {
         assertEquals(1, n);
     }
-    
+
 }
