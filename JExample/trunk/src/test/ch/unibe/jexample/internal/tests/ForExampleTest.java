@@ -25,14 +25,14 @@ public class ForExampleTest {
 
     @Test
     public void forExampleStackEmpty() {
-        Stack<String> stack = For.example(StackTest.class, "empty");
+        Stack<String> stack = For.example(StackTest.class, "emptyStack");
         assertNotNull(null, stack);
         assertEquals(0, stack.size());
     }
 
     @Test
     public void forExampleStackEmpty2() {
-        Stack<String> stack = For.example("ch.unibe.jexample.demo.StackTest#empty");
+        Stack<String> stack = For.example("ch.unibe.jexample.demo.StackTest#emptyStack");
         assertNotNull(null, stack);
         assertEquals(0, stack.size());
     }
