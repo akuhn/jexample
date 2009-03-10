@@ -242,7 +242,8 @@ public class MethodLocator {
         private String yank() {
             int pos = buf.position();
             buf.reset();
-            String $ = buf.subSequence(0, pos - buf.position()).toString();
+            // FIX due to a bug in Java 1.6.0_11 CharBuffer#subSequence is broken.       
+            String $ = buf.toString().substring(0, pos - buf.position());
             buf.position(pos);
             return $;
         }
