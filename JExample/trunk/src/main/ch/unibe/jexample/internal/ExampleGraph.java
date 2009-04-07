@@ -88,7 +88,7 @@ public class ExampleGraph {
     }
 
     public Result runJExample() {
-        CompositeRunner runner = new CompositeRunner("All");
+        CompositeRunner runner = new CompositeRunner();
         for (ExampleClass eg: classes.values()) {
             runner.add(new JExample(eg));
         }

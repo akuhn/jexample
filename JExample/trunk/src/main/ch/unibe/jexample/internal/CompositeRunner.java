@@ -20,10 +20,8 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class CompositeRunner extends Runner implements Filterable, Sortable {
         private final List<Runner> fRunners= new ArrayList<Runner>();
-        private final String fName;
         
-        public CompositeRunner(String name) {
-                fName= name;
+        public CompositeRunner() {
         }
         
         @Override
@@ -38,7 +36,7 @@ public class CompositeRunner extends Runner implements Filterable, Sortable {
 
         @Override
         public Description getDescription() {
-                Description spec= Description.createSuiteDescription(fName);
+                Description spec= Description.createSuiteDescription(ExampleGraph.class);
                 for (Runner runner : fRunners)
                         spec.addChild(runner.getDescription());
                 return spec;
@@ -64,10 +62,6 @@ public class CompositeRunner extends Runner implements Filterable, Sortable {
                         else
                                 iter.remove();
                 }
-        }
-
-        protected String getName() {
-                return fName;
         }
 
         public void sort(final Sorter sorter) {
