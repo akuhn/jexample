@@ -77,7 +77,9 @@ class ExampleRunner {
     }
 
     private ExampleState abort(Throwable ex) {
-        notifier.testAborted(eg.description, ex);
+        notifier.fireTestStarted(eg.description);
+        notifier.fireTestFailure(new Failure(eg.description, ex));
+        notifier.fireTestFinished(eg.description);
         return RED;
     }
 

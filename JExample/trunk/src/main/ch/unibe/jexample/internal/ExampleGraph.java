@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.junit.internal.runners.CompositeRunner;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.manipulation.Filter;
