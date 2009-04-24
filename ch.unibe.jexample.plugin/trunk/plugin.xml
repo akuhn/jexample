@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+            class="ch.unibe.jexample.plugin.JExampleClasspathContainerInitializer"
+            id="ch.unibe.jexample.plugin.JEXAMPLE_CONTAINER">
+      </classpathContainerInitializer>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.classpathContainerPage">
+      <classpathContainerPage
+            class="ch.unibe.jexample.plugin.JExampleClasspathContainerPage"
+            id="ch.unibe.jexample.plugin.JEXAMPLE_CONTAINER"
+            name="JExample">
+      </classpathContainerPage>
+   </extension>
+</plugin>

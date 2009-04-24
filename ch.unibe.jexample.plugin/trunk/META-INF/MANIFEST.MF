@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JExample library
+Bundle-SymbolicName: ch.unibe.jexample;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: ch.unibe.jexample.plugin.JExampleCore
+Bundle-Vendor: Adrian Kuhn
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui,
+ org.eclipse.ui
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
