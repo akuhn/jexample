@@ -35,11 +35,13 @@ public class Util {
         if (isCloneable(object)) return clone(object);
         Class<?> jclass = object.getClass();
         Object clone = Util.getConstructor(jclass).newInstance();
-        for (Field field: jclass.getDeclaredFields()) {
-            if (Modifier.isFinal(field.getModifiers())) continue;
-            if (Modifier.isStatic(field.getModifiers())) continue;
-            field.setAccessible(true);
-            field.set(clone, forceClone(field.get(object)));
+        for (Class<?> each = jclass; each !=  null; each = each.getSuperclass()) {
+        	for (Field field: each.getDeclaredFields()) {
+	            if (Modifier.isFinal(field.getModifiers())) continue;
+	            if (Modifier.isStatic(field.getModifiers())) continue;
+	            field.setAccessible(true);
+	            field.set(clone, forceClone(field.get(object)));
+	        }
         }
         return (T) clone;
     }
