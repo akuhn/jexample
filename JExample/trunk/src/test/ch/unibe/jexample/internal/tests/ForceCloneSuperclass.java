@@ -12,7 +12,7 @@ import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.JExampleOptions;
 
 
-public class JExampleOptionsCloneSuperClass {
+public class ForceCloneSuperclass {
 	
 	@RunWith(JExample.class)
 	public abstract static class AbstractClonedTestCase {

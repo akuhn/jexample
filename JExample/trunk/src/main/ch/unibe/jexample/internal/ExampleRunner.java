@@ -84,7 +84,7 @@ class ExampleRunner {
     }
 
     /**
-     * Runs dependencies and returns success. Dependencies are runned in order
+     * Runs dependencies and returns success. Dependencies are ran in order
      * of declaration.
      * 
      * @return If all dependencies succeed return <code>true</code>.<br>

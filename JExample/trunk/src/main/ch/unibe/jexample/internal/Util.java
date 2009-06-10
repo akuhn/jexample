@@ -1,6 +1,12 @@
 package ch.unibe.jexample.internal;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -31,9 +37,10 @@ public class Util {
 
     @SuppressWarnings("unchecked")
     public static <T> T forceClone(T object) throws InstantiationException, IllegalAccessException,
-            IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+            IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException, IOException, ClassNotFoundException {
         if (isImmutable(object)) return object;
         if (isCloneable(object)) return clone(object);
+        if (object instanceof Serializable) return (T) deepClone(object);
         Class<?> jclass = object.getClass();
         Object clone = Util.getConstructor(jclass).newInstance();
         for (Class<?> each = jclass; each !=  null; each = each.getSuperclass()) {
@@ -47,10 +54,21 @@ public class Util {
         return (T) clone;
     }
 
+    public static Object deepClone(Object object) throws IOException, ClassNotFoundException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream out = new ObjectOutputStream(baos);
+		out.writeObject(object);
+		out.close();
+		ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+		Object clone = in.readObject();
+		in.close();
+		return clone;
+    }
+    
     public static boolean isImmutable(Object $) {
         return $ == null || $ instanceof String || $ instanceof Boolean
-                || $ instanceof Number || $ instanceof File;
-        // TODO add dynamically extensiable plugin mechanism
+                || $ instanceof Number;
+        // TODO add dynamically extensible plug-in mechanism
     }
 
     public static boolean isCloneable(Object $) {

@@ -4,6 +4,7 @@ import static ch.unibe.jexample.internal.Util.forceClone;
 import static ch.unibe.jexample.internal.Util.isCloneable;
 import static ch.unibe.jexample.internal.Util.isImmutable;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import ch.unibe.jexample.JExampleOptions;
@@ -39,7 +40,7 @@ public class ReturnValue {
     }
 
     public Object getTestCaseInstance() throws InstantiationException, IllegalAccessException,
-            IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+            IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException, IOException, ClassNotFoundException {
         return forceClone(testCaseInstance);
     }
 
