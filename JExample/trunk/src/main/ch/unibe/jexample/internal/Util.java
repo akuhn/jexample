@@ -1,5 +1,6 @@
 package ch.unibe.jexample.internal;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -48,8 +49,8 @@ public class Util {
 
     public static boolean isImmutable(Object $) {
         return $ == null || $ instanceof String || $ instanceof Boolean
-                || $ instanceof Number;
-        // TODO add more classes
+                || $ instanceof Number || $ instanceof File;
+        // TODO add dynamically extensiable plugin mechanism
     }
 
     public static boolean isCloneable(Object $) {
