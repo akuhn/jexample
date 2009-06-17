@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ch.unibe.jexample.AllTests;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.MethodLocator;
@@ -150,7 +151,7 @@ public class DependsParserTest {
 
     @Test
     public void packageLookup() throws Exception {
-        MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(AllTests.class);
+        MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(ForExampleTest.class);
         assertEquals(A.class, ref.jclass);
         assertEquals("unique", ref.getName());
     }
