@@ -24,6 +24,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JExampleOptions {
 
+    // TODO, change scope of clone policy from class to return value.
+    // TODO, provide more flexible choice from { Reuse, Clone, DeepClone, Rerun }.
+    // TODO, think about scope of shared references in deep clone (example, same reference passed down on two paths).
+    
     /**
      * Controls how return values are passed from producer to consumer.
      * <p>
@@ -36,6 +40,9 @@ public @interface JExampleOptions {
      * they are cloneable. At the moment, the set of immutable objects is
      * limited to instances of {@link String} and boxed primitives. In the
      * future (see JSR 308) this might change.
+     * 
+     * <P>TODO, fix above para to talk about (unsafe) reflection clone! 
+     * 
      * <p>
      * If this option is <code>false</code> return values are passed along
      * without cloning or rerunning. If the same return value is used by more
