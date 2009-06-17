@@ -23,8 +23,8 @@ import ch.unibe.jexample.demo.StackTest;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleClass;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)

@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal;
+package ch.unibe.jexample.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -8,7 +8,7 @@ import java.lang.reflect.Modifier;
 
 import ch.unibe.jexample.deepclone.CloneFactory;
 
-public class Util {
+public class CloneUtil {
 
     public static Constructor<?> getConstructor(Class<?> jClass) throws SecurityException, NoSuchMethodException {
         if (!Modifier.isPublic(jClass.getModifiers())) {

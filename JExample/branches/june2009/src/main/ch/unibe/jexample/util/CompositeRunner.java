@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal;
+package ch.unibe.jexample.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +14,8 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.manipulation.Sortable;
 import org.junit.runner.manipulation.Sorter;
 import org.junit.runner.notification.RunNotifier;
+
+import ch.unibe.jexample.internal.ExampleGraph;
 
 /** Copypasta from JUnit 4.4 sources, since missing in JUnit 4.5 and beyond.
  *

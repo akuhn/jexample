@@ -9,11 +9,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ch.unibe.jexample.AllTests;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.internal.MethodLocator;
-import ch.unibe.jexample.internal.MethodReference;
+import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.util.MethodReference;
 
 /**
  * @author Lea Haensenberger

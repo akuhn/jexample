@@ -5,9 +5,9 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.MethodLocator;
-import ch.unibe.jexample.internal.MethodReference;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.util.MethodReference;
 
 /**
  * Creates example instances. Sometimes, when you are writing a script or

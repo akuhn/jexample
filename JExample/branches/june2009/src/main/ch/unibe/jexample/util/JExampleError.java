@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal;
+package ch.unibe.jexample.util;
 
 import java.util.ArrayList;
 

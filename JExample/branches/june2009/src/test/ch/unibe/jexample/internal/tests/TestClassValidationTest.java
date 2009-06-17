@@ -10,8 +10,8 @@ import org.junit.runner.Runner;
 
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 public class TestClassValidationTest {
 

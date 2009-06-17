@@ -1,6 +1,6 @@
 package ch.unibe.jexample.internal;
 
-import static ch.unibe.jexample.internal.ExampleState.NONE;
+import static ch.unibe.jexample.internal.ExampleColor.NONE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,12 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExampleOptions;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.InvalidDeclarationError;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.util.CloneUtil;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 /**
  * A test method with dependencies and return value. Test methods are written
@@ -54,7 +59,7 @@ public class Example {
     public final Class<? extends Throwable> expectedException;
 
     protected JExampleError errors;
-    private ExampleState result;
+    private ExampleColor color;
     protected JExampleOptions policy;
 
     public Example(MethodReference method, ExampleClass owner) {
@@ -62,7 +67,7 @@ public class Example {
         this.owner = owner;
         this.method = method;
         this.providers = new Dependencies();
-        this.result = ExampleState.NONE;
+        this.color = ExampleColor.NONE;
         this.description = method.createTestDescription();
         this.returnValue = new ReturnValue(this);
         this.policy = initJExampleOptions(method.jclass);
@@ -110,7 +115,7 @@ public class Example {
         if (this.policy.cloneTestCase() && providers.hasFirstProviderImplementedIn(this)) {
             return providers.get(0).returnValue.getTestCaseInstance();
         }
-        return Util.getConstructor(method.jclass).newInstance();
+        return CloneUtil.getConstructor(method.jclass).newInstance();
     }
 
     protected Object bareInvoke() throws Exception {
@@ -118,7 +123,7 @@ public class Example {
         Object[] args = providers.getInjectionValues(policy, method.arity());
         Object container = getContainerInstance();
         Object newResult = method.invoke(container, args);
-        if (result == NONE) { 
+        if (color == NONE) { 
          // XXX why do we store the first result, and not the most recent one? 
             returnValue.assign(newResult);
             returnValue.assignInstance(container);
@@ -127,7 +132,7 @@ public class Example {
     }
 
     public void run(RunNotifier notifier) {
-        if (result == NONE) result = new ExampleRunner(this, notifier).run();
+        if (color == NONE) color = new ExampleRunner(this, notifier).run();
     }
 
     @Override
@@ -177,7 +182,7 @@ public class Example {
     }
 
     public boolean wasSuccessful() {
-        return result == ExampleState.GREEN;
+        return color == ExampleColor.GREEN;
     }
 
 }

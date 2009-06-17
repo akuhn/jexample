@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ch.unibe.jexample.internal;
+package ch.unibe.jexample.util;
 
 import static java.lang.Character.isJavaIdentifierPart;
 import static java.lang.Character.isJavaIdentifierStart;
@@ -11,6 +11,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 /**
  * Breaks a dependency declaration into method references. The class accepts the

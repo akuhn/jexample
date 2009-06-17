@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
+import ch.unibe.jexample.util.JExampleError;
 
 public class ExceptionExpected {
 
