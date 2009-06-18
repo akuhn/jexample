@@ -22,5 +22,9 @@ public class Dependency {
         return dependency;
     }
 
+    public Throwable getError() {
+        return broken;
+    }
+
     
 }

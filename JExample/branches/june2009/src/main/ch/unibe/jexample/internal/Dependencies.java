@@ -16,7 +16,7 @@ import ch.unibe.jexample.JExampleOptions;
  * @author Adrian Kuhn
  * 
  */
-public class Dependencies implements Iterable<Example> {
+public class Dependencies implements Iterable<Dependency> {
 
     private List<Dependency> elements = new ArrayList<Dependency>();
     
@@ -32,10 +32,12 @@ public class Dependencies implements Iterable<Example> {
     }
 
     private void validateCycle(Example example, Stack<Example> cycle, Set<Example> done) {
-        for (Example each: this) {
-            cycle.push(each);
-            if (example == each) invalidate(cycle);
-            if (done.add(each)) each.providers.validateCycle(example, cycle, done);
+        for (Dependency each: elements) {
+            if (each.isBroken()) continue;
+            Example eg = each.dependency();
+            cycle.push(eg);
+            if (example == eg) invalidate(cycle);
+            if (done.add(eg)) eg.providers.validateCycle(example, cycle, done);
             cycle.pop();
         }
     }
@@ -52,8 +54,9 @@ public class Dependencies implements Iterable<Example> {
     }
 
     private void collectTransitiveClosureInto(Collection<Example> all) {
-        for (Example each: this) {
-            if (all.add(each)) each.providers.collectTransitiveClosureInto(all);
+        for (Dependency each: this) {
+            Example eg = each.dependency();
+            if (all.add(eg)) eg.providers.collectTransitiveClosureInto(all);
         }
     }
 
@@ -78,8 +81,8 @@ public class Dependencies implements Iterable<Example> {
     }
 
     @Override
-    public Iterator<Example> iterator() {
-        return new Iter(elements.iterator());
+    public Iterator<Dependency> iterator() {
+        return elements.iterator();
     }
 
     public void add(Example d) {
@@ -109,6 +112,10 @@ public class Dependencies implements Iterable<Example> {
             throw new UnsupportedOperationException();
         }
         
+    }
+
+    public void addBroken(Throwable error) {
+        elements.add(new Dependency(error));
     }
     
 }

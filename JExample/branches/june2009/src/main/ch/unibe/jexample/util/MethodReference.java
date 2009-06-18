@@ -10,14 +10,23 @@ import org.junit.runner.Description;
 
 public class MethodReference implements Reference {
 
-    private final Method jmethod;
-    public final Class<?> jclass;
+    private Method jmethod;
+    public Class<?> jclass;
+    private Throwable error;
 
     public MethodReference(Class<?> jclass, Method jmethod) {
         assert jmethod.getDeclaringClass().isAssignableFrom(jclass);
         jmethod.setAccessible(true);
         this.jmethod = jmethod;
         this.jclass = jclass;
+    }
+
+    public MethodReference(Throwable ex) {
+        this.error = ex;
+    }
+    
+    public boolean isBroken() {
+        return error != null;
     }
 
     @Override
@@ -85,12 +94,18 @@ public class MethodReference implements Reference {
 
     @Override
     public String toString() {
+        if (isBroken()) return "Broken: " + error;
         return jclass.toString() + "#" + getName();
     }
 
     @Override
     public boolean exists() {
         return true;
+    }
+
+    public Throwable getError() {
+        assert isBroken();
+        return error;
     }
 
 }

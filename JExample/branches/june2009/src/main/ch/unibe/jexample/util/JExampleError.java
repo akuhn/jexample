@@ -51,7 +51,11 @@ public class JExampleError extends InitializationError {
 
     public Kind kind() {
         assert size() == 1;
-        return ((Entry) getCauses().get(0)).kind;
+        return first().kind;
+    }
+
+    private Entry first() {
+        return (Entry) getCauses().get(0);
     }
 
     public boolean isEmpty() {
@@ -63,4 +67,16 @@ public class JExampleError extends InitializationError {
         return "JExample error: " + getCauses();
     }
 
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this; 
+    }
+
+    @Override
+    public Throwable getCause() {
+        return isEmpty() ? null : first().getCause();
+    }
+
+    
+    
 }

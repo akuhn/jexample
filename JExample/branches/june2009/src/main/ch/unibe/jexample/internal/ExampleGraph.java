@@ -58,9 +58,14 @@ public class ExampleGraph {
         e = new Example(method, newExampleClass(method.jclass));
         examples.put(method, e);
         for (MethodReference m: e.collectDependencies()) {
-            Example d = newExample(m);
-            e.providers.add(d);
-            e.validateCycle();
+            if (m.isBroken()) {
+                e.providers.addBroken(m.getError());
+            }
+            else {
+                Example d = newExample(m);
+                e.providers.add(d);
+                e.validateCycle();
+            }
         }
         e.validate();
         return e;

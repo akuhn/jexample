@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ch.unibe.jexample.internal.tests;
+package ch.unibe.jexample.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.internal.tests.ForExampleTest;
 import ch.unibe.jexample.util.MethodLocator;
 import ch.unibe.jexample.util.MethodReference;
 
@@ -149,7 +150,7 @@ public class DependsParserTest {
 
     @Test
     public void packageLookup() throws Exception {
-        MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(ForExampleTest.class);
+        MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(Util.class);
         assertEquals(A.class, ref.jclass);
         assertEquals("unique", ref.getName());
     }
@@ -163,34 +164,30 @@ public class DependsParserTest {
 
     @Test
     public void qualifiedLookup() throws Exception {
-        MethodReference ref = MethodLocator.parse("ch.unibe.jexample.internal.tests.DependsParserTest$A.unique")
+        MethodReference ref = MethodLocator.parse("ch.unibe.jexample.util.DependsParserTest$A.unique")
                 .resolve(Void.class);
         assertEquals(A.class, ref.jclass);
         assertEquals("unique", ref.getName());
     }
 
+    @Test(expected = ClassNotFoundException.class)
     public void classNotFound() throws Exception {
-        MethodReference ref = MethodLocator.parse("Zork.method").resolve(A.class);
-        assertTrue(ref.isBroken());
-        assertTrue(ref.getError() instanceof ClassNotFoundException);
+        MethodLocator.parse("Zork.method").resolve(A.class);
     }
 
+    @Test(expected = NoSuchMethodException.class)
     public void noSuchMethod() throws Exception {
-        MethodReference ref = MethodLocator.parse("zork()").resolve(A.class);
-        assertTrue(ref.isBroken());
-        assertTrue(ref.getError() instanceof NoSuchMethodException);
+        MethodLocator.parse("zork()").resolve(A.class);
     }
 
+    @Test(expected = NoSuchMethodException.class)
     public void noSuchUniqueMethod() throws Exception {
-        MethodReference ref = MethodLocator.parse("zork").resolve(A.class);
-        assertTrue(ref.isBroken());
-        assertTrue(ref.getError() instanceof NoSuchMethodException);
+        MethodLocator.parse("zork").resolve(A.class);
     }
 
+    @Test(expected = ClassNotFoundException.class)
     public void parameterTypeNotFound() throws Exception {
-        MethodReference ref = MethodLocator.parse("test(zork)").resolve(A.class);
-        assertTrue(ref.isBroken());
-        assertTrue(ref.getError() instanceof ClassNotFoundException);
+        MethodLocator.parse("test(zork)").resolve(A.class);
     }
 
     @RunWith(JExample.class)

@@ -80,16 +80,12 @@ public class Example {
         Given a = method.getAnnotation(Given.class);
         if (a == null) return all;
         try {
-            for (MethodLocator each: MethodLocator.parseAll(a.value()))
-                all.add(each.resolve(method.jclass));
+            Iterable<MethodLocator> locators = MethodLocator.parseAll(a.value());
+            for (MethodLocator each: locators) {
+                 all.add(each.resolve(method.jclass));
+            }
         } catch (InvalidDeclarationError ex) {
             errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
-        } catch (SecurityException ex) {
-            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-        } catch (ClassNotFoundException ex) {
-            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-        } catch (NoSuchMethodException ex) {
-            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
         }
         return all;
     }
@@ -164,10 +160,16 @@ public class Example {
     }
 
     private void validateDependencyTypes() {
-        Iterator<Example> tms = providers.iterator();
+        Iterator<Dependency> tms = providers.iterator();
         int position = 1;
         for (Class<?> t: method.getParameterTypes()) {
-            Example tm = tms.next();
+            Dependency each = tms.next();
+            if (each.isBroken()) {
+                errors.add(Kind.PROVIDER_NOT_FOUND,
+                        each.getError());
+                continue;
+            }
+            Example tm = each.dependency();
             Class<?> r = tm.method.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
@@ -178,6 +180,14 @@ public class Example {
                         "(%s): invalid dependency (%s), provider must not expect exception.", method, tm.method);
             }
             position++;
+        }
+        while (tms.hasNext()) {
+            Dependency each = tms.next();
+            if (each.isBroken()) {
+                errors.add(Kind.PROVIDER_NOT_FOUND,
+                        each.getError());
+                continue;
+            }
         }
     }
 

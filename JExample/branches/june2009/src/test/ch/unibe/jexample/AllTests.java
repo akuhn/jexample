@@ -7,11 +7,13 @@ import org.junit.runners.Suite.SuiteClasses;
 import ch.unibe.jexample.deepclone.DeepCloneTest;
 import ch.unibe.jexample.demo.ListTest;
 import ch.unibe.jexample.demo.StackTest;
+import ch.unibe.jexample.internal.BrokenDependencyTest;
 import ch.unibe.jexample.internal.tests.*;
 
 
 @RunWith(Suite.class)
 @SuiteClasses( {
+    BrokenDependencyTest.class,
     ForceCloneSuperclass.class,
     DeepCloneSerializableObjects.class,
     DeepCloneTest.class,

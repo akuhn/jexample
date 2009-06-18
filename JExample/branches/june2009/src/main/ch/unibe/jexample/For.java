@@ -35,10 +35,6 @@ public abstract class For {
             throw new RuntimeException(ex);
         } catch (JExampleError ex) {
             throw new RuntimeException(ex);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch (NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
         }
     }
 

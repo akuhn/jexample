@@ -55,7 +55,7 @@ public class InheritanceTest extends JExampleTest {
         Example test = g.findExample(B.class, "test");
 
         assertEquals(1, test.providers.size());
-        assertEquals(m, test.providers.iterator().next());
+        assertEquals(m, test.providers.iterator().next().dependency());
 
     }
 
@@ -70,7 +70,7 @@ public class InheritanceTest extends JExampleTest {
         Example test = g.findExample(A.class, "test");
 
         assertEquals(1, test.providers.size());
-        assertEquals(m, test.providers.iterator().next());
+        assertEquals(m, test.providers.iterator().next().dependency());
 
     }
 
@@ -86,13 +86,13 @@ public class InheritanceTest extends JExampleTest {
         Example test = g.findExample(A.class, "test");
 
         assertEquals(1, test.providers.size());
-        assertEquals(m, test.providers.iterator().next());
+        assertEquals(m, test.providers.iterator().next().dependency());
 
         m = g.findExample(B.class, "m");
         test = g.findExample(B.class, "test");
 
         assertEquals(1, test.providers.size());
-        assertEquals(m, test.providers.iterator().next());
+        assertEquals(m, test.providers.iterator().next().dependency());
     }
 
     @Test

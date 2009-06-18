@@ -68,10 +68,18 @@ public class MethodLocator {
             this.base = base;
         }
 
-        private MethodReference findMethodReference(MethodLocator token) throws ClassNotFoundException,
-                SecurityException, NoSuchMethodException {
-            Class providerClass = findClass(token);
-            return findMethodReference(providerClass, token);
+        private MethodReference findMethodReference(MethodLocator token) {
+            try {
+                Class providerClass = findClass(token);
+                return findMethodReference(providerClass, token);
+            } catch (ClassNotFoundException ex) {
+                return new MethodReference(ex);
+            } catch (SecurityException ex) {
+                return new MethodReference(ex);
+            } catch (NoSuchMethodException ex) {
+                return new MethodReference(ex);
+            }
+            
         }
 
         private Class findClass(MethodLocator token) throws ClassNotFoundException {
@@ -269,12 +277,11 @@ public class MethodLocator {
         return p.scanDeclaration();
     }
 
-    public MethodReference resolve() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+    public MethodReference resolve() {
         return resolve(Object.class);
     }
 
-    public MethodReference resolve(Class context) throws SecurityException, ClassNotFoundException,
-            NoSuchMethodException {
+    public MethodReference resolve(Class context) {
         return new Resolver(context).findMethodReference(this);
     }
 

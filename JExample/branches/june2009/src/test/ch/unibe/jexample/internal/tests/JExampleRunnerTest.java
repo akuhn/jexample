@@ -360,9 +360,8 @@ public class JExampleRunnerTest {
 
     @Test
     public void testBadTests() throws JExampleError {
-        Class<?>[] classes = { D_fail.class, C_fail.class };
         ExampleGraph g = new ExampleGraph();
-        Result result = g.runJExample(classes);
+        Result result = g.runJExample(D_fail.class, C_fail.class);
         assertEquals(2, result.getFailureCount());
         assertEquals(0, result.getIgnoreCount());
         assertEquals(2, result.getRunCount());

@@ -91,9 +91,10 @@ class ExampleRunner {
      *         If any fails, abort and return <code>false</code>.
      */
     private boolean runDependencies() {
-        for (Example each: eg.providers) {
-            each.run(notifier);
-            if (!each.wasSuccessful()) {
+        for (Dependency each: eg.providers) {
+            Example eg = each.dependency();
+            eg.run(notifier);
+            if (!eg.wasSuccessful()) {
                 return false;
             }
         }
