@@ -1,6 +1,6 @@
 package ch.unibe.jexample.internal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.runner.Result;
@@ -37,8 +37,10 @@ public class BrokenDependencyTest {
        assertEquals(3, result.getRunCount());
        assertEquals(1, result.getFailureCount());
        Failure failure = result.getFailures().iterator().next();
-       System.out.println(failure.getTrace());
-       // TODO ...
+       assertEquals(JExampleError.class, failure.getException().getClass());
+       JExampleError error = (JExampleError) failure.getException();
+       assertEquals(NoSuchMethodException.class, error.getCause().getClass());
+       assertEquals("t(" + A.class.getName() + ")", failure.getTestHeader());
     }
     
     @Test
