@@ -55,6 +55,7 @@ public class Dependencies implements Iterable<Dependency> {
 
     private void collectTransitiveClosureInto(Collection<Example> all) {
         for (Dependency each: this) {
+            if (each.isBroken()) continue;
             Example eg = each.dependency();
             if (all.add(eg)) eg.providers.collectTransitiveClosureInto(all);
         }
@@ -87,31 +88,6 @@ public class Dependencies implements Iterable<Dependency> {
 
     public void add(Example d) {
         elements.add(new Dependency(d));
-    }
-
-    private static class Iter implements Iterator<Example> {
-     
-        private Iterator<Dependency> it;
-        
-        public Iter(Iterator<Dependency> it) {
-            this.it = it;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return it.hasNext();
-        }
-
-        @Override
-        public Example next() {
-            return it.next().dependency();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-        
     }
 
     public void addBroken(Throwable error) {

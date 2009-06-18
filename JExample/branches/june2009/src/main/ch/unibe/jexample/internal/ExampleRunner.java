@@ -94,9 +94,7 @@ class ExampleRunner {
         for (Dependency each: eg.providers) {
             Example eg = each.dependency();
             eg.run(notifier);
-            if (!eg.wasSuccessful()) {
-                return false;
-            }
+            if (!eg.wasSuccessful()) return false;
         }
         return true;
     }
