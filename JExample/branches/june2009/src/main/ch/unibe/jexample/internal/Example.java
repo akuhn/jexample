@@ -113,7 +113,7 @@ public class Example {
 
     private Object getContainerInstance() throws Exception {
         if (this.policy.cloneTestCase() && providers.hasFirstProviderImplementedIn(this)) {
-            return providers.get(0).returnValue.getTestCaseInstance();
+            return providers.first().returnValue.getTestCaseInstance();
         }
         return CloneUtil.getConstructor(method.jclass).newInstance();
     }
@@ -164,7 +164,7 @@ public class Example {
     }
 
     private void validateDependencyTypes() {
-        Iterator<Example> tms = this.providers.iterator();
+        Iterator<Example> tms = providers.iterator();
         int position = 1;
         for (Class<?> t: method.getParameterTypes()) {
             Example tm = tms.next();
