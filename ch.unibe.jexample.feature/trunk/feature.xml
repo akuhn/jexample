@@ -2,7 +2,7 @@
 <feature
       id="ch.unibe.jexample.feature"
       label="JExample library"
-      version="4.5.285.qualifier"
+      version="4.5.285"
       provider-name="Adrian Kuhn and Lea Hänsenberger">
 
    <description url="http://scg.unibe.ch/research/jexample">
