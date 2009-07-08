@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.unibe.jexample.feature"
-      label="Feature"
-      version="4.5.285.qualifier">
+      label="JExample library"
+      version="4.5.285.qualifier"
+      provider-name="Adrian Kuhn and Lea Hänsenberger">
 
    <description url="http://scg.unibe.ch/research/jexample">
       JExample is a unit testing framework with dependecy management. You can run JExample tests with the JUnit runner.
