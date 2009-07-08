@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/ch.unibe.jexample.feature_4.5.285.qualifier.jar" id="ch.unibe.jexample.feature" version="4.5.285.qualifier">
+      <category name="JExample"/>
+   </feature>
+   <category-def name="JExample" label="JExample">
+      <description>
+         Unit testing framework.
+      </description>
+   </category-def>
+</site>
