@@ -2,18 +2,20 @@
 <feature
       id="ch.unibe.jexample.feature"
       label="Feature"
-      version="1.0.0.qualifier">
+      version="4.5.285.qualifier">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://scg.unibe.ch/research/jexample">
+      JExample is a unit testing framework with dependecy management. You can run JExample tests with the JUnit runner.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright url="http://scg.unibe.ch/research/jexample">
+      Copyright (c) 2007-2009, Adrian Kuhn and Lea Haensenberger.
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="http://www.eclipse.org/legal/epl-v10.html">
+      The accompanying program is provided under the terms of this eclipse public
+      license (&quot;agreement&quot;). any use, reproduction or distribution of the program 
+      constitutes recipients acceptance of this agreement.
    </license>
 
    <plugin
