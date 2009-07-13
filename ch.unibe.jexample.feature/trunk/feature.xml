@@ -3,20 +3,18 @@
       id="ch.unibe.jexample.feature"
       label="JExample library"
       version="4.5.285"
-      provider-name="Adrian Kuhn and Lea Hänsenberger">
+      provider-name="%author">
 
    <description url="http://scg.unibe.ch/research/jexample">
       JExample is a unit testing framework with dependecy management. You can run JExample tests with the JUnit runner.
    </description>
 
    <copyright url="http://scg.unibe.ch/research/jexample">
-      Copyright (c) 2007-2009, Adrian Kuhn and Lea Haensenberger.
+      Copyright (c) 2007-2009, %author<!-- -->.
    </copyright>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
-      The accompanying program is provided under the terms of this eclipse public
-      license (&quot;agreement&quot;). any use, reproduction or distribution of the program 
-      constitutes recipients acceptance of this agreement.
+      %license
    </license>
 
    <plugin
