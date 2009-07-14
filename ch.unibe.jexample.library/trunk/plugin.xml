@@ -4,7 +4,7 @@
    <extension
       point="org.eclipse.jdt.core.classpathContainerInitializer">
       <classpathContainerInitializer
-            class="ch.unibe.jexample.internal.buildpath.JUnitContainerInitializer"
+            class="ch.unibe.jexample.internal.JExampleContainerInitializer"
             id="ch.unibe.jexample.JEXAMPLE_CONTAINER">
       </classpathContainerInitializer>
    </extension>
@@ -13,9 +13,28 @@
          point="org.eclipse.jdt.ui.classpathContainerPage">
       <classpathContainerPage
             name="JExample"
-            class="ch.unibe.jexample.internal.buildpath.JUnitContainerWizardPage"
+            class="ch.unibe.jexample.internal.JExampleContainerWizardPage"
             id="ch.unibe.jexample.JEXAMPLE_CONTAINER">
       </classpathContainerPage>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.classpathFixProcessors">
+      <classpathFixProcessor
+            class="ch.unibe.jexample.internal.JExampleClasspathFixProcessor"
+            id="ch.unibe.jexample.library.JExampleClasspathFixProcessor"
+            name="JExample Classpath Fix Processor">
+         <overrides
+               id="org.eclipse.jdt.ui.text.correction.DefaultClasspathFixProcessor">
+         </overrides>
+      </classpathFixProcessor>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.quickFixProcessors">
+      <quickFixProcessor
+            class="ch.unibe.jexample.internal.JExampleQuickFixProcessor"
+            id="ch.unibe.jexample.library.JExampleQuickFixProcessor"
+            name="JExample Quick Fix Processor">
+      </quickFixProcessor>
    </extension>
 
 </plugin>

@@ -2,11 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JExample library
 Bundle-SymbolicName: ch.unibe.jexample.library;singleton:=true
-Bundle-Version: 4.5.285
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Bundle-Version: 4.5.285.r318
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.junit,
  org.eclipse.jdt.ui,
- org.eclipse.jdt.core
+ org.eclipse.ui,
+ org.eclipse.jface.text,
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.core.resources,
+ org.eclipse.ltk.ui.refactoring
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Adrian Kuhn and Lea Hänsenberger

@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal.buildpath;
+package ch.unibe.jexample.internal;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -8,10 +8,11 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-public class JUnitContainerWizardPage extends WizardPage implements IClasspathContainerPage  {
 
-	public JUnitContainerWizardPage() {
-		super(JUnitContainerWizardPage.class.getName());
+public class JExampleContainerWizardPage extends WizardPage implements IClasspathContainerPage  {
+
+	public JExampleContainerWizardPage() {
+		super(JExampleContainerWizardPage.class.getName());
 	}
 
 	public boolean finish() {
@@ -19,7 +20,7 @@ public class JUnitContainerWizardPage extends WizardPage implements IClasspathCo
 	}
 
 	public IClasspathEntry getSelection() {
-		return JavaCore.newContainerEntry(new Path("ch.unibe.jexample.JEXAMPLE_CONTAINER"));
+		return JavaCore.newContainerEntry(new Path(JExampleContainerInitializer.JEXAMPLE_PATH));
 	}
 
 	public void setSelection(IClasspathEntry containerEntry) {
