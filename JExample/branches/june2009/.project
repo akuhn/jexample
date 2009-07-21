@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JExample-4</name>
+	<name>JExample-june2009</name>
 	<comment>JExample is an extensions of JUnit that improves defect localizaton by
     changing the way you structure your tests. It introduces first-class
     dependencies. If test B depends on A, the return value of A can be used as
@@ -12,6 +12,11 @@
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.codemap.HapaxBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
