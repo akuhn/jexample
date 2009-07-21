@@ -54,9 +54,9 @@ public class ExampleGraphTest {
         assertEquals(2, r.getFailureCount());
         JExampleError err;
         err = (JExampleError) r.getFailures().get(0).getException();
-        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.getKind());
         err = (JExampleError) r.getFailures().get(1).getException();
-        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.getKind());
     }
 
     @RunWith(JExample.class)

@@ -165,7 +165,7 @@ public class Example {
         for (Class<?> t: method.getParameterTypes()) {
             Dependency each = tms.next();
             if (each.isBroken()) {
-                errors.add(Kind.PROVIDER_NOT_FOUND,
+                errors.add(Kind.NO_SUCH_PROVIDER,
                         each.getError());
                 continue;
             }
@@ -184,7 +184,7 @@ public class Example {
         while (tms.hasNext()) {
             Dependency each = tms.next();
             if (each.isBroken()) {
-                errors.add(Kind.PROVIDER_NOT_FOUND,
+                errors.add(Kind.NO_SUCH_PROVIDER,
                         each.getError());
                 continue;
             }

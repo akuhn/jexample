@@ -7,76 +7,90 @@ import org.junit.internal.runners.InitializationError;
 @SuppressWarnings("serial")
 public class JExampleError extends InitializationError {
 
-    public JExampleError() {
-        super(new ArrayList<Throwable>());
-    }
+	public JExampleError() {
+		super(new ArrayList<Throwable>());
+	}
 
-    public class Entry extends RuntimeException {
-        public final Kind kind;
+	public void add(Kind kind, String message, Object... args) {
+		Exception ex = new Entry(kind, String.format(message, args), null);
+		ex.fillInStackTrace();
+		getCauses().add(ex);
+	}
 
-        public Entry(Kind kind, String message, Throwable cause) {
-            super(message, cause);
-            this.kind = kind;
-        }
-    }
+	public void add(Kind kind, Throwable cause) {
+		Exception ex = new Entry(kind, cause.getMessage(), cause);
+		ex.fillInStackTrace();
+		getCauses().add(ex);
+	}
 
-    public void add(Kind kind, Throwable cause) {
-        Exception ex = new Entry(kind, cause.getMessage(), cause);
-        ex.fillInStackTrace();
-        getCauses().add(ex);
-    }
+	@Override
+	public synchronized Throwable fillInStackTrace() {
+		return this; 
+	}
 
-    public void add(Kind kind, String message, Object... args) {
-        Exception ex = new Entry(kind, String.format(message, args), null);
-        ex.fillInStackTrace();
-        getCauses().add(ex);
-    }
+	private Entry first() {
+		return (Entry) getCauses().get(0);
+	}
 
-    public enum Kind {
-        MISSING_PROVIDERS, 
-        MISSING_TEST_ANNOTATION, 
-        PARAMETER_NOT_ASSIGNABLE, 
-        PROVIDER_EXPECTS_EXCEPTION, 
-        MISSING_RUNWITH_ANNOTATION, 
-        NO_EXAMPLES_FOUND, 
-        MISSING_CONSTRUCTOR, 
-        INVALID_DEPENDS_DECLARATION, 
-        PROVIDER_NOT_FOUND,
-        RECURSIVE_DEPENDENCIES,
-    }
+	@Override
+	public Throwable getCause() {
+		return isEmpty() ? null : first().getCause();
+	}
 
-    public int size() {
-        return getCauses().size();
-    }
+	public Kind getKind() {
+		assert size() == 1;
+		return first().kind;
+	}
 
-    public Kind kind() {
-        assert size() == 1;
-        return first().kind;
-    }
+	public boolean isEmpty() {
+		return getCauses().isEmpty();
+	}
 
-    private Entry first() {
-        return (Entry) getCauses().get(0);
-    }
+	public int size() {
+		return getCauses().size();
+	}
 
-    public boolean isEmpty() {
-        return getCauses().isEmpty();
-    }
+	
+	
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("JExample, could not initialize example.\n");
+		for (Throwable entry : getCauses()) {
+			buf.append(entry).append('\n');
+		}
+		return buf.toString();
+	}
 
-    @Override
-    public String toString() {
-        return "JExample error: " + getCauses();
-    }
+	public class Entry extends RuntimeException {
+		public final Kind kind;
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this; 
-    }
+		public Entry(Kind kind, String message, Throwable cause) {
+			super(message, cause);
+			this.kind = kind;
+		}
 
-    @Override
-    public Throwable getCause() {
-        return isEmpty() ? null : first().getCause();
-    }
+		@Override
+		public String toString() {
+			return String.format("%s: %s", kind, getMessage());
+		}
+		
+		
+	}
 
-    
-    
+	public enum Kind {
+		INVALID_DEPENDS_DECLARATION, 
+		MISSING_CONSTRUCTOR, 
+		MISSING_PROVIDERS, 
+		MISSING_RUNWITH_ANNOTATION, 
+		MISSING_TEST_ANNOTATION, 
+		NO_EXAMPLES_FOUND, 
+		PARAMETER_NOT_ASSIGNABLE, 
+		PROVIDER_EXPECTS_EXCEPTION, 
+		NO_SUCH_PROVIDER,
+		RECURSIVE_DEPENDENCIES,
+	}
+
+
+
 }

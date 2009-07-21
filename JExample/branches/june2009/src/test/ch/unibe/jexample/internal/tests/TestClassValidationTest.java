@@ -50,7 +50,7 @@ public class TestClassValidationTest {
             fail("InitializationError expected!");
         } catch (JExampleError err) {
             assertEquals(1, err.size());
-            assertEquals(Kind.MISSING_RUNWITH_ANNOTATION, err.kind());
+            assertEquals(Kind.MISSING_RUNWITH_ANNOTATION, err.getKind());
         }
     }
 
@@ -61,7 +61,7 @@ public class TestClassValidationTest {
             fail("InitializationError expected!");
         } catch (JExampleError err) {
             assertEquals(1, err.size());
-            assertEquals(Kind.MISSING_CONSTRUCTOR, err.kind());
+            assertEquals(Kind.MISSING_CONSTRUCTOR, err.getKind());
         }
     }
 
@@ -72,7 +72,7 @@ public class TestClassValidationTest {
             fail("InitializationError expected!");
         } catch (JExampleError err) {
             assertEquals(1, err.size());
-            assertEquals(Kind.NO_EXAMPLES_FOUND, err.kind());
+            assertEquals(Kind.NO_EXAMPLES_FOUND, err.getKind());
         }
     }
 
@@ -83,7 +83,7 @@ public class TestClassValidationTest {
             fail("InitializationError expected!");
         } catch (JExampleError err) {
             assertEquals(1, err.size());
-            assertEquals(Kind.MISSING_RUNWITH_ANNOTATION, err.kind());
+            assertEquals(Kind.MISSING_RUNWITH_ANNOTATION, err.getKind());
         }
     }
 

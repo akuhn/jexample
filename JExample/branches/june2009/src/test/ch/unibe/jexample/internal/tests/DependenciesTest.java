@@ -150,7 +150,7 @@ public class DependenciesTest {
         assertEquals(1, r.getFailureCount());
         JExampleError err = (JExampleError) r.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, err.kind());
+        assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, err.getKind());
     }
 
     @Test
@@ -199,7 +199,7 @@ public class DependenciesTest {
         assertEquals(1, r.getFailureCount());
         JExampleError err = (JExampleError) r.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, err.kind());
+        assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, err.getKind());
     }
 
     @RunWith(JExample.class)
@@ -226,7 +226,7 @@ public class DependenciesTest {
         assertEquals(1, r.getFailureCount());
         JExampleError err = (JExampleError) r.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.MISSING_PROVIDERS, err.kind());
+        assertEquals(Kind.MISSING_PROVIDERS, err.getKind());
     }
 
 }

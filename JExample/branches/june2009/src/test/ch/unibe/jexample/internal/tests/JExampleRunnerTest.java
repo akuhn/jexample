@@ -60,7 +60,7 @@ public class JExampleRunnerTest {
         assertEquals(3, result.getFailureCount());
         JExampleError err = (JExampleError) result.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.getKind());
     }
 
     @RunWith(JExample.class)

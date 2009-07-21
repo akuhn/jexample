@@ -57,7 +57,7 @@ public class MethodLocator {
 
     @Override
     public String toString() {
-        return String.format("%s#%s%s", path, simple, args == null ? "" : Arrays.asList(args));
+        return String.format("%s#%s%s", path == null ? "" : path, simple, args == null ? "" : Arrays.asList(args));
     }
 
     public static class Resolver {
