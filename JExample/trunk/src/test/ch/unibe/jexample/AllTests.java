@@ -4,17 +4,23 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import ch.unibe.jexample.deepclone.DeepCloneHashMapTest;
+import ch.unibe.jexample.deepclone.DeepCloneReferenceTest;
 import ch.unibe.jexample.deepclone.DeepCloneTest;
 import ch.unibe.jexample.demo.ListTest;
 import ch.unibe.jexample.demo.StackTest;
+import ch.unibe.jexample.internal.BrokenDependencyTest;
 import ch.unibe.jexample.internal.tests.*;
 
 
 @RunWith(Suite.class)
 @SuiteClasses( {
+    BrokenDependencyTest.class,
     ForceCloneSuperclass.class,
     DeepCloneSerializableObjects.class,
     DeepCloneTest.class,
+    DeepCloneHashMapTest.class,
+    DeepCloneReferenceTest.class,
     BeforeClassTest.class, 
     CanRunPrivateInnerClassTest.class,
     DependenciesTest.class,

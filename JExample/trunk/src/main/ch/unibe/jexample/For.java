@@ -1,13 +1,14 @@
 package ch.unibe.jexample;
 
 import org.junit.internal.runners.InitializationError;
+import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.MethodLocator;
-import ch.unibe.jexample.internal.MethodReference;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.util.MethodReference;
 
 /**
  * Creates example instances. Sometimes, when you are writing a script or
@@ -24,9 +25,9 @@ import ch.unibe.jexample.internal.MethodReference;
 @SuppressWarnings("unchecked")
 public abstract class For {
 
-    public static <T> T example(String reference) {
+    public static <T> T example(String fullReference) {
         try {
-            MethodReference ref = MethodLocator.parse(reference).resolve();
+            MethodReference ref = MethodLocator.parse(fullReference).resolve();
             ExampleGraph g = new ExampleGraph();
             g.add(ref.jclass);
             Example e = g.findExample(ref);
@@ -34,10 +35,6 @@ public abstract class For {
         } catch (SecurityException ex) {
             throw new RuntimeException(ex);
         } catch (JExampleError ex) {
-            throw new RuntimeException(ex);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch (NoSuchMethodException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -49,8 +46,14 @@ public abstract class For {
     }
 
     private static Object runExample(Example e) {
-        e.run(new RunNotifier());
-        if (!e.wasSuccessful()) throw new RuntimeException("Test failed.");
+    	Result result= new Result();
+		RunNotifier notifier = new RunNotifier();
+		notifier.addFirstListener(result.createListener());
+        e.run(notifier);
+        if (!e.wasSuccessful()) {
+        	if (result.getFailures().size() != 1) throw new RuntimeException("Oops, what do we now!?");
+        	throw new RuntimeException(result.getFailures().iterator().next().getException());
+        }
         return e.returnValue.getValue();
     }
 

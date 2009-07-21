@@ -23,8 +23,8 @@ import ch.unibe.jexample.demo.StackTest;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleClass;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 /**
  * @author Lea Haensenberger (lhaensenberger at students.unibe.ch)
@@ -60,7 +60,7 @@ public class JExampleRunnerTest {
         assertEquals(3, result.getFailureCount());
         JExampleError err = (JExampleError) result.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.getKind());
     }
 
     @RunWith(JExample.class)
@@ -360,9 +360,8 @@ public class JExampleRunnerTest {
 
     @Test
     public void testBadTests() throws JExampleError {
-        Class<?>[] classes = { D_fail.class, C_fail.class };
         ExampleGraph g = new ExampleGraph();
-        Result result = g.runJExample(classes);
+        Result result = g.runJExample(D_fail.class, C_fail.class);
         assertEquals(2, result.getFailureCount());
         assertEquals(0, result.getIgnoreCount());
         assertEquals(2, result.getRunCount());

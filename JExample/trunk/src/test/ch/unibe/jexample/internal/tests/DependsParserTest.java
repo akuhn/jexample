@@ -9,11 +9,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ch.unibe.jexample.AllTests;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.internal.MethodLocator;
-import ch.unibe.jexample.internal.MethodReference;
+import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.util.MethodReference;
 
 /**
  * @author Lea Haensenberger
@@ -71,11 +70,10 @@ public class DependsParserTest {
 
     @Test
     public void ambigousSimpleName() throws Exception {
-        try {
-            MethodLocator.parse("test").resolve(A.class);
-        } catch (NoSuchMethodException ex) {
-            assertTrue(ex.getMessage().startsWith("Ambigous depedency"));
-        }
+        MethodReference ref = MethodLocator.parse("test").resolve(A.class);
+        assertTrue(ref.isBroken());
+        assertTrue(ref.getError() instanceof NoSuchMethodException);
+        assertTrue(ref.getError().getMessage().startsWith("Ambigous depedency"));
     }
 
     @Test
@@ -171,24 +169,28 @@ public class DependsParserTest {
         assertEquals("unique", ref.getName());
     }
 
-    @Test(expected = ClassNotFoundException.class)
     public void classNotFound() throws Exception {
-        MethodLocator.parse("Zork.method").resolve(A.class);
+        MethodReference ref = MethodLocator.parse("Zork.method").resolve(A.class);
+        assertTrue(ref.isBroken());
+        assertTrue(ref.getError() instanceof ClassNotFoundException);
     }
 
-    @Test(expected = NoSuchMethodException.class)
     public void noSuchMethod() throws Exception {
-        MethodLocator.parse("zork()").resolve(A.class);
+        MethodReference ref = MethodLocator.parse("zork()").resolve(A.class);
+        assertTrue(ref.isBroken());
+        assertTrue(ref.getError() instanceof NoSuchMethodException);
     }
 
-    @Test(expected = NoSuchMethodException.class)
     public void noSuchUniqueMethod() throws Exception {
-        MethodLocator.parse("zork").resolve(A.class);
+        MethodReference ref = MethodLocator.parse("zork").resolve(A.class);
+        assertTrue(ref.isBroken());
+        assertTrue(ref.getError() instanceof NoSuchMethodException);
     }
 
-    @Test(expected = ClassNotFoundException.class)
     public void parameterTypeNotFound() throws Exception {
-        MethodLocator.parse("test(zork)").resolve(A.class);
+        MethodReference ref = MethodLocator.parse("test(zork)").resolve(A.class);
+        assertTrue(ref.isBroken());
+        assertTrue(ref.getError() instanceof ClassNotFoundException);
     }
 
     @RunWith(JExample.class)

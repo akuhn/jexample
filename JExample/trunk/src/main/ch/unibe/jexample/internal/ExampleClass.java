@@ -12,7 +12,10 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.util.CloneUtil;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 /**
  * Java class with example methods.
@@ -57,7 +60,7 @@ public class ExampleClass {
                     "Class %s is not a JExample test class, annotation @RunWith(JExample.class) missing.", this);
         }
         try {
-            Util.getConstructor(jclass);
+            CloneUtil.getConstructor(jclass);
         } catch (NoSuchMethodException ex) {
             errors.add(Kind.MISSING_CONSTRUCTOR, ex);
         } catch (SecurityException ex) {

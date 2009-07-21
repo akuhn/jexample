@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ch.unibe.jexample.internal;
+package ch.unibe.jexample.util;
 
 import static java.lang.Character.isJavaIdentifierPart;
 import static java.lang.Character.isJavaIdentifierStart;
@@ -11,6 +11,7 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 /**
  * Breaks a dependency declaration into method references. The class accepts the
@@ -56,7 +57,7 @@ public class MethodLocator {
 
     @Override
     public String toString() {
-        return String.format("%s#%s%s", path, simple, args == null ? "" : Arrays.asList(args));
+        return String.format("%s#%s%s", path == null ? "" : path, simple, args == null ? "" : Arrays.asList(args));
     }
 
     public static class Resolver {
@@ -67,10 +68,18 @@ public class MethodLocator {
             this.base = base;
         }
 
-        private MethodReference findMethodReference(MethodLocator token) throws ClassNotFoundException,
-                SecurityException, NoSuchMethodException {
-            Class providerClass = findClass(token);
-            return findMethodReference(providerClass, token);
+        private MethodReference findMethodReference(MethodLocator token) {
+            try {
+                Class providerClass = findClass(token);
+                return findMethodReference(providerClass, token);
+            } catch (ClassNotFoundException ex) {
+                return new MethodReference(ex);
+            } catch (SecurityException ex) {
+                return new MethodReference(ex);
+            } catch (NoSuchMethodException ex) {
+                return new MethodReference(ex);
+            }
+            
         }
 
         private Class findClass(MethodLocator token) throws ClassNotFoundException {
@@ -268,12 +277,11 @@ public class MethodLocator {
         return p.scanDeclaration();
     }
 
-    public MethodReference resolve() throws SecurityException, ClassNotFoundException, NoSuchMethodException {
+    public MethodReference resolve() {
         return resolve(Object.class);
     }
 
-    public MethodReference resolve(Class context) throws SecurityException, ClassNotFoundException,
-            NoSuchMethodException {
+    public MethodReference resolve(Class context) {
         return new Resolver(context).findMethodReference(this);
     }
 

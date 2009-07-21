@@ -3,6 +3,8 @@ package ch.unibe.jexample.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
@@ -14,9 +16,10 @@ import ch.unibe.jexample.JExampleOptions;
  * @author Adrian Kuhn
  * 
  */
-@SuppressWarnings("serial")
-public class Dependencies extends ArrayList<Example> {
+public class Dependencies implements Iterable<Dependency> {
 
+    private List<Dependency> elements = new ArrayList<Dependency>();
+    
     /**
      * Checks if these dependencies are part of a cycle. For each detected
      * cycle, invalidates all contained nodes.
@@ -29,10 +32,12 @@ public class Dependencies extends ArrayList<Example> {
     }
 
     private void validateCycle(Example example, Stack<Example> cycle, Set<Example> done) {
-        for (Example each: this) {
-            cycle.push(each);
-            if (example == each) invalidate(cycle);
-            if (done.add(each)) each.providers.validateCycle(example, cycle, done);
+        for (Dependency each: elements) {
+            if (each.isBroken()) continue;
+            Example eg = each.dependency();
+            cycle.push(eg);
+            if (example == eg) invalidate(cycle);
+            if (done.add(eg)) eg.providers.validateCycle(example, cycle, done);
             cycle.pop();
         }
     }
@@ -49,21 +54,44 @@ public class Dependencies extends ArrayList<Example> {
     }
 
     private void collectTransitiveClosureInto(Collection<Example> all) {
-        for (Example e: this) {
-            if (all.add(e)) e.providers.collectTransitiveClosureInto(all);
+        for (Dependency each: this) {
+            if (each.isBroken()) continue;
+            Example eg = each.dependency();
+            if (all.add(eg)) eg.providers.collectTransitiveClosureInto(all);
         }
     }
 
     public Object[] getInjectionValues(JExampleOptions policy, int length) throws Exception {
         Object[] values = new Object[length];
         for (int i = 0; i < length; i++) {
-            values[i] = this.get(i).returnValue.get(policy);
+            values[i] = elements.get(i).dependency().returnValue.get(policy);
         }
         return values;
     }
 
     public boolean hasFirstProviderImplementedIn(Example example) {
-        return !isEmpty() && get(0).returnValue.hasTestCaseInstance(example.method.jclass);
+        return !elements.isEmpty() && first().returnValue.hasTestCaseInstance(example.method.jclass);
     }
 
+    public Example first() {
+        return elements.get(0).dependency();
+    }
+
+    public int size() {
+        return elements.size();
+    }
+
+    @Override
+    public Iterator<Dependency> iterator() {
+        return elements.iterator();
+    }
+
+    public void add(Example d) {
+        elements.add(new Dependency(d));
+    }
+
+    public void addBroken(Throwable error) {
+        elements.add(new Dependency(error));
+    }
+    
 }

@@ -12,6 +12,10 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.util.CompositeRunner;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.util.Reference;
 
 /**
  * Validates, describes and runs all JExample tests. Implemented as a singleton
@@ -54,9 +58,14 @@ public class ExampleGraph {
         e = new Example(method, newExampleClass(method.jclass));
         examples.put(method, e);
         for (MethodReference m: e.collectDependencies()) {
-            Example d = newExample(m);
-            e.providers.add(d);
-            e.validateCycle();
+            if (m.isBroken()) {
+                e.providers.addBroken(m.getError());
+            }
+            else {
+                Example d = newExample(m);
+                e.providers.add(d);
+                e.validateCycle();
+            }
         }
         e.validate();
         return e;
@@ -128,7 +137,7 @@ public class ExampleGraph {
         }
     }
 
-    public Example findExample(MethodReference ref) {
+    public Example findExample(Reference ref) {
         for (Example eg: getExamples()) {
             if (ref.equals(eg.method)) return eg;
         }

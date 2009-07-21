@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal.tests;
+package ch.unibe.jexample.util;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

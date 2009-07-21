@@ -10,8 +10,8 @@ import sun.reflect.ReflectionFactory;
 
 public class UnsafeCloning implements DeepCloneStrategy {
 
-	private Constructor<?>		constructor;
-	private Collection<Field>	fields;
+	private Constructor<?> constructor;
+	private Collection<Field> fields;
 
 	public UnsafeCloning(Class<?> type) {
 		this.constructor = makeConstructor(type);
@@ -21,9 +21,8 @@ public class UnsafeCloning implements DeepCloneStrategy {
 	private static Collection<Field> makeFields(Class<?> type) {
 		Collection<Field> fields = new ArrayList<Field>();
 		for (Class<?> each = type; each != null; each = each.getSuperclass()) {
-			for (Field f : each.getDeclaredFields()) {
-				if (Modifier.isStatic(f.getModifiers()))
-					continue;
+			for (Field f: each.getDeclaredFields()) {
+				if (Modifier.isStatic(f.getModifiers())) continue;
 				f.setAccessible(true);
 				fields.add(f);
 			}

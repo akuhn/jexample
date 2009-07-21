@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal;
+package ch.unibe.jexample.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -8,22 +8,32 @@ import java.util.Collection;
 
 import org.junit.runner.Description;
 
-public class MethodReference {
+public class MethodReference implements Reference {
 
-    private final Method jmethod;
-    public final Class<?> jclass;
+    private Method jmethod;
+    public Class<?> jclass;
+    private Throwable error;
 
-    public MethodReference(Class<?> klass, Method method) {
-        assert method.getDeclaringClass().isAssignableFrom(klass);
-        method.setAccessible(true);
-        this.jmethod = method;
-        this.jclass = klass;
+    public MethodReference(Class<?> jclass, Method jmethod) {
+        assert jmethod.getDeclaringClass().isAssignableFrom(jclass);
+        jmethod.setAccessible(true);
+        this.jmethod = jmethod;
+        this.jclass = jclass;
+    }
+
+    public MethodReference(Throwable ex) {
+        this.error = ex;
+    }
+    
+    public boolean isBroken() {
+        return error != null;
     }
 
     @Override
-    public boolean equals(Object o) {
-        return (o instanceof MethodReference) && ((MethodReference) o).jmethod.equals(jmethod)
-                && ((MethodReference) o).jclass.equals(jclass);
+    public boolean equals(Object other) {
+        return (other instanceof MethodReference) &&
+                ((MethodReference) other).jmethod.equals(jmethod) &&
+                ((MethodReference) other).jclass.equals(jclass);
     }
 
     @Override
@@ -84,7 +94,18 @@ public class MethodReference {
 
     @Override
     public String toString() {
+        if (isBroken()) return "Broken: " + error;
         return jclass.toString() + "#" + getName();
+    }
+
+    @Override
+    public boolean exists() {
+        return true;
+    }
+
+    public Throwable getError() {
+        assert isBroken();
+        return error;
     }
 
 }

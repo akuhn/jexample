@@ -3,9 +3,9 @@
  */
 package ch.unibe.jexample.internal;
 
-import static ch.unibe.jexample.internal.ExampleState.GREEN;
-import static ch.unibe.jexample.internal.ExampleState.RED;
-import static ch.unibe.jexample.internal.ExampleState.WHITE;
+import static ch.unibe.jexample.internal.ExampleColor.GREEN;
+import static ch.unibe.jexample.internal.ExampleColor.RED;
+import static ch.unibe.jexample.internal.ExampleColor.WHITE;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -29,16 +29,16 @@ class ExampleRunner {
         this.notifier = notifier;
     }
 
-    private ExampleState fail(Throwable e) {
+    private ExampleColor fail(Throwable e) {
         notifier.fireTestFailure(new Failure(eg.description, e));
         return RED;
     }
 
-    private ExampleState failExpectedException() {
+    private ExampleColor failExpectedException() {
         return fail(new AssertionError("Expected exception: " + eg.expectedException.getName()));
     }
 
-    private ExampleState failUnexpectedException(Throwable ex) {
+    private ExampleColor failUnexpectedException(Throwable ex) {
         String message = "Unexpected exception, expected<" + eg.expectedException.getName() + "> but was<"
                 + ex.getClass().getName() + ">";
         return fail(new Exception(message, ex));
@@ -48,7 +48,7 @@ class ExampleRunner {
         notifier.fireTestFinished(eg.description);
     }
 
-    private ExampleState ignore() {
+    private ExampleColor ignore() {
         notifier.fireTestIgnored(eg.description);
         return WHITE;
     }
@@ -64,7 +64,7 @@ class ExampleRunner {
      *         example is invalid or failed, and<br> {@link WHITE} if any of the
      *         dependencies failed.
      */
-    public ExampleState run() {
+    public ExampleColor run() {
         if (eg.errors.size() > 0) return abort(eg.errors);
         if (toBeIgnored()) return ignore();
         if (!runDependencies()) return ignore();
@@ -76,7 +76,7 @@ class ExampleRunner {
         }
     }
 
-    private ExampleState abort(Throwable ex) {
+    private ExampleColor abort(Throwable ex) {
         notifier.fireTestStarted(eg.description);
         notifier.fireTestFailure(new Failure(eg.description, ex));
         notifier.fireTestFinished(eg.description);
@@ -91,11 +91,10 @@ class ExampleRunner {
      *         If any fails, abort and return <code>false</code>.
      */
     private boolean runDependencies() {
-        for (Example each: eg.providers) {
-            each.run(notifier);
-            if (!each.wasSuccessful()) {
-                return false;
-            }
+        for (Dependency each: eg.providers) {
+            Example eg = each.dependency();
+            eg.run(notifier);
+            if (!eg.wasSuccessful()) return false;
         }
         return true;
     }
@@ -107,7 +106,7 @@ class ExampleRunner {
      *         expected exception).<br> {@link RED} if the example fails (or if an
      *         exception was expected, does not throw the expected exception).
      */
-    private ExampleState runExample() {
+    private ExampleColor runExample() {
         try {
             eg.bareInvoke();
             if (eg.expectedException != null) return failExpectedException();
@@ -126,7 +125,7 @@ class ExampleRunner {
         notifier.fireTestStarted(eg.description);
     }
 
-    private ExampleState success() {
+    private ExampleColor success() {
         return GREEN;
     }
 

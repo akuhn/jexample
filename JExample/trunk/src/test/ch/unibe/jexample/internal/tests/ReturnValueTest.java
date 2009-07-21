@@ -16,8 +16,8 @@ import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.Util;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.CloneUtil;
 
 public class ReturnValueTest {
 
@@ -94,7 +94,7 @@ public class ReturnValueTest {
     public void nullIsCloneable() throws JExampleError {
         Example e = runNullExample();
         assertEquals(null, e.returnValue.getValue());
-        assertTrue(Util.isCloneable(e.returnValue.getValue()));
+        assertTrue(CloneUtil.isCloneable(e.returnValue.getValue()));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class ReturnValueTest {
         Example e = runWithField("testChangeString");
 
         assertNull(e.returnValue.getValue());
-        assertEquals("Hello, World", Util.getField(e.returnValue.getTestCaseInstance(), "aString"));
+        assertEquals("Hello, World", CloneUtil.getField(e.returnValue.getTestCaseInstance(), "aString"));
     }
 
     @Test

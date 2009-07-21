@@ -10,8 +10,8 @@ import org.junit.runner.RunWith;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 public class ExampleGraphTest {
 
@@ -54,9 +54,9 @@ public class ExampleGraphTest {
         assertEquals(2, r.getFailureCount());
         JExampleError err;
         err = (JExampleError) r.getFailures().get(0).getException();
-        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.getKind());
         err = (JExampleError) r.getFailures().get(1).getException();
-        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.kind());
+        assertEquals(Kind.RECURSIVE_DEPENDENCIES, err.getKind());
     }
 
     @RunWith(JExample.class)

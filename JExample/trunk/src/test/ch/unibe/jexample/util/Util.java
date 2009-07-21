@@ -1,4 +1,4 @@
-package ch.unibe.jexample.internal.tests;
+package ch.unibe.jexample.util;
 
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunNotifier;
@@ -42,10 +42,10 @@ public abstract class Util {
         return e;
     }
 
-    public static Result runAllExamples(Class<?>... containers) {
+    public static Result runAllExamples(Class<?>... constainers) {
         ExampleGraph g = new ExampleGraph();
         try {
-            return g.runJExample(containers);
+            return g.runJExample(constainers);
         } catch (JExampleError ex) {
             throw new RuntimeException(ex);
         }

@@ -14,8 +14,8 @@ import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.JExampleError;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 public class DependenciesTest {
 
@@ -54,7 +54,7 @@ public class DependenciesTest {
         assertNotNull(t);
         assertNotNull(e);
         assertEquals(1, t.providers.size());
-        assertEquals(e, t.providers.iterator().next());
+        assertEquals(e, t.providers.iterator().next().dependency());
     }
 
     @Test
@@ -106,9 +106,9 @@ public class DependenciesTest {
         assertNotNull(b);
         assertNotNull(e);
         assertEquals(1, b.providers.size());
-        assertEquals(e, b.providers.iterator().next());
+        assertEquals(e, b.providers.iterator().next().dependency());
         assertEquals(1, a.providers.size());
-        assertEquals(b, a.providers.iterator().next());
+        assertEquals(b, a.providers.iterator().next().dependency());
     }
 
     @RunWith(JExample.class)
@@ -150,7 +150,7 @@ public class DependenciesTest {
         assertEquals(1, r.getFailureCount());
         JExampleError err = (JExampleError) r.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, err.kind());
+        assertEquals(Kind.PARAMETER_NOT_ASSIGNABLE, err.getKind());
     }
 
     @Test
@@ -199,7 +199,7 @@ public class DependenciesTest {
         assertEquals(1, r.getFailureCount());
         JExampleError err = (JExampleError) r.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, err.kind());
+        assertEquals(Kind.PROVIDER_EXPECTS_EXCEPTION, err.getKind());
     }
 
     @RunWith(JExample.class)
@@ -226,7 +226,7 @@ public class DependenciesTest {
         assertEquals(1, r.getFailureCount());
         JExampleError err = (JExampleError) r.getFailures().get(0).getException();
         assertEquals(1, err.size());
-        assertEquals(Kind.MISSING_PROVIDERS, err.kind());
+        assertEquals(Kind.MISSING_PROVIDERS, err.getKind());
     }
 
 }

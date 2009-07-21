@@ -5,6 +5,6 @@ package ch.unibe.jexample.internal;
  * 
  * @author Lea Haensenberger
  */
-enum ExampleState {
+enum ExampleColor {
     NONE, GREEN, WHITE, RED
 }

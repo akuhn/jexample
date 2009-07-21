@@ -1,13 +1,14 @@
 package ch.unibe.jexample.internal;
 
-import static ch.unibe.jexample.internal.Util.forceClone;
-import static ch.unibe.jexample.internal.Util.isCloneable;
-import static ch.unibe.jexample.internal.Util.isImmutable;
+import static ch.unibe.jexample.util.CloneUtil.forceClone;
+import static ch.unibe.jexample.util.CloneUtil.isCloneable;
+import static ch.unibe.jexample.util.CloneUtil.isImmutable;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import ch.unibe.jexample.JExampleOptions;
+import ch.unibe.jexample.util.CloneUtil;
 
 /**
  * 
@@ -31,7 +32,7 @@ public class ReturnValue {
     public Object get(JExampleOptions options) throws Exception {
         if (isImmutable(returnValue)) return returnValue;
         if (!options.cloneReturnValues()) return returnValue;
-        if (isCloneable(returnValue)) return Util.clone(returnValue);
+        if (isCloneable(returnValue)) return CloneUtil.clone(returnValue);
         return provider.bareInvoke();
     }
 

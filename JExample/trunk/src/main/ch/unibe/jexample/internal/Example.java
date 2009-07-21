@@ -1,6 +1,6 @@
 package ch.unibe.jexample.internal;
 
-import static ch.unibe.jexample.internal.ExampleState.NONE;
+import static ch.unibe.jexample.internal.ExampleColor.NONE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,12 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExampleOptions;
-import ch.unibe.jexample.internal.JExampleError.Kind;
+import ch.unibe.jexample.util.InvalidDeclarationError;
+import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.util.CloneUtil;
+import ch.unibe.jexample.util.JExampleError.Kind;
 
 /**
  * A test method with dependencies and return value. Test methods are written
@@ -54,7 +59,7 @@ public class Example {
     public final Class<? extends Throwable> expectedException;
 
     protected JExampleError errors;
-    private ExampleState result;
+    private ExampleColor color;
     protected JExampleOptions policy;
 
     public Example(MethodReference method, ExampleClass owner) {
@@ -62,7 +67,7 @@ public class Example {
         this.owner = owner;
         this.method = method;
         this.providers = new Dependencies();
-        this.result = ExampleState.NONE;
+        this.color = ExampleColor.NONE;
         this.description = method.createTestDescription();
         this.returnValue = new ReturnValue(this);
         this.policy = initJExampleOptions(method.jclass);
@@ -75,16 +80,12 @@ public class Example {
         Given a = method.getAnnotation(Given.class);
         if (a == null) return all;
         try {
-            for (MethodLocator each: MethodLocator.parseAll(a.value()))
-                all.add(each.resolve(method.jclass));
+            Iterable<MethodLocator> locators = MethodLocator.parseAll(a.value());
+            for (MethodLocator each: locators) {
+                 all.add(each.resolve(method.jclass));
+            }
         } catch (InvalidDeclarationError ex) {
             errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
-        } catch (SecurityException ex) {
-            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-        } catch (ClassNotFoundException ex) {
-            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
-        } catch (NoSuchMethodException ex) {
-            errors.add(Kind.PROVIDER_NOT_FOUND, ex);
         }
         return all;
     }
@@ -108,9 +109,9 @@ public class Example {
 
     private Object getContainerInstance() throws Exception {
         if (this.policy.cloneTestCase() && providers.hasFirstProviderImplementedIn(this)) {
-            return providers.get(0).returnValue.getTestCaseInstance();
+            return providers.first().returnValue.getTestCaseInstance();
         }
-        return Util.getConstructor(method.jclass).newInstance();
+        return CloneUtil.getConstructor(method.jclass).newInstance();
     }
 
     protected Object bareInvoke() throws Exception {
@@ -118,7 +119,7 @@ public class Example {
         Object[] args = providers.getInjectionValues(policy, method.arity());
         Object container = getContainerInstance();
         Object newResult = method.invoke(container, args);
-        if (result == NONE) { 
+        if (color == NONE) { 
          // XXX why do we store the first result, and not the most recent one? 
             returnValue.assign(newResult);
             returnValue.assignInstance(container);
@@ -127,7 +128,7 @@ public class Example {
     }
 
     public void run(RunNotifier notifier) {
-        if (result == NONE) result = new ExampleRunner(this, notifier).run();
+        if (color == NONE) color = new ExampleRunner(this, notifier).run();
     }
 
     @Override
@@ -159,10 +160,16 @@ public class Example {
     }
 
     private void validateDependencyTypes() {
-        Iterator<Example> tms = this.providers.iterator();
+        Iterator<Dependency> tms = providers.iterator();
         int position = 1;
         for (Class<?> t: method.getParameterTypes()) {
-            Example tm = tms.next();
+            Dependency each = tms.next();
+            if (each.isBroken()) {
+                errors.add(Kind.NO_SUCH_PROVIDER,
+                        each.getError());
+                continue;
+            }
+            Example tm = each.dependency();
             Class<?> r = tm.method.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
@@ -174,10 +181,18 @@ public class Example {
             }
             position++;
         }
+        while (tms.hasNext()) {
+            Dependency each = tms.next();
+            if (each.isBroken()) {
+                errors.add(Kind.NO_SUCH_PROVIDER,
+                        each.getError());
+                continue;
+            }
+        }
     }
 
     public boolean wasSuccessful() {
-        return result == ExampleState.GREEN;
+        return color == ExampleColor.GREEN;
     }
 
 }
