@@ -8,7 +8,7 @@ import java.util.Map;
 import org.junit.Test;
 
 @SuppressWarnings("unchecked")
-public class DeepCloneHashMap {
+public class DeepCloneHashMapTest {
 
 	@Test
 	public void test() {
