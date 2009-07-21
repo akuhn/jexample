@@ -1,18 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>jexample</name>
-  <comment>JExample is an extensions of JUnit that improves defect localizaton by
+	<name>JExample-4</name>
+	<comment>JExample is an extensions of JUnit that improves defect localizaton by
     changing the way you structure your tests. It introduces first-class
     dependencies. If test B depends on A, the return value of A can be used as
     B&apos;s fixture. And if A test fails, B and all other dependees of A are
     skipped and marked as white. We show in an empirical study that JExample
     improves performance and defect localization.</comment>
-  <projects/>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>

@@ -12,6 +12,7 @@ public class ImmutableClasses {
 		type.isAnnotation() ||
 		type.isPrimitive() ||
 		Class.class.isAssignableFrom(type) ||
+		ClassLoader.class.isAssignableFrom(type) ||
 		Number.class.isAssignableFrom(type) ||
 		Throwable.class.isAssignableFrom(type) ||
 		classNames.contains(type.getName());
