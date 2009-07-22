@@ -15,7 +15,7 @@ import java.util.Map;
 public class CloneFactory {
     
     private Map<Object,Object> done = new IdentityHashMap<Object,Object>();
-    private DeepCloneStrategyCache cache = new DeepCloneStrategyCache();
+    private DeepCloneStrategyCache cache = DeepCloneStrategyCache.getDefault();
     
     @SuppressWarnings("unchecked")
     public <T> T clone(T original) throws DeepCloneException {

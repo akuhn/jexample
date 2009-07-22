@@ -7,9 +7,15 @@ import java.util.Map;
 
 public class DeepCloneStrategyCache {
 
+	private static DeepCloneStrategyCache DEFAULT = null;
+	
 	private ImmutableClasses immutables; 
 	private Map<Class<?>,DeepCloneStrategy> cache; 
 
+	public static DeepCloneStrategyCache getDefault() {
+		return DEFAULT == null ? DEFAULT = new DeepCloneStrategyCache() : DEFAULT;
+	}
+	
 	public DeepCloneStrategyCache() {
 		this.immutables = new ImmutableClasses();
 		this.cache = new HashMap<Class<?>,DeepCloneStrategy>();
@@ -33,5 +39,6 @@ public class DeepCloneStrategyCache {
 		if (type.isArray()) return new ArrayCloning(type);
 		return new UnsafeCloning(type);
 	}
+
 
 }

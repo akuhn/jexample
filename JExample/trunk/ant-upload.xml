@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Upload files using scp and ssh." default="default" basedir=".">
+
+    <target name="default">
+        <exec executable="scp" dir=".">
+            <arg line="target/jexample-4.4-r324-SNAPSHOT.jar scg@haddock.unibe.ch:download/jexample/jexample-r324.jar"/>
+        </exec>
+        <exec executable="ssh" dir=".">
+            <arg line="scg@haddock.unibe.ch ''"/>
+        </exec>
+    </target>	
+		
+</project>
