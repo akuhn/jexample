@@ -5,17 +5,18 @@ import java.util.HashSet;
 
 public class ImmutableClasses {
 
-	private Collection<String>	classNames	= new HashSet<String>();
+	private Collection<String> classNames = new HashSet<String>();
 
 	public boolean contains(Class<?> type) {
-		return type.isEnum() 
-			|| type.isAnnotation() 
-			|| type.isPrimitive() 
-			|| ClassLoader.class.isAssignableFrom(type)
-			|| Class.class.isAssignableFrom(type)			
-			|| Number.class.isAssignableFrom(type) 
-			|| Throwable.class.isAssignableFrom(type)			
-			|| classNames.contains(type.getName());
+		return type.isEnum() ||
+				type.isAnnotation() ||
+				type.isPrimitive() ||
+				Class.class.isAssignableFrom(type) ||
+				ClassLoader.class.isAssignableFrom(type) ||
+				Number.class.isAssignableFrom(type) ||
+				Throwable.class.isAssignableFrom(type) ||
+				Thread.class.isAssignableFrom(type) ||
+				classNames.contains(type.getName());
 	}
 
 	public void add(String className) {
@@ -23,8 +24,7 @@ public class ImmutableClasses {
 	}
 
 	public void add(String... classNames) {
-		for (String each : classNames)
-			add(each);
+		for (String each: classNames) add(each);
 	}
 
 	public ImmutableClasses() {
@@ -32,7 +32,7 @@ public class ImmutableClasses {
 				"java.lang.Character", 
 				"java.lang.Object", 
 				"java.lang.Void",
-				"java.lang.String");
+		"java.lang.String");
 	}
 
 }
