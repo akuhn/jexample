@@ -15,6 +15,7 @@ public class ImmutableClasses {
 		ClassLoader.class.isAssignableFrom(type) ||
 		Number.class.isAssignableFrom(type) ||
 		Throwable.class.isAssignableFrom(type) ||
+		Thread.class.isAssignableFrom(type) ||
 		classNames.contains(type.getName());
     }
     
