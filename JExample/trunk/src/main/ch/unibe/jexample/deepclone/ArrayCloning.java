@@ -35,4 +35,9 @@ public class ArrayCloning implements DeepCloneStrategy {
         }
     }
 
+	@Override
+	public String toString() {
+		return "ArrayCloning";
+	}
+
 }

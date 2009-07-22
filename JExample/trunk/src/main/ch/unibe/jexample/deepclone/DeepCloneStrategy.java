@@ -7,6 +7,10 @@ public interface DeepCloneStrategy {
         public Object makeClone(Object original, CloneFactory delegate) throws Exception {
             return original;
         }
+        @Override
+        public String toString() {
+        	return "IMMUTABLE";
+        }
     };
 
     public Object makeClone(Object original, CloneFactory delegate) throws Exception;

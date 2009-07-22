@@ -21,6 +21,10 @@ public class UseCloneMethod implements DeepCloneStrategy {
 	return cloneMethod.invoke(instance);
     }
     
+	@Override
+	public String toString() {
+		return "UseCloneMethod";
+	}
     
     
 }
