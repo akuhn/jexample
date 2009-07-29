@@ -2,7 +2,7 @@
 <feature
       id="ch.unibe.jexample.feature"
       label="JExample library"
-      version="4.5.324.r325"
+      version="4.5.333.r332"
       provider-name="%author">
 
    <description url="http://scg.unibe.ch/research/jexample">
@@ -21,7 +21,7 @@
          id="ch.unibe.jexample.library"
          download-size="0"
          install-size="0"
-         version="4.5.324.r325"
+         version="4.5.333.r332"
          unpack="false"/>
 
 </feature>

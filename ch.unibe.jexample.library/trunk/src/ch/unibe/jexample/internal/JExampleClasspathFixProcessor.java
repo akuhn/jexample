@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.text.java.ClasspathFixProcessor;
@@ -40,14 +41,17 @@ public class JExampleClasspathFixProcessor extends ClasspathFixProcessor {
 			fRelevance= relevance;
 		}
 
+		@Override
 		public String getAdditionalProposalInfo() {
 			return "Adds the JExample library to the build path.";
 		}
 
+		@Override
 		public Change createChange(IProgressMonitor monitor) throws CoreException {
-			if (monitor == null) {
-				monitor= new NullProgressMonitor();
-			}
+			return createChange2(monitor == null ? new NullProgressMonitor() : monitor);
+		}
+
+		private Change createChange2(IProgressMonitor monitor) throws JavaModelException {
 			monitor.beginTask("Adding JExample library", 1);
 			try {
 				IClasspathEntry entry= null;
@@ -82,14 +86,17 @@ public class JExampleClasspathFixProcessor extends ClasspathFixProcessor {
 			return new NullChange();
 		}
 
+		@Override
 		public String getDisplayString() {
 			return "Add JExample library to the build path";
 		}
 
+		@Override
 		public Image getImage() {
 			return JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_LIBRARY);
 		}
 
+		@Override
 		public int getRelevance() {
 			return fRelevance;
 		}

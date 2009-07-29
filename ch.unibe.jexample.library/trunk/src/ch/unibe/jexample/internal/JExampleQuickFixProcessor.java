@@ -106,6 +106,7 @@ public class JExampleQuickFixProcessor implements IQuickFixProcessor {
 			return change;
 		}
 
+		@SuppressWarnings("deprecation")
 		public void apply(IDocument document) {
 			try {
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(false, true, new IRunnableWithProgress() {
