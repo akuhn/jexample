@@ -25,6 +25,10 @@ public class Dependency {
     public Throwable getError() {
         return broken;
     }
+    
+    public String toString() {
+    	return broken == null ? dependency.toString() : broken.toString();
+    }
 
     
 }
