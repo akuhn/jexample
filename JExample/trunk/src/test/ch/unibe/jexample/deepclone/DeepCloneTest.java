@@ -100,7 +100,7 @@ public class DeepCloneTest {
 	}
 
 	static class Dummy {
-		final int num;
+		private int num;
 		public Dummy(int num) {
 			this.num = num;
 		}
