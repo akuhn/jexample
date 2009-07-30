@@ -54,4 +54,9 @@ public class ReturnValue {
         return testCaseInstance != null && testCaseInstance.getClass() == jclass;
     }
 
+	public void dispose() {
+		returnValue = null;
+		testCaseInstance = null;
+	}
+
 }

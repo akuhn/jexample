@@ -51,7 +51,9 @@ import ch.unibe.jexample.util.JExampleError.Kind;
  */
 public class Example {
 
-    public final Description description;
+    public static boolean DISPOSE_IF_DONE = false;
+    
+	public final Description description;
     public final ReturnValue returnValue;
     public final MethodReference method;
     public final Dependencies providers;
@@ -61,6 +63,7 @@ public class Example {
     protected JExampleError errors;
     private ExampleColor color;
     protected JExampleOptions policy;
+	private Collection<Example> consumers;
 
     public Example(MethodReference method, ExampleClass owner) {
         assert method != null && owner != null;
@@ -73,6 +76,7 @@ public class Example {
         this.policy = initJExampleOptions(method.jclass);
         this.errors = new JExampleError();
         this.expectedException = initExpectedException();
+        this.consumers = new ArrayList<Example>();
     }
 
     protected Iterable<MethodReference> collectDependencies() {
@@ -129,9 +133,20 @@ public class Example {
 
     public void run(RunNotifier notifier) {
         if (color == NONE) color = new ExampleRunner(this, notifier).run();
+        this.maybeRemoveMyselfFromMyProducersConsumersList();
     }
 
-    @Override
+    private void maybeRemoveMyselfFromMyProducersConsumersList() {
+		if (!DISPOSE_IF_DONE || !consumers.isEmpty()) return;
+		this.returnValue.dispose();
+		for (Dependency each: providers) {
+			if (each.isBroken()) continue;
+			each.dependency().consumers.remove(this);
+			each.dependency().maybeRemoveMyselfFromMyProducersConsumersList();
+		}
+	}
+
+	@Override
     public String toString() {
         return "Example: " + method;
     }
@@ -194,5 +209,9 @@ public class Example {
     public boolean wasSuccessful() {
         return color == ExampleColor.GREEN;
     }
+
+	public void addConsumer(Example consumer) {
+		consumers.add(consumer);
+	}
 
 }

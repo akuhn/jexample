@@ -86,12 +86,14 @@ public class Dependencies implements Iterable<Dependency> {
         return elements.iterator();
     }
 
-    public void add(Example d) {
-        elements.add(new Dependency(d));
+    public void add(Example producer, Example consumer) {
+        elements.add(new Dependency(producer, consumer));
     }
 
     public void addBroken(Throwable error) {
         elements.add(new Dependency(error));
     }
+    
+    
     
 }

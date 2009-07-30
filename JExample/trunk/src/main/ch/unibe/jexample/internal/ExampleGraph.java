@@ -63,7 +63,7 @@ public class ExampleGraph {
             }
             else {
                 Example d = newExample(m);
-                e.providers.add(d);
+                e.providers.add(d, e);
                 e.validateCycle();
             }
         }

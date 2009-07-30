@@ -2,11 +2,14 @@ package ch.unibe.jexample.internal;
 
 public class Dependency {
 
-    private Example dependency;
+	private Example consumer;
+    private Example producer;
     private Throwable broken;
     
-    public Dependency(Example dependency) {
-        this.dependency = dependency;
+    public Dependency(Example dependency, Example consumer) {
+        this.producer = dependency;
+        this.consumer = consumer;
+        producer.addConsumer(consumer);
     }
     
     public Dependency(Throwable broken) {
@@ -19,7 +22,7 @@ public class Dependency {
     
     public Example dependency() {
         if (isBroken()) throw new RuntimeException(broken);
-        return dependency;
+        return producer;
     }
 
     public Throwable getError() {
@@ -27,7 +30,7 @@ public class Dependency {
     }
     
     public String toString() {
-    	return broken == null ? dependency.toString() : broken.toString();
+    	return broken == null ? producer.toString() : broken.toString();
     }
 
     

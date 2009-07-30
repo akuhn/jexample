@@ -3,7 +3,7 @@
 
     <target name="default">
         <exec executable="scp" dir=".">
-            <arg line="target/jexample-4.4-r324-SNAPSHOT.jar scg@haddock.unibe.ch:download/jexample/jexample-r324.jar"/>
+            <arg line="target/jexample-4.4-r332-SNAPSHOT.jar scg@haddock.unibe.ch:download/jexample/jexample-r332.jar"/>
         </exec>
         <exec executable="ssh" dir=".">
             <arg line="scg@haddock.unibe.ch ''"/>
