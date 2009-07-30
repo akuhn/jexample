@@ -37,11 +37,13 @@ public class CloneFactory {
 	}
 
 	private void debugPush(Object original) {
+		if (!DEBUG_TRACE) return;
 		if (debugTraceStack.get() == null) debugTraceStack.set(new Stack<String>());
 		debugTraceStack.get().push(original.getClass().toString());
 	}
 	
 	private void debugPop() {
+		if (!DEBUG_TRACE) return;
 		if (debugTraceStack.get() == null) debugTraceStack.set(new Stack<String>());
 		debugTraceStack.get().pop();
 	}
