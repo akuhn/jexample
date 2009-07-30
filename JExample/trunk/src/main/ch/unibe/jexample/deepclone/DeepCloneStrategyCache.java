@@ -2,11 +2,13 @@ package ch.unibe.jexample.deepclone;
 
 import static ch.unibe.jexample.deepclone.DeepCloneStrategy.IMMUTABLE;
 
+import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 
 
 public class DeepCloneStrategyCache {
@@ -55,7 +57,8 @@ public class DeepCloneStrategyCache {
 	private DeepCloneStrategy makeStrategy(Class<?> type) {
 		if (isImmutable(type)) return IMMUTABLE;
 		if (type.isArray()) return new ArrayCloning(type);
-		if (HashMap.class.isAssignableFrom(type)) return new HashMapCloning();
+		if (HashMap.class.isAssignableFrom(type)) return new HashMapCloning(); 
+		if (Reference.class.isAssignableFrom(type)) return new UnsafeWithoutTransientCloning(type);
 		if (noFieldsOrFinalFieldsOnly(type)) return IMMUTABLE;
 		return new UnsafeCloning(type);
 	}

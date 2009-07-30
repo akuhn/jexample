@@ -32,7 +32,7 @@ public class CloneFactory {
 		} catch (DeepCloneException ex) {
 			throw ex;
 		} catch (Throwable ex) {
-			throw new DeepCloneException(debugTraceStack, ex);
+			throw (DEBUG_TRACE ? new DeepCloneException(debugTraceStack, ex) : new DeepCloneException(ex));
 		}
 	}
 

@@ -11,7 +11,7 @@ import sun.reflect.ReflectionFactory;
 public class UnsafeCloning implements DeepCloneStrategy {
 
 	private Constructor<?> constructor;
-	private Collection<Field> fields;
+	protected Collection<Field> fields;
 
 	public UnsafeCloning(Class<?> type) {
 		this.constructor = makeConstructor(type);
