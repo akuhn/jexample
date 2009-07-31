@@ -1,6 +1,7 @@
 package ch.unibe.jexample.internal;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -13,9 +14,14 @@ import org.eclipse.jdt.ui.wizards.IClasspathContainerPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.OpenWindowListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.internal.browser.WorkbenchBrowserSupport;
 import org.osgi.framework.Bundle;
 
 public class JExampleContainerWizardPage extends WizardPage implements IClasspathContainerPage  {
@@ -60,6 +66,21 @@ public class JExampleContainerWizardPage extends WizardPage implements IClasspat
 					e.printStackTrace();
 				}
 				composite.layout(true);
+				browser.addOpenWindowListener(new OpenWindowListener() {
+					
+					public void open(WindowEvent event) {
+						System.out.println(event);
+						System.out.println(event.browser);
+						IWebBrowser b;
+						try {
+							b = WorkbenchBrowserSupport.getInstance().getExternalBrowser();
+							//event.browser = null;
+						} catch (PartInitException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
 			}
 		});
 	}

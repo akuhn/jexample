@@ -2,55 +2,42 @@
 <HEAD>
 <STYLE>
   body { background-color:buttonface; font: 10pt sans-serif; }
-  h1 { font: bold 12pt sans-serif; }  
+  h1, span#name { font: bold 12pt sans-serif; }  
 </STYLE>
 </HEAD>
 <BODY>
-<P><B>JExample</B> is a small framework to write repeatable <i>and dependent</i> tests.
+<P><span id="name">JExample</span> is a small framework to write unit tests that <i>depend on each other</i>. 
+ Brought to you by Adrian Kuhn and Lea H&auml;nsenberger.
 <P>
-Dependent tests are not only more fun to write&mdash;they also run faster,
+Dependent tests are not only more fun to write than isolated ones&mdash;they also run faster,
  reduce code duplication and provide better failure localization. How come?
  Given dependencies A, B and C had been executed successfully, 
  test T can reuse all of their fixtures.
  This saves both setup costs and code duplication.
  On the other hand, if one of the dependencies fails, test T and all its dependents are skipped. 
  This helps to pin-point failures to their very cause.
-<!-- <P>
-With JExample, testing complex scenarios is a bliss.
- There are always hidden dependencies that cannot be broken with isolated testing.
- Even something as simple as, for example, testing a <tt>Stack</tt> class includes hidden dependencies.
- You just cannot pop elements without first using the push functionality.
- Thus if <tt>push</tt> is broken, even an isolated <tt>testPop</tt> will fail.
- With JExample we can do better.
-<PRE>
-@RunWith(JExample.class)
-public class StackTest {
+<P>
+For more information, please refer to the <A HREF="http://scg.unibe.ch/research/jexample">JExample website</A> or 
+ <A HREF="http://twitter.com/jexample">follow us on twitter</A>. 
+<H1>Release Notes</H1>
 
-    @Test
-    public Stack emptyStack() {
-        Stack stack = new Stack();
-        assert stack.isEmpty();
-        return stack;
-    }
+<P>r339, shows browser with release notes in add library wizard page.
+<P>r337, don't clone transient field of references (ie weak and soft reference).
+<P>r334, hidden developer flag, now possible to dispose cached test results
+ when all their consumers (and co-consumers) are run.
+<P>r332, fixed deep clone test (had to fix the dummy,
+ since immutable objects aren't cloned anymore. Thus our test dummy now includes a mutable field).
+<P>r329, don't clone instances of immutable classes (an immutable class has no, or primitive-immutable fields only).
+<P>r328, if you deep-clone threads, bad things happen, thus we don't clone Threads.
+<P>r327, all clone factories share the same clone strategy cache,
+ this improves performance (before 24% of test running time was spent in UnsafeCloneStrategy#makeConstructor).
+<P>r324, merged deep-clone branch into trunk. 
+<P>Here starts prehistory&hellip; :)
 
-    @Test
-    @Given("#emptyStack")
-    public Stack testPush(Stack stack) {
-        stack.push("element"):
-        assert stack.size() == 1;
-        return stack;
-    }
-    
-    @Test 
-    @Given("#testPush")
-    public void testPop(Stack stack) {
-        Object elem = stack.pop():
-        assert elem.equals("element");
-        assert stack.isEmpty();
-    }
-    
-}    
-</PRE>
-With that code, <tt>testPop</tt> is only executed if <tt>testPush</tt> returns a valid example of a Stack instance. --> 
+<P>&nbsp;
+
+<HR/>
+
+JExample, revision 339, Copyright &copy; 2007-2009 Adrian Kuhn and Lea H&auml;nsenberger, distributed under Eclipse Public License 1.0 
  
 </BODY>
