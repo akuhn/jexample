@@ -22,10 +22,10 @@ import org.osgi.framework.Bundle;
 @SuppressWarnings("restriction")
 public class JExampleContainerInitializer extends ClasspathContainerInitializer {
 
-	private static final String JEXAMPLE_JAR = "jexample-r332.jar";
-	private static final String JEXAMPLE_BUNDLE = "ch.unibe.jexample.library";
+	static final String JEXAMPLE_JAR = "jexample-r332.jar";
+	static final String JEXAMPLE_BUNDLE = "ch.unibe.jexample.library";
 	
-	public static final String JEXAMPLE_PATH = "ch.unibe.jexample.JEXAMPLE_CONTAINER";
+	static final String JEXAMPLE_PATH = "ch.unibe.jexample.JEXAMPLE_CONTAINER";
 
 	
 	@Override
