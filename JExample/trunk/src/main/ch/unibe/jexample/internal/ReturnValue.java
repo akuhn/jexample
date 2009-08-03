@@ -17,11 +17,13 @@ import ch.unibe.jexample.util.CloneUtil;
  */
 public class ReturnValue {
 
-    public final Example provider;
+    private Example provider;
     private Object returnValue;
     private Object testCaseInstance;
+    public ExampleColor color;
 
     public ReturnValue(Example provider) {
+        this.color = ExampleColor.NONE;
         this.provider = provider;
     }
 
@@ -46,7 +48,7 @@ public class ReturnValue {
     }
 
     public void assignInstance(Object test) {
-        assert this.provider.owner.jclass.equals(test.getClass());
+        assert this.provider.owner.getImplementingClass().equals(test.getClass());
         this.testCaseInstance = test;
     }
 

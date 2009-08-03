@@ -15,7 +15,6 @@ import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.util.CompositeRunner;
 import ch.unibe.jexample.util.JExampleError;
 import ch.unibe.jexample.util.MethodReference;
-import ch.unibe.jexample.util.Reference;
 
 /**
  * Validates, describes and runs all JExample tests. Implemented as a singleton
@@ -30,6 +29,7 @@ import ch.unibe.jexample.util.Reference;
 public class ExampleGraph {
 
     private static ExampleGraph GRAPH;
+    
     private Map<MethodReference,Example> examples;
     private Map<Class<?>,ExampleClass> classes;
     private boolean anyHasBeenRun = false;
@@ -43,7 +43,7 @@ public class ExampleGraph {
         return GRAPH == null ? GRAPH = new ExampleGraph() : GRAPH;
     }
 
-    protected ExampleClass newExampleClass(Class<?> jclass) {
+    protected ExampleClass makeExampleClass(Class<?> jclass) {
         ExampleClass egClass = classes.get(jclass);
         if (egClass == null) {
             egClass = new ExampleClass(jclass, this);
@@ -52,19 +52,20 @@ public class ExampleGraph {
         return egClass;
     }
 
-    protected Example newExample(MethodReference method) {
+    protected Example makeExample(MethodReference method) {
         Example e = examples.get(method);
         if (e != null) return e;
-        e = new Example(method, newExampleClass(method.jclass));
+        e = new Example(method, makeExampleClass(method.getActualClass()));
         examples.put(method, e);
         for (MethodReference m: e.collectDependencies()) {
             if (m.isBroken()) {
-                e.providers.addBroken(m.getError());
+                e.producers().add(new Dependency(m.getError()));
             }
             else {
-                Example d = newExample(m);
-                e.providers.add(d, e);
-                e.validateCycle();
+                Example d = makeExample(m);
+                Dependency dep = new Dependency(d.node, e.node);
+                e.producers().add(dep);
+                dep.validateCycle();
             }
         }
         e.validate();
@@ -73,7 +74,7 @@ public class ExampleGraph {
 
     public ExampleClass add(Class<?> jclass) throws JExampleError {
         if (anyHasBeenRun) throw new RuntimeException("Cannot add test to running system.");
-        ExampleClass egClass = newExampleClass(jclass);
+        ExampleClass egClass = makeExampleClass(jclass);
         egClass.validate();
         egClass.initializeExamples();
         return egClass;
@@ -124,20 +125,20 @@ public class ExampleGraph {
     public void filter(Filter filter) {
         Iterator<Example> it = examples.values().iterator();
         while (it.hasNext()) {
-            if (!filter.shouldRun(it.next().description)) {
+            if (!filter.shouldRun(it.next().getDescription())) {
                 it.remove();
             }
         }
         // copy list of values to avoid concurrent modification
         Collection<Example> copy = new ArrayList<Example>(examples.values());
         for (Example e: copy) {
-            for (Example dependency: e.providers.transitiveClosure()) {
+            for (Example dependency: e.transitiveClosure()) {
                 examples.put(dependency.method, dependency);
             }
         }
     }
 
-    public Example findExample(Reference ref) {
+    public Example findExample(MethodReference ref) {
         for (Example eg: getExamples()) {
             if (ref.equals(eg.method)) return eg;
         }

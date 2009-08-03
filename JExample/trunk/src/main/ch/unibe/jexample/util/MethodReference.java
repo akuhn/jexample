@@ -8,10 +8,10 @@ import java.util.Collection;
 
 import org.junit.runner.Description;
 
-public class MethodReference implements Reference {
+public class MethodReference {
 
     private Method jmethod;
-    public Class<?> jclass;
+    private final Class<?> jclass;
     private Throwable error;
 
     public MethodReference(Class<?> jclass, Method jmethod) {
@@ -23,6 +23,7 @@ public class MethodReference implements Reference {
 
     public MethodReference(Throwable ex) {
         this.error = ex;
+        this.jclass = null;
     }
     
     public boolean isBroken() {
@@ -33,12 +34,12 @@ public class MethodReference implements Reference {
     public boolean equals(Object other) {
         return (other instanceof MethodReference) &&
                 ((MethodReference) other).jmethod.equals(jmethod) &&
-                ((MethodReference) other).jclass.equals(jclass);
+                ((MethodReference) other).getActualClass().equals(getActualClass());
     }
 
     @Override
     public int hashCode() {
-        return jmethod.hashCode() ^ jclass.hashCode();
+        return jmethod.hashCode() ^ getActualClass().hashCode();
     }
 
     public static Collection<MethodReference> all(Class<?> jclass) {
@@ -56,11 +57,11 @@ public class MethodReference implements Reference {
     }
 
     public Description createTestDescription() {
-        return Description.createTestDescription(jclass, getName());
+        return Description.createTestDescription(getActualClass(), getName());
     }
 
     public boolean equals(Class<?> c, String name) {
-        return jclass == c && getName().equals(name);
+        return getActualClass() == c && getName().equals(name);
     }
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
@@ -95,10 +96,9 @@ public class MethodReference implements Reference {
     @Override
     public String toString() {
         if (isBroken()) return "Broken: " + error;
-        return jclass.toString() + "#" + getName();
+        return getActualClass().toString() + "#" + getName();
     }
 
-    @Override
     public boolean exists() {
         return true;
     }
@@ -106,6 +106,10 @@ public class MethodReference implements Reference {
     public Throwable getError() {
         assert isBroken();
         return error;
+    }
+
+    public Class<?> getActualClass() {
+        return jclass;
     }
 
 }

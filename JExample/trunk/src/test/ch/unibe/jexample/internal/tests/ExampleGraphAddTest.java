@@ -32,7 +32,7 @@ public class ExampleGraphAddTest {
         g.add(A.class);
 
         assertEquals(1, g.getExamples().size());
-        assertEquals(A.class, g.getExamples().iterator().next().method.jclass);
+        assertEquals(A.class, g.getExamples().iterator().next().method.getActualClass());
         assertEquals("t", g.getExamples().iterator().next().method.getName());
     }
 
@@ -49,7 +49,7 @@ public class ExampleGraphAddTest {
         g.add(B.class);
 
         assertEquals(1, g.getExamples().size());
-        assertEquals(B.class, g.getExamples().iterator().next().method.jclass);
+        assertEquals(B.class, g.getExamples().iterator().next().method.getActualClass());
         assertEquals("t", g.getExamples().iterator().next().method.getName());
     }
 
@@ -77,9 +77,9 @@ public class ExampleGraphAddTest {
 
         Example p = g.findExample(C.class, "provider");
         Example c = g.findExample(C.class, "consumer");
-        assertEquals(0, p.providers.size());
-        assertEquals(1, c.providers.size());
-        assertEquals(p, c.providers.iterator().next().dependency());
+        assertEquals(0, p.producers().size());
+        assertEquals(1, c.producers().size());
+        assertEquals(p, c.producers().iterator().next().dependency());
     }
 
 }

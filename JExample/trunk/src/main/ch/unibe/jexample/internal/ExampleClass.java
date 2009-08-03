@@ -26,13 +26,14 @@ import ch.unibe.jexample.util.JExampleError.Kind;
  */
 public class ExampleClass {
 
-    public final Class<?> jclass;
-
+    private final Class<?> jclass;
     private final JExampleError errors;
     private final ExampleGraph graph;
+
     private boolean beforesRunned = false;
 
-    public ExampleClass(Class<?> jclass, ExampleGraph graph) {
+    
+    /*default*/ ExampleClass(Class<?> jclass, ExampleGraph graph) {
         this.errors = new JExampleError();
         this.graph = graph;
         this.jclass = jclass;
@@ -44,8 +45,9 @@ public class ExampleClass {
 
     public Description getDescription() {
         Description description = Description.createSuiteDescription(jclass);
-        for (Example tm: graph.getExamples())
-            if (this.contains(tm)) description.addChild(tm.description);
+        for (Example each: graph.getExamples()) {
+            if (this.contains(each)) description.addChild(each.getDescription());
+        }
         return description;
     }
 
@@ -77,12 +79,12 @@ public class ExampleClass {
     }
 
     public boolean contains(Example m) {
-        return m.method.jclass.equals(jclass);
+        return m.method.getActualClass().equals(jclass);
     }
 
     public void initializeExamples() {
         for (MethodReference m: collectTestMethods()) {
-            graph.newExample(m);
+            graph.makeExample(m);
         }
     }
 
@@ -97,10 +99,15 @@ public class ExampleClass {
                 } catch (IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 } catch (InvocationTargetException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         }
         beforesRunned = true;
+    }
+
+    public Object getImplementingClass() {
+        return jclass;
     }
 
 }

@@ -23,9 +23,6 @@ import ch.unibe.jexample.internal.ExampleGraph;
 public class CompositeRunner extends Runner implements Filterable, Sortable {
         private final List<Runner> fRunners= new ArrayList<Runner>();
         
-        public CompositeRunner() {
-        }
-        
         @Override
         public void run(RunNotifier notifier) {
                 runChildren(notifier);

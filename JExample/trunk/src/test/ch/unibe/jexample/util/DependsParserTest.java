@@ -55,7 +55,7 @@ public class DependsParserTest {
 	public void uniqueSimpleName() throws Exception {
 		MethodLocator loc = MethodLocator.parse("unique");
 		MethodReference ref = loc.resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("unique", ref.getName());
 	}
 
@@ -70,7 +70,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithoutParameters() throws Exception {
 		MethodReference ref = MethodLocator.parse("test()").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(0, ref.getParameterTypes().length);
 	}
@@ -78,7 +78,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithString() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(String)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(String.class, ref.getParameterTypes()[0]);
@@ -87,7 +87,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithInt() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(int)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(int.class, ref.getParameterTypes()[0]);
@@ -96,7 +96,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithLong() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(long)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(long.class, ref.getParameterTypes()[0]);
@@ -105,7 +105,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithFloat() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(float)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(float.class, ref.getParameterTypes()[0]);
@@ -114,7 +114,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithDouble() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(double)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(double.class, ref.getParameterTypes()[0]);
@@ -123,7 +123,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithChar() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(char)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(char.class, ref.getParameterTypes()[0]);
@@ -132,7 +132,7 @@ public class DependsParserTest {
 	@Test
 	public void testWithBoolean() throws Exception {
 		MethodReference ref = MethodLocator.parse("test(boolean)").resolve(A.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("test", ref.getName());
 		assertEquals(1, ref.getParameterTypes().length);
 		assertEquals(boolean.class, ref.getParameterTypes()[0]);
@@ -141,14 +141,14 @@ public class DependsParserTest {
 	@Test
 	public void packageLookup() throws Exception {
 		MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(Util.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("unique", ref.getName());
 	}
 
 	@Test
 	public void innerclassLookup() throws Exception {
 		MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(DependsParserTest.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("unique", ref.getName());
 	}
 
@@ -156,7 +156,7 @@ public class DependsParserTest {
 	public void qualifiedLookup() throws Exception {
 		MethodReference ref = MethodLocator.parse("ch.unibe.jexample.util.DependsParserTest$A.unique")
 		.resolve(Void.class);
-		assertEquals(A.class, ref.jclass);
+		assertEquals(A.class, ref.getActualClass());
 		assertEquals("unique", ref.getName());
 	}
 

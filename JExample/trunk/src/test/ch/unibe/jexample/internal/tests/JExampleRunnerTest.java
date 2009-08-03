@@ -271,7 +271,7 @@ public class JExampleRunnerTest {
         ExampleGraph g = new ExampleGraph();
         Runner runner = new JExample(g.add(StackTest.class));
         Example e = g.findExample(StackTest.class, "withValue");
-        ((Filterable) runner).filter(newFilter(e.description));
+        ((Filterable) runner).filter(newFilter(e.getDescription()));
         Result r = new JUnitCore().run(runner);
         assertEquals(2, r.getRunCount());
         assertEquals(0, r.getIgnoreCount()); // it says filter, not ignore!

@@ -21,40 +21,40 @@ import org.junit.runner.notification.RunNotifier;
  */
 class ExampleRunner {
 
-    private final Example eg;
+    private final Example example;
     private final RunNotifier notifier;
 
     public ExampleRunner(Example example, RunNotifier notifier) {
-        this.eg = example;
+        this.example = example;
         this.notifier = notifier;
     }
 
     private ExampleColor fail(Throwable e) {
-        notifier.fireTestFailure(new Failure(eg.description, e));
+        notifier.fireTestFailure(new Failure(example.getDescription(), e));
         return RED;
     }
 
     private ExampleColor failExpectedException() {
-        return fail(new AssertionError("Expected exception: " + eg.expectedException.getName()));
+        return fail(new AssertionError("Expected exception: " + example.expectedException.getName()));
     }
 
     private ExampleColor failUnexpectedException(Throwable ex) {
-        String message = "Unexpected exception, expected<" + eg.expectedException.getName() + "> but was<"
+        String message = "Unexpected exception, expected<" + example.expectedException.getName() + "> but was<"
                 + ex.getClass().getName() + ">";
         return fail(new Exception(message, ex));
     }
 
     private void finished() {
-        notifier.fireTestFinished(eg.description);
+        notifier.fireTestFinished(example.getDescription());
     }
 
     private ExampleColor ignore() {
-        notifier.fireTestIgnored(eg.description);
+        notifier.fireTestIgnored(example.getDescription());
         return WHITE;
     }
 
     private boolean isUnexpected(Throwable exception) {
-        return !eg.expectedException.isAssignableFrom(exception.getClass());
+        return !example.expectedException.isAssignableFrom(exception.getClass());
     }
 
     /**
@@ -65,7 +65,7 @@ class ExampleRunner {
      *         dependencies failed.
      */
     public ExampleColor run() {
-        if (eg.errors.size() > 0) return abort(eg.errors);
+        if (example.errors.size() > 0) return abort(example.errors);
         if (toBeIgnored()) return ignore();
         if (!runDependencies()) return ignore();
         started();
@@ -77,9 +77,9 @@ class ExampleRunner {
     }
 
     private ExampleColor abort(Throwable ex) {
-        notifier.fireTestStarted(eg.description);
-        notifier.fireTestFailure(new Failure(eg.description, ex));
-        notifier.fireTestFinished(eg.description);
+        notifier.fireTestStarted(example.getDescription());
+        notifier.fireTestFailure(new Failure(example.getDescription(), ex));
+        notifier.fireTestFinished(example.getDescription());
         return RED;
     }
 
@@ -91,7 +91,7 @@ class ExampleRunner {
      *         If any fails, abort and return <code>false</code>.
      */
     private boolean runDependencies() {
-        for (Dependency each: eg.providers) {
+        for (Dependency each: example.producers()) {
             Example eg = each.dependency();
             eg.run(notifier);
             if (!eg.wasSuccessful()) return false;
@@ -108,12 +108,12 @@ class ExampleRunner {
      */
     private ExampleColor runExample() {
         try {
-            eg.bareInvoke();
-            if (eg.expectedException != null) return failExpectedException();
+            example.bareInvoke();
+            if (example.expectedException != null) return failExpectedException();
             return success();
         } catch (InvocationTargetException e) {
             Throwable actual = e.getTargetException();
-            if (eg.expectedException == null) return fail(actual);
+            if (example.expectedException == null) return fail(actual);
             if (isUnexpected(actual)) return failUnexpectedException(actual);
             return success();
         } catch (Throwable e) {
@@ -122,7 +122,7 @@ class ExampleRunner {
     }
 
     private void started() {
-        notifier.fireTestStarted(eg.description);
+        notifier.fireTestStarted(example.getDescription());
     }
 
     private ExampleColor success() {
@@ -130,7 +130,7 @@ class ExampleRunner {
     }
 
     private boolean toBeIgnored() {
-        return eg.method.getAnnotation(Ignore.class) != null;
+        return example.method.getAnnotation(Ignore.class) != null;
     }
 
 }

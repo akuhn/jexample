@@ -29,7 +29,7 @@ public abstract class For {
         try {
             MethodReference ref = MethodLocator.parse(fullReference).resolve();
             ExampleGraph g = new ExampleGraph();
-            g.add(ref.jclass);
+            g.add(ref.getActualClass());
             Example e = g.findExample(ref);
             return (T) runExample(e);
         } catch (SecurityException ex) {
