@@ -94,7 +94,6 @@ public class ReturnValueTest {
     public void nullIsCloneable() throws JExampleError {
         Example e = runNullExample();
         assertEquals(null, e.returnValue.getValue());
-        assertTrue(CloneUtil.isCloneable(e.returnValue.getValue()));
     }
 
     @Test

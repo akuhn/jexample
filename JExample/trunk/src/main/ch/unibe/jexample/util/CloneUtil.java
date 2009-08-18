@@ -34,48 +34,4 @@ public class CloneUtil {
         return new CloneFactory().clone(object);
     }
 
-    public static Object deepClone(Object object) {
-    	return new CloneFactory().clone(object);
-    }
-    
-    public static boolean isImmutable(Object $) {
-        return $ == null || $ instanceof String || $ instanceof Boolean
-                || $ instanceof Number;
-        // TODO add dynamically extensible plug-in mechanism
-    }
-
-    public static boolean isCloneable(Object $) {
-        if ($ == null) return true;
-        if (!($ instanceof Cloneable)) return false;
-        try {
-            // False friend: the interface Cloneable does not specify the method
-            // clone, it is a tagging interface only, hence we must check here
-            // if #clone is actually implemented!
-            $.getClass().getMethod("clone");
-        } catch (SecurityException ex) {
-            return false;
-        } catch (NoSuchMethodException ex) {
-            return false;
-        }
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T clone(T $) {
-        try {
-            Method cloneMethod = $.getClass().getMethod("clone");
-            return (T) cloneMethod.invoke($);
-        } catch (SecurityException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
-        } catch (NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
 }

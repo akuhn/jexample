@@ -1,12 +1,6 @@
 package ch.unibe.jexample.internal;
 
 import static ch.unibe.jexample.util.CloneUtil.forceClone;
-import static ch.unibe.jexample.util.CloneUtil.isCloneable;
-import static ch.unibe.jexample.util.CloneUtil.isImmutable;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
 import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.util.CloneUtil;
 
@@ -32,18 +26,20 @@ public class ReturnValue {
     }
 
     public Object get(JExampleOptions options) throws Exception {
-        if (isImmutable(returnValue)) return returnValue;
+        if (hasSystemPropertyForceRerun()) return provider.bareInvoke();
         if (!options.cloneReturnValues()) return returnValue;
-        if (isCloneable(returnValue)) return CloneUtil.clone(returnValue);
-        return provider.bareInvoke();
+        return CloneUtil.forceClone(returnValue);
+    }
+
+    private boolean hasSystemPropertyForceRerun() {
+        return false;
     }
 
     void assign(Object value) {
         this.returnValue = value;
     }
 
-    public Object getTestCaseInstance() throws InstantiationException, IllegalAccessException,
-            IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException, IOException, ClassNotFoundException {
+    public Object getTestCaseInstance() {
         return forceClone(testCaseInstance);
     }
 
@@ -56,9 +52,9 @@ public class ReturnValue {
         return testCaseInstance != null && testCaseInstance.getClass() == jclass;
     }
 
-	public void dispose() {
-		returnValue = null;
-		testCaseInstance = null;
-	}
+    public void dispose() {
+        returnValue = null;
+        testCaseInstance = null;
+    }
 
 }
