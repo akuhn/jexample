@@ -14,14 +14,11 @@ import java.util.Map;
  */
 public class CloneFactory {
 
-    public static long NANOS = 0L;
-    
     private Map<Object,Object> done = new IdentityHashMap<Object,Object>();
     private DeepCloneStrategyCache cache = DeepCloneStrategyCache.getDefault();
 
     @SuppressWarnings("unchecked")
     public <T> T clone(T original) throws DeepCloneException {
-        long time = System.nanoTime();
         try {
             if (original == null) return null;
             return (T) cache.lookup(original).makeClone(original, this);
@@ -29,9 +26,6 @@ public class CloneFactory {
             throw ex;
         } catch (Throwable ex) {
             throw new DeepCloneException(ex);
-        }
-        finally {
-            NANOS += (System.nanoTime() - time);
         }
     }
 

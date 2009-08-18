@@ -6,8 +6,6 @@ public class Dependency {
     private final ExampleNode producer;
     private final Throwable broken;
     
-    
-    
     public Dependency(ExampleNode producer, ExampleNode consumer) {
         this.producer = producer;
         this.broken = null;
