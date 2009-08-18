@@ -12,7 +12,7 @@ public class ExampleNode {
 
     // TODO 1) move all graph navigation to this class
     // TODO 2) move all graph validation to this class
-    // TODO 3) rewrite isolated tests for ExampleNode & Dependency 
+    // TODO 3) rewrite isolated tests for ExampleNode & Dependency
     
     private List<Dependency> producers;
     private Collection<Example> consumers; // TODO Collection<Dependency>

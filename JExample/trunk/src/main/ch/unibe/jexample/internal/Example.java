@@ -109,34 +109,13 @@ public class Example {
         return options;
     }
 
-    private Object getContainerInstance() throws Exception {
-        if (this.policy.cloneTestCase() && (!this.node.dependencies().isEmpty() && this.node.dependencies().get(0).dependency().returnValue.hasTestCaseInstance(this.method.getActualClass()))) {
-            return this.node.dependencies().get(0).dependency().returnValue.getTestCaseInstance();
-        }
-        return CloneUtil.getConstructor(method.getActualClass()).newInstance();
-    }
-    
     protected Object bareInvoke() throws Exception {
         owner.runBeforeClassBefores();
-        Object[] values = getInjectionValues();
-        Object[] args = values;
-        Object container = getContainerInstance();
-        Object newResult = method.invoke(container, args);
-        if (returnValue.color == NONE) { 
-            // XXX why do we store the first result, and not the most recent one? 
-            returnValue.assign(newResult);
-            returnValue.assignInstance(container);
-        }
+        InjectionValues injection = InjectionValues.from(this);
+        Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
+        returnValue.assign(newResult);
+        returnValue.assignInstance(injection.getTestInstance());
         return newResult;
-    }
-
-    private Object[] getInjectionValues() throws Exception {
-        int length = method.arity();
-        Object[] values = new Object[length];
-        for (int i = 0; i < length; i++) {
-            values[i] = this.node.dependencies().get(i).dependency().returnValue.get(policy);
-        }
-        return values;
     }
 
     public void run(RunNotifier notifier) {
