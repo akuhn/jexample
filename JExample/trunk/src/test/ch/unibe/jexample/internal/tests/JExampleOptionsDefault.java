@@ -2,84 +2,102 @@ package ch.unibe.jexample.internal.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.internal.tests.Util.IsCloneable;
-import ch.unibe.jexample.internal.tests.Util.NotCloneable;
 
 @RunWith(JExample.class)
 public class JExampleOptionsDefault {
 
     @Test
-    public NotCloneable notCloneable() {
-        return new NotCloneable("root");
+    public Immutable notCloneable() {
+        return new Immutable("root");
     }
 
     @Test
     @Given("#notCloneable,#notCloneable")
-    public void testRerunning(NotCloneable a, NotCloneable b) {
-        assertNotSame(a, b);
+    public void testRerunning(Immutable a, Immutable b) {
+        assertSame(a, b);
         assertEquals(a.name, b.name);
     }
 
     @Test
     @Given("#notCloneable")
-    public NotCloneable left(NotCloneable a) {
+    public Immutable left(Immutable a) {
         assertEquals("root", a.name);
         return a;
     }
 
     @Test
     @Given("#notCloneable")
-    public NotCloneable right(NotCloneable a) {
+    public Immutable right(Immutable a) {
         assertEquals("root", a.name);
         return a;
     }
 
     @Test
     @Given("#left,#right")
-    public void testRerunning2(NotCloneable a, NotCloneable b) {
-        assertNotSame(a, b);
+    public void testRerunning2(Immutable a, Immutable b) {
+        assertSame(a, b);
         assertEquals(a.name, b.name);
     }
 
     @Test
-    public IsCloneable isCloneable() {
-        return new IsCloneable("root");
+    public Mutable isCloneable() {
+        return new Mutable("root");
     }
 
     @Test
     @Given("#isCloneable,#isCloneable")
-    public void testCloning(IsCloneable a, IsCloneable b) {
+    public void testCloning(Mutable a, Mutable b) {
         assertNotSame(a, b);
-        assertEquals("clone of root", a.name);
-        assertEquals("clone of root", b.name);
+        assertEquals("root", a.name);
+        assertEquals("root", b.name);
     }
 
     @Test
     @Given("#isCloneable")
-    public IsCloneable leftClone(IsCloneable a) {
-        assertEquals("clone of root", a.name);
+    public Mutable leftClone(Mutable a) {
+        assertEquals("root", a.name);
         return a;
     }
 
     @Test
     @Given("#isCloneable")
-    public IsCloneable rightClone(IsCloneable a) {
-        assertEquals("clone of root", a.name);
+    public Mutable rightClone(Mutable a) {
+        assertEquals("root", a.name);
         return a;
     }
 
     @Test
     @Given("#leftClone,#rightClone")
-    public void testCloning2(IsCloneable a, IsCloneable b) {
+    public void testCloning2(Mutable a, Mutable b) {
         assertNotSame(a, b);
-        assertEquals("clone of clone of root", a.name);
-        assertEquals("clone of clone of root", b.name);
+        assertEquals("root", a.name);
+        assertEquals("root", b.name);
+    }
+    
+    static class Mutable {
+
+        public String name;
+        
+        public Mutable(String value) {
+            this.name = value;
+        }
+        
+    }
+    
+    static class Immutable {
+        
+        public final String name;
+        
+        public Immutable(String value) {
+            this.name = value;
+        }
     }
 
 }

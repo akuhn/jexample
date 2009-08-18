@@ -14,31 +14,37 @@ import java.util.Map;
  */
 public class CloneFactory {
 
-	private Map<Object,Object> done = new IdentityHashMap<Object,Object>();
-	private DeepCloneStrategyCache cache = DeepCloneStrategyCache.getDefault();
+    public static long NANOS = 0L;
+    
+    private Map<Object,Object> done = new IdentityHashMap<Object,Object>();
+    private DeepCloneStrategyCache cache = DeepCloneStrategyCache.getDefault();
 
-	@SuppressWarnings("unchecked")
-	public <T> T clone(T original) throws DeepCloneException {
-		try {
-			if (original == null) return null;
-			return (T) cache.lookup(original).makeClone(original, this);
-		} catch (DeepCloneException ex) {
-			throw ex;
-		} catch (Throwable ex) {
-			throw new DeepCloneException(ex);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T clone(T original) throws DeepCloneException {
+        long time = System.nanoTime();
+        try {
+            if (original == null) return null;
+            return (T) cache.lookup(original).makeClone(original, this);
+        } catch (DeepCloneException ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            throw new DeepCloneException(ex);
+        }
+        finally {
+            NANOS += (System.nanoTime() - time);
+        }
+    }
 
-	public static <T> T deepClone(T object) {
-		return new CloneFactory().clone(object);
-	}
+    public static <T> T deepClone(T object) {
+        return new CloneFactory().clone(object);
+    }
 
-	public Object getCachedClone(Object original) {
-		return done.get(original);
-	}
+    public Object getCachedClone(Object original) {
+        return done.get(original);
+    }
 
-	public void putCachedClone(Object original, Object clone) {
-		done.put(original, clone);
-	}
+    public void putCachedClone(Object original, Object clone) {
+        done.put(original, clone);
+    }
 
 }

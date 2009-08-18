@@ -8,32 +8,32 @@ import org.junit.runner.RunWith;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.JExampleOptions;
-import ch.unibe.jexample.internal.tests.Util.IsCloneable;
+import ch.unibe.jexample.internal.tests.JExampleOptionsDefault.Mutable;
 
 @RunWith(JExample.class)
 @JExampleOptions(cloneReturnValues = false)
 public class JExampleOptionsDontCloneReturnValues {
 
     @Test
-    public IsCloneable create() {
-        return new IsCloneable("root");
+    public Mutable create() {
+        return new Mutable("root");
     }
 
     @Test
     @Given("create")
-    public IsCloneable left(IsCloneable a) {
+    public Mutable left(Mutable a) {
         return a;
     }
 
     @Test
     @Given("create")
-    public IsCloneable right(IsCloneable a) {
+    public Mutable right(Mutable a) {
         return a;
     }
 
     @Test
     @Given("left;right")
-    public void test(IsCloneable left, IsCloneable right) {
+    public void test(Mutable left, Mutable right) {
         assertSame(left, right);
     }
 
