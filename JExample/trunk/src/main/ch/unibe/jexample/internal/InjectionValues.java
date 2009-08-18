@@ -48,6 +48,7 @@ public class InjectionValues {
                 && example.node.dependencies().get(0)
                     .dependency().returnValue.hasTestCaseInstance(
                     example.method.getActualClass())) {
+            if (length == 0) example.node.dependencies().get(0).dependency().bareInvoke();
             testInstance = example.node.dependencies().get(0).dependency().returnValue.__getTestCaseInstance();
         }
         else {
