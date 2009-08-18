@@ -273,7 +273,7 @@ public class JExampleRunnerTest {
         Example e = g.findExample(StackTest.class, "withValue");
         ((Filterable) runner).filter(newFilter(e.getDescription()));
         Result r = new JUnitCore().run(runner);
-        assertEquals(2, r.getRunCount());
+        assertEquals(3, r.getRunCount());
         assertEquals(0, r.getIgnoreCount()); // it says filter, not ignore!
         assertEquals(0, r.getFailureCount());
         assertEquals(true, r.wasSuccessful());

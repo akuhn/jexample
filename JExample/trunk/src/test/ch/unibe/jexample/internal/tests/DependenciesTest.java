@@ -53,8 +53,8 @@ public class DependenciesTest {
 
         assertNotNull(t);
         assertNotNull(e);
-        assertEquals(1, t.producers().size());
-        assertEquals(e, t.producers().iterator().next().dependency());
+        assertEquals(1, t.node.dependencies().size());
+        assertEquals(e, t.node.dependencies().iterator().next().dependency());
     }
 
     @Test
@@ -105,10 +105,10 @@ public class DependenciesTest {
         assertNotNull(a);
         assertNotNull(b);
         assertNotNull(e);
-        assertEquals(1, b.producers().size());
-        assertEquals(e, b.producers().iterator().next().dependency());
-        assertEquals(1, a.producers().size());
-        assertEquals(b, a.producers().iterator().next().dependency());
+        assertEquals(1, b.node.dependencies().size());
+        assertEquals(e, b.node.dependencies().iterator().next().dependency());
+        assertEquals(1, a.node.dependencies().size());
+        assertEquals(b, a.node.dependencies().iterator().next().dependency());
     }
 
     @RunWith(JExample.class)
@@ -169,10 +169,10 @@ public class DependenciesTest {
         assertNotNull(a);
         assertNotNull(b);
         assertNotNull(x);
-        assertEquals(1, b.producers().size());
-        assertEquals(x, b.producers().iterator().next());
-        assertEquals(1, a.producers().size());
-        assertEquals(b, a.producers().iterator().next());
+        assertEquals(1, b.node.dependencies().size());
+        assertEquals(x, b.node.dependencies().iterator().next());
+        assertEquals(1, a.node.dependencies().size());
+        assertEquals(b, a.node.dependencies().iterator().next());
     }
 
     @RunWith(JExample.class)

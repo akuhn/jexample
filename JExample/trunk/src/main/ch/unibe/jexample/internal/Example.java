@@ -59,7 +59,7 @@ public class Example {
     public final ExampleClass owner;
     public final Class<? extends Throwable> expectedException;
 
-    final ExampleNode node;
+    public final ExampleNode node;
 
     private final Description description;
     protected JExampleError errors;
@@ -110,27 +110,12 @@ public class Example {
     }
 
     private Object getContainerInstance() throws Exception {
-        if (this.policy.cloneTestCase() && (!this.producers().isEmpty() && this.producers().get(0).dependency().returnValue.hasTestCaseInstance(this.method.getActualClass()))) {
-            return this.producers().get(0).dependency().returnValue.getTestCaseInstance();
+        if (this.policy.cloneTestCase() && (!this.node.dependencies().isEmpty() && this.node.dependencies().get(0).dependency().returnValue.hasTestCaseInstance(this.method.getActualClass()))) {
+            return this.node.dependencies().get(0).dependency().returnValue.getTestCaseInstance();
         }
         return CloneUtil.getConstructor(method.getActualClass()).newInstance();
     }
     
-    public Collection<Example> transitiveClosure() {
-        Collection<Example> all = new HashSet<Example>();
-        this.collectTransitiveClosureInto(all);
-        return all;
-    }
-
-    private void collectTransitiveClosureInto(Collection<Example> all) {
-        for (Dependency each: this.producers()) {
-            if (each.isBroken()) continue;
-            Example eg = each.dependency();
-            if (all.add(eg)) eg.collectTransitiveClosureInto(all);
-        }
-    }
-    
-
     protected Object bareInvoke() throws Exception {
         owner.runBeforeClassBefores();
         Object[] values = getInjectionValues();
@@ -149,7 +134,7 @@ public class Example {
         int length = method.arity();
         Object[] values = new Object[length];
         for (int i = 0; i < length; i++) {
-            values[i] = this.producers().get(i).dependency().returnValue.get(policy);
+            values[i] = this.node.dependencies().get(i).dependency().returnValue.get(policy);
         }
         return values;
     }
@@ -160,11 +145,11 @@ public class Example {
     }
 
     private void maybeRemoveMyselfFromMyProducersConsumersList() {
-        if (!DISPOSE_IF_DONE || !consumers().isEmpty()) return;
+        if (!DISPOSE_IF_DONE || !node.consumers().isEmpty()) return;
         this.returnValue.dispose();
-        for (Dependency each: this.producers()) {
+        for (Dependency each: this.node.dependencies()) {
             if (each.isBroken()) continue;
-            each.dependency().consumers().remove(this);
+            each.dependency().node.consumers().remove(this);
             each.dependency().maybeRemoveMyselfFromMyProducersConsumersList();
         }
     }
@@ -179,7 +164,7 @@ public class Example {
             errors.add(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.",
                     toString());
         }
-        int d = this.producers().size();
+        int d = this.node.dependencies().size();
         int p = method.arity();
         if (p > d) {
             errors.add(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p,
@@ -194,7 +179,7 @@ public class Example {
     }
 
     private void validateDependencyTypes() {
-        Iterator<Dependency> tms = this.producers().iterator();
+        Iterator<Dependency> tms = this.node.dependencies().iterator();
         int position = 1;
         for (Class<?> t: method.getParameterTypes()) {
             Dependency each = tms.next();
@@ -229,20 +214,8 @@ public class Example {
         return returnValue.color == ExampleColor.GREEN;
     }
 
-    public void addConsumer(Example consumer) {
-        consumers().add(consumer);
-    }
-
     public Description getDescription() {
         return description;
-    }
-
-    public List<Dependency> producers() {
-        return node.producers;
-    }
-
-    private Collection<Example> consumers() {
-        return node.consumers;
     }
 
 }

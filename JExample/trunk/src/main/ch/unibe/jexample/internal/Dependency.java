@@ -1,23 +1,22 @@
 package ch.unibe.jexample.internal;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
 
 public class Dependency {
 
-    private ExampleNode consumer;
-    private ExampleNode producer;
-    private Throwable broken;
+    private final ExampleNode producer;
+    private final Throwable broken;
 
-    public Dependency(ExampleNode dependency, ExampleNode consumer) {
-        this.producer = dependency;
-        this.consumer = consumer;
-        producer.consumers.add(consumer.value);
+    public Dependency(ExampleNode producer, ExampleNode consumer) {
+        this.producer = producer;
+        this.broken = null;
+        producer.__consumersAdd(consumer.value);
+        consumer.__producersAdd(this);
     }
 
-    public Dependency(Throwable broken) {
+    public Dependency(Throwable broken, ExampleNode consumer) {
         this.broken = broken;
+        this.producer = null;
+        consumer.__producersAdd(this);
     }
 
     public boolean isBroken() {
@@ -25,8 +24,12 @@ public class Dependency {
     }
 
     public Example dependency() {
-        if (isBroken()) throw new RuntimeException(broken);
-        return producer.value;
+        return getProducer().value;
+    }
+    
+    public ExampleNode getProducer() {
+        if (isBroken()) throw new IllegalStateException();
+        return producer;
     }
 
     public Throwable getError() {
@@ -36,24 +39,6 @@ public class Dependency {
     @Override
     public String toString() {
         return broken == null ? producer.toString() : broken.toString();
-    }
-
-    public void validateCycle() {
-        validateCycle(consumer, new Stack<ExampleNode>(), new HashSet<ExampleNode>());
-    }
-    
-    private void validateCycle(ExampleNode example, Stack<ExampleNode> cycle, Set<ExampleNode> done) {
-        if (this.isBroken()) return;
-        cycle.push(producer);
-        if (example == producer) invalidate(cycle);
-        if (done.add(producer)) {
-            for (Dependency each: producer.producers) each.validateCycle(example, cycle, done);
-        }
-        cycle.pop();
-    }
-
-    private void invalidate(Stack<ExampleNode> cycle) {
-        for (ExampleNode each: cycle) each.value.errorPartOfCycle();
     }
     
 }
