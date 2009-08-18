@@ -45,8 +45,10 @@ public class InjectionValues {
         }
         Object testInstance = null;
         if (!example.node.dependencies().isEmpty() 
-                && example.node.dependencies().get(0).dependency().returnValue.hasTestCaseInstance(example.method.getActualClass())) {
-            testInstance = example.node.dependencies().get(0).dependency().returnValue.getTestCaseInstance();
+                && example.node.dependencies().get(0)
+                    .dependency().returnValue.hasTestCaseInstance(
+                    example.method.getActualClass())) {
+            testInstance = example.node.dependencies().get(0).dependency().returnValue.__getTestCaseInstance();
         }
         else {
             testInstance = CloneUtil.getConstructor(example.method.getActualClass()).newInstance();

@@ -57,4 +57,8 @@ public class ReturnValue {
         testCaseInstance = null;
     }
 
+    public Object __getTestCaseInstance() {
+        return testCaseInstance;
+    }
+
 }
