@@ -19,15 +19,12 @@ import ch.unibe.jexample.util.CloneUtil;
 public class InjectionValues {
 
     private static final boolean FORCE_RERUN = System.getProperty("jexample.rerun") != null;
-    
-    
-    
+
     private Object testInstance;
     private Object[] arguments;
-
-
-
     private CloneFactory factory;
+
+    public static long NANOS = 0L;
     
     public InjectionValues(Example example) throws Exception {
         this.arguments = new Object[example.method.arity()];
@@ -91,7 +88,13 @@ public class InjectionValues {
     
     private Object clone(Object object) {
         if (factory == null) factory = new CloneFactory();
-        return factory.clone(object);
+        long time = System.nanoTime();
+        try {
+            return factory.clone(object);
+        }
+        finally {
+            NANOS  += (System.nanoTime() - time);
+        }
     }
     
 }

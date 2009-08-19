@@ -4,11 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import ch.unibe.jexample.deepclone.CloneFactory;
-
 public class CloneUtil {
-
-    public static long NANOS;
 
     public static Constructor<?> getConstructor(Class<?> jClass) throws SecurityException, NoSuchMethodException {
         if (!Modifier.isPublic(jClass.getModifiers())) {
@@ -27,16 +23,6 @@ public class CloneUtil {
             return (T) f.get(object);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
-        }
-    }
-
-    public static <T> T forceClone(T object) {
-        long time = System.nanoTime();
-        try {
-            return new CloneFactory().clone(object);
-        }
-        finally {
-            NANOS += (System.nanoTime() - time);
         }
     }
 
