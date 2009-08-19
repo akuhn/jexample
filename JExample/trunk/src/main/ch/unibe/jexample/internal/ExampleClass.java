@@ -2,10 +2,10 @@ package ch.unibe.jexample.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runner.manipulation.Filter;
@@ -32,7 +32,7 @@ public class ExampleClass {
 
     private boolean beforesRunned = false;
 
-    
+
     /*default*/ ExampleClass(Class<?> jclass, ExampleGraph graph) {
         this.errors = new JExampleError();
         this.graph = graph;
@@ -40,7 +40,12 @@ public class ExampleClass {
     }
 
     public Collection<MethodReference> collectTestMethods() {
-        return MethodReference.all(jclass, Test.class);
+        Collection<MethodReference> result = new ArrayList<MethodReference>();
+        for (Method each: jclass.getMethods()) {
+            MethodReference ref = new MethodReference(jclass, each);
+            if (ref.isTestAnnotationPresent()) result.add(ref);
+        }
+        return result;
     }
 
     public Description getDescription() {

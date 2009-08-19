@@ -18,28 +18,24 @@ public class JExampleOptionsDefault {
         return new Immutable("root");
     }
 
-    @Test
     @Given("#notCloneable,#notCloneable")
     public void testRerunning(Immutable a, Immutable b) {
         assertSame(a, b);
         assertEquals(a.name, b.name);
     }
 
-    @Test
     @Given("#notCloneable")
     public Immutable left(Immutable a) {
         assertEquals("root", a.name);
         return a;
     }
 
-    @Test
     @Given("#notCloneable")
     public Immutable right(Immutable a) {
         assertEquals("root", a.name);
         return a;
     }
 
-    @Test
     @Given("#left,#right")
     public void testRerunning2(Immutable a, Immutable b) {
         assertSame(a, b);
@@ -51,7 +47,6 @@ public class JExampleOptionsDefault {
         return new Mutable("root");
     }
 
-    @Test
     @Given("#isCloneable,#isCloneable")
     public void shouldUseSameCloneFactoryFroAllArguments(Mutable a, Mutable b) {
         assertSame(a, b); 
@@ -59,21 +54,18 @@ public class JExampleOptionsDefault {
         assertEquals("root", b.name);
     }
 
-    @Test
     @Given("#isCloneable")
     public Mutable leftClone(Mutable a) {
         assertEquals("root", a.name);
         return a;
     }
 
-    @Test
     @Given("#isCloneable")
     public Mutable rightClone(Mutable a) {
         assertEquals("root", a.name);
         return a;
     }
 
-    @Test
     @Given("#leftClone,#rightClone")
     public void testCloning2(Mutable a, Mutable b) {
         assertNotSame(a, b);

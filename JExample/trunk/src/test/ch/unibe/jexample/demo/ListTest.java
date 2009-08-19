@@ -24,7 +24,6 @@ public class ListTest {
         return list;
     }
 
-    @Test
     @Given("#emptyList")
     public List<String> withValue(List<String> list) {
         list.add("Lorem");
@@ -33,7 +32,6 @@ public class ListTest {
         return list;
     }
 
-    @Test
     @Given("#withValue")
     public List<String> withMoreValues(List<String> list) {
         list.add("Ipsum");

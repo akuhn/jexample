@@ -10,9 +10,6 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import ch.unibe.jexample.util.InvalidDeclarationError;
-import ch.unibe.jexample.util.MethodLocator;
-
 public class DependsScannerTest {
 
     @Test

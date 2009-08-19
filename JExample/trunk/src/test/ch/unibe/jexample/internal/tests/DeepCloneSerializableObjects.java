@@ -1,6 +1,7 @@
 package ch.unibe.jexample.internal.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 import java.io.Serializable;
 
@@ -32,7 +33,7 @@ public class DeepCloneSerializableObjects implements Serializable {
 		assertSame(this.b, this.a[0]);
 	}
 	
-	@Test @Given("#first")
+	@Given("#first")
 	public void then() {
 		assertNotSame(original, this);
 		assertSame(this.a, this.b[0]);

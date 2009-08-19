@@ -34,17 +34,14 @@ public class JExampleRunnerTest {
 
     @RunWith(JExample.class)
     private static class CycleOfThree {
-        @Test
         @Given("ccc")
         public void aaa() {
         }
 
-        @Test
         @Given("aaa")
         public void bbb() {
         }
 
-        @Test
         @Given("bbb")
         public void ccc() {
         }
@@ -75,21 +72,18 @@ public class JExampleRunnerTest {
         }
 
         // test is supposed to fail
-        @Test
         @Given("firstMethod")
         public void secondMethod() {
             assertTrue(false);
         }
 
         // this test is ignored, because secondMethod failed
-        @Test
         @Given("secondMethod")
         public void thirdMethod() {
             assertTrue(true);
         }
 
         // this test is ignored, because secondMethod failed
-        @Test
         @Given("secondMethod")
         public void fourthMethod() {
             assertTrue(true);
@@ -116,13 +110,11 @@ public class JExampleRunnerTest {
 
         }
 
-        @Test
         @Given("firstMethod")
         public void secondMethod() {
             assertTrue(true);
         }
 
-        @Test
         @Given("secondMethod")
         public void thirdMethod() {
             assertTrue(true);
@@ -149,7 +141,6 @@ public class JExampleRunnerTest {
 
         }
 
-        @Test
         @Given("JExampleRunnerTest$SecondGoodTest.secondMethod")
         public void thirdMethod() {
             assertTrue(true);
@@ -161,7 +152,6 @@ public class JExampleRunnerTest {
         public SecondGoodTest() {
         }
 
-        @Test
         @Given("JExampleRunnerTest$FirstGoodTest.firstMethod")
         public void secondMethod() {
             assertTrue(true);
@@ -199,14 +189,12 @@ public class JExampleRunnerTest {
 
         }
 
-        @Test
         @Given("rootMethod")
         public String getsString(String aString) {
             assertEquals("Hello, I'm a string.", aString);
             return aString;
         }
 
-        @Test
         @Given("getsString(java.lang.String);returnInteger")
         public boolean getsStringAndInteger(String aString, int aInteger) {
             assertEquals("Hello, I'm a string.", aString);
@@ -214,7 +202,6 @@ public class JExampleRunnerTest {
             return true;
         }
 
-        @Test
         @Given("getsStringAndInteger(java.lang.String,int)")
         public void findsDep(boolean aBool) {
             assertTrue(aBool);
@@ -242,14 +229,12 @@ public class JExampleRunnerTest {
             return 2;
         }
 
-        @Test
         @Given("root")
         public String second(int i) {
             assertEquals(2, i);
             return "bla";
         }
 
-        @Test
         @Given("second(int)")
         public void third(String aString) {
             assertEquals("bla", aString);
@@ -320,12 +305,10 @@ public class JExampleRunnerTest {
         public void missingAnnotation() {
         }
 
-        @Test
         @Given("#missingAnnotation")
         public void provider() {
         }
 
-        @Test
         @Given("#provider")
         public void consumer() {
         }
@@ -343,7 +326,6 @@ public class JExampleRunnerTest {
 
     @RunWith(JExample.class)
     static class C_fail {
-        @Test
         @Given("D#test")
         public void test() {
             assertTrue(true);
@@ -352,7 +334,6 @@ public class JExampleRunnerTest {
 
     @RunWith(JExample.class)
     static class D_fail {
-        @Test
         @Given("C#test")
         public void test() {
         }

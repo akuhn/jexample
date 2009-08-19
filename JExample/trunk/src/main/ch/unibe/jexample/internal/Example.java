@@ -5,11 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.graph.Node;
@@ -70,30 +68,20 @@ public class Example {
         this.description = method.createTestDescription();
         this.returnValue = ReturnValue.R_NONE;
         this.policy = initJExampleOptions(method.getActualClass());
-        this.expectedException = initExpectedException();
+        this.expectedException = method.initExpectedException();
         this.node = new Node<Example>(this);
     }
 
     protected Iterable<MethodReference> collectDependencies() {
-        Collection<MethodReference> all = new ArrayList<MethodReference>();
-        Given a = method.getAnnotation(Given.class);
-        if (a == null) return all;
+        String declaration = method.getDependencyString();
         try {
-            Iterable<MethodLocator> locators = MethodLocator.parseAll(a.value());
-            for (MethodLocator each: locators) {
-                all.add(each.resolve(method.getActualClass()));
-            }
+            Collection<MethodReference> all = new ArrayList<MethodReference>();
+            Iterable<MethodLocator> locators = MethodLocator.parseAll(declaration);
+            for (MethodLocator each: locators) all.add(each.resolve(method.getActualClass()));
+            return all;
         } catch (InvalidDeclarationError ex) {
             return Collections.singleton(new MethodReference(ex));
         }
-        return all;
-    }
-
-    private Class<? extends Throwable> initExpectedException() {
-        Test a = this.method.getAnnotation(Test.class);
-        if (a == null) return null;
-        if (a.expected() == org.junit.Test.None.class) return null;
-        return a.expected();
     }
 
     private JExampleOptions initJExampleOptions(Class<?> jclass) {
@@ -135,10 +123,10 @@ public class Example {
         if (this.node.isPartOfCycle()) {
             errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
         }
-        if (!method.isAnnotationPresent(Test.class)) {
-            errors.add(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.",
-                    toString());
-        }
+        if (!method.isTestAnnotationPresent()) errors.add(
+                Kind.MISSING_ANNOTATION, 
+                "Method %s is not a test method, missing @Test or @Given annotation.",
+                this);
         int d = this.node.dependencies().size();
         int p = method.arity();
         if (p > d) {
@@ -201,7 +189,7 @@ public class Example {
             }
             else {
                 Example d = exampleGraph.makeExample(m);
-                node.makeEdge(d.node);
+                node.addProvider(d.node);
             }
         }
     }

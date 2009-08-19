@@ -37,13 +37,11 @@ public class ForceCloneSuperclass {
 			initName();
 		}
 		
-		@Test
 		@Given("#setUp")
 		public void testNameNotNull(){
 			assertNotNull(this.name);
 		}
 		
-		@Test
 		@Given("#setUp")
 		public void testNameInSuperclass(){
 			nameNotNull();

@@ -201,19 +201,16 @@ public class DependsParserTest {
 
         }
 
-        @Test
         @Given("GraphTest$CyclicOverClasses.depOnOtherTest")
         public void otherTestCyclic() {
 
         }
 
-        @Test
         @Given("CycleDetectorTest$WithCycleOverClasses.bottomCyclicMethod")
         public void cyclicMethod() {
 
         }
 
-        @Test
         @Given("CycleDetectorTest$WithoutCycleOverClasses.rootMethod")
         public void middleMethod() {
 

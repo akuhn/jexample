@@ -21,7 +21,6 @@ public class StackTest {
         return stack;
     }
 
-    @Test
     @Given("#emptyStack")
     public Stack<String> shouldPush(Stack<String> stack) {
         stack.push("boe");
@@ -29,13 +28,11 @@ public class StackTest {
         return stack;
     }
     
-    @Test
     @Given("#shouldPush") 
     public Stack<String> withValue(Stack<String> stack) {
         return stack;
     }
 
-    @Test
     @Given("#shouldPush")
     public void shouldPop(Stack<String> stack) {
         int size = stack.size();
@@ -44,7 +41,6 @@ public class StackTest {
         assertEquals(size - 1, stack.size());
     }
     
-    @Test
     @Given("#shouldPush")
     public Stack<String> withManyValues(Stack<String> stack) {
         stack.push("foo");
@@ -53,7 +49,6 @@ public class StackTest {
         return stack;
     }
 
-    @Test
     @Given("#withValue;ListTest#withMoreValues")
     public void testPushAll(Stack<String> stack, List<String> list) {
         stack.addAll(list);

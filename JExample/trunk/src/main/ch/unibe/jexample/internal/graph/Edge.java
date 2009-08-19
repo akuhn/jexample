@@ -2,6 +2,7 @@ package ch.unibe.jexample.internal.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Stack;
 
@@ -13,7 +14,7 @@ public class Edge<E> {
     private final Throwable broken;
     private Collection<Cycle<E>> cycles;
     
-    /*default*/ Edge(Node<E> producer, Node<E> consumer) {
+    /*default*/ Edge(Node<E> consumer, Node<E> producer) {
         this.consumer = consumer;
         this.producer = producer;
         this.broken = null;
@@ -22,7 +23,7 @@ public class Edge<E> {
         this.detectCyclicDependencies();
     }
 
-    /*default*/ Edge(Throwable broken, Node<E> consumer) {
+    /*default*/ Edge(Node<E> consumer, Throwable broken) {
         this.consumer = consumer;
         this.broken = broken;
         this.producer = null;
@@ -42,28 +43,24 @@ public class Edge<E> {
         return broken;
     }
 
-    @Override
-    public String toString() {
-        return broken == null ? producer.toString() : broken.toString();
-    }
-
     private void detectCyclicDependencies() {
         this.validateCycle(this, new Stack<Edge<E>>(), new HashSet<Edge<E>>());
     }
     
     private void validateCycle(Edge<E> initial, Stack<Edge<E>> stack, HashSet<Edge<E>> hashSet) {
+        stack.push(this);
         if (hashSet.add(this)) {
             for (Edge<E> each: this.producer.dependencies()) {
-                stack.push(each);
                 if (initial == each) invalidate(stack);
                 each.validateCycle(initial, stack, hashSet);
-                stack.pop();
             }
         }
+        stack.pop();
     }
 
     private void invalidate(Stack<Edge<E>> stack) {
-        for (Edge<E> each: stack) each.addCycle(new Cycle<E>(stack));
+        Cycle<E> cycle = new Cycle<E>(stack);
+        for (Edge<E> each: stack) each.addCycle(cycle);
     }
 
     private void addCycle(Cycle<E> cycle) {
@@ -75,5 +72,9 @@ public class Edge<E> {
         return !(cycles == null || cycles.isEmpty());
     }
     
+    public Collection<Cycle<E>> cycles() {
+        if (cycles == null) return Collections.emptyList();
+        return Collections.unmodifiableCollection(cycles);
+    }
     
 }

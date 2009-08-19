@@ -5,7 +5,6 @@ package ch.unibe.jexample.internal;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.junit.Ignore;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
@@ -64,7 +63,7 @@ class ExampleRunner {
      */
     public ReturnValue run() {
         if (example.hasErrors()) return abort(example.errors);
-        if (toBeIgnored()) return ignore();
+        if (example.method.isIgnorePresent()) return ignore();
         if (!runDependencies()) return ignore();
         started();
         try {
@@ -121,10 +120,6 @@ class ExampleRunner {
 
     private void started() {
         notifier.fireTestStarted(example.getDescription());
-    }
-
-    private boolean toBeIgnored() {
-        return example.method.getAnnotation(Ignore.class) != null;
     }
 
 }

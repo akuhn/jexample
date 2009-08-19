@@ -13,7 +13,25 @@ import ch.unibe.jexample.internal.BrokenDependencyTest;
 import ch.unibe.jexample.internal.InvalidDependencyTest;
 import ch.unibe.jexample.internal.graph.CycleDetectionTest;
 import ch.unibe.jexample.internal.graph.SmallGraph;
-import ch.unibe.jexample.internal.tests.*;
+import ch.unibe.jexample.internal.tests.BeforeClassTest;
+import ch.unibe.jexample.internal.tests.CanRunPrivateInnerClassTest;
+import ch.unibe.jexample.internal.tests.DeepCloneSerializableObjects;
+import ch.unibe.jexample.internal.tests.DependenciesTest;
+import ch.unibe.jexample.internal.tests.DependsParserTest;
+import ch.unibe.jexample.internal.tests.DependsScannerTest;
+import ch.unibe.jexample.internal.tests.ExampleGraphAddTest;
+import ch.unibe.jexample.internal.tests.ExampleGraphTest;
+import ch.unibe.jexample.internal.tests.ExampleValidateTest;
+import ch.unibe.jexample.internal.tests.ExceptionExpected;
+import ch.unibe.jexample.internal.tests.ForExampleTest;
+import ch.unibe.jexample.internal.tests.ForceCloneSuperclass;
+import ch.unibe.jexample.internal.tests.InheritanceTest;
+import ch.unibe.jexample.internal.tests.JExampleOptionsDefault;
+import ch.unibe.jexample.internal.tests.JExampleOptionsDontCloneReturnValues;
+import ch.unibe.jexample.internal.tests.JExampleRunnerTest;
+import ch.unibe.jexample.internal.tests.JExampleTest;
+import ch.unibe.jexample.internal.tests.ReturnValueTest;
+import ch.unibe.jexample.internal.tests.TestClassValidationTest;
 
 
 @RunWith(Suite.class)

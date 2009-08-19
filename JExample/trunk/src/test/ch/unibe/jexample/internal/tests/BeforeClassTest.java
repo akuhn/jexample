@@ -24,7 +24,6 @@ public class BeforeClassTest {
         assertEquals(1, n);
     }
 
-    @Test
     @Given("atLeastOnce")
     public void noMoreThanOnce() {
         assertEquals(1, n);

@@ -16,8 +16,8 @@ import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.util.JExampleError;
 import ch.unibe.jexample.util.CloneUtil;
+import ch.unibe.jexample.util.JExampleError;
 
 public class ReturnValueTest {
 
@@ -32,7 +32,6 @@ public class ReturnValueTest {
             stack = new Stack<Integer>();
         }
 
-        @Test
         @Given("#setUp")
         public void first() {
             assertNotNull(stack);
@@ -40,7 +39,6 @@ public class ReturnValueTest {
             stack.push(42);
         }
 
-        @Test
         @Given("#setUp;#first")
         public void second() {
             assertNotNull(stack);
@@ -60,7 +58,6 @@ public class ReturnValueTest {
             assertEquals("Hello, World", this.aString);
         }
 
-        @Test
         @Given("#testChangeString")
         public void testField() {
             assertEquals("Hello, World", this.aString);

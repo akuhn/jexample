@@ -1,12 +1,16 @@
 package ch.unibe.jexample.util;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.Test.None;
 import org.junit.runner.Description;
+
+import ch.unibe.jexample.Given;
 
 public class MethodReference {
 
@@ -49,13 +53,6 @@ public class MethodReference {
         return all;
     }
 
-    public static Collection<MethodReference> all(Class<?> jclass, Class<? extends Annotation> anon) {
-        Collection<MethodReference> all = new ArrayList<MethodReference>();
-        for (Method m: jclass.getMethods())
-            if (m.isAnnotationPresent(anon)) all.add(new MethodReference(jclass, m));
-        return all;
-    }
-
     public Description createTestDescription() {
         return Description.createTestDescription(getActualClass(), getName());
     }
@@ -64,14 +61,11 @@ public class MethodReference {
         return getActualClass() == c && getName().equals(name);
     }
 
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        return jmethod.isAnnotationPresent(annotationClass);
+    public String getDependencyString() {
+        Given given = jmethod.getAnnotation(Given.class);
+        return given == null ? "" : given.value(); 
     }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        return jmethod.getAnnotation(annotationClass);
-    }
-
+    
     public Object invoke(Object receiver, Object[] args) throws IllegalArgumentException, IllegalAccessException,
             InvocationTargetException {
         return jmethod.invoke(receiver, args);
@@ -110,6 +104,22 @@ public class MethodReference {
 
     public Class<?> getActualClass() {
         return jclass;
+    }
+    
+    public boolean isTestAnnotationPresent() {
+        return jmethod.isAnnotationPresent(Test.class)
+            || jmethod.isAnnotationPresent(Given.class);
+    }
+
+    public Class<? extends Throwable> initExpectedException() {
+        Test annotation = jmethod.getAnnotation(Test.class);
+        if (annotation == null) return null;
+        if (annotation.expected() == None.class) return null;
+        return annotation.expected();
+    }
+
+    public boolean isIgnorePresent() {
+        return jmethod.isAnnotationPresent(Ignore.class);
     }
 
 }

@@ -13,8 +13,6 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.util.MethodLocator;
-import ch.unibe.jexample.util.MethodReference;
 
 /**
  * @author Lea Haensenberger
@@ -188,15 +186,12 @@ public class DependsParserTest {
 		@Test
 		public void otherTest() { /**/ }
 
-		@Test
 		@Given("GraphTest$CyclicOverClasses.depOnOtherTest")
 		public void otherTestCyclic() { /**/ }
 
-		@Test
 		@Given("CycleDetectorTest$WithCycleOverClasses.bottomCyclicMethod")
 		public void cyclicMethod() { /**/ }
 
-		@Test
 		@Given("CycleDetectorTest$WithoutCycleOverClasses.rootMethod")
 		public void middleMethod() { /**/ }
 		

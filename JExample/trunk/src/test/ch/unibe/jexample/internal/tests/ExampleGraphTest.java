@@ -71,13 +71,11 @@ public class ExampleGraphTest {
 
         }
 
-        @Test
         @Given("testMethod")
         public void anotherTestMethod() {
 
         }
 
-        @Test
         @Given("DependsParserTest$B.otherTest")
         public void depOnOtherTest() {
 
@@ -90,12 +88,10 @@ public class ExampleGraphTest {
         public void provider() {
         }
 
-        @Test
         @Given("provider;aaa")
         public void bbb() {
         }
 
-        @Test
         @Given("bbb")
         public void aaa() {
         }
@@ -112,13 +108,11 @@ public class ExampleGraphTest {
 
         }
 
-        @Test
         @Given("testMethod")
         public void anotherTestMethod() {
 
         }
 
-        @Test
         @Given("B.otherTestCyclic")
         public void depOnOtherTest() {
 

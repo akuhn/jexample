@@ -64,12 +64,12 @@ public class Node<E> {
         return false;
     }
       
-    public void makeEdge(Node<E> dependency) {
-        new Edge<E>(dependency, this);
+    public void addProvider(Node<E> dependency) {
+        new Edge<E>(this, dependency);
     }
 
     public void makeBrokenEdge(Throwable ex) {
-        new Edge<E>(ex, this);
+        new Edge<E>(this, ex);
     }
     
 }

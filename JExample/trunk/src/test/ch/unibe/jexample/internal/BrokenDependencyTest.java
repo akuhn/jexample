@@ -1,6 +1,7 @@
 package ch.unibe.jexample.internal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.junit.runner.Result;
@@ -19,7 +20,6 @@ public class BrokenDependencyTest {
     public static class A {
         @Test public int m() { return 1; }
         @Test public int n() { return 2;}
-        @Test 
         @Given("#m,#a,#n")
         public Object t(int m, int a, int n) { 
             throw new RuntimeException("Not reachable!");
@@ -47,7 +47,6 @@ public class BrokenDependencyTest {
     public static class B {
         @Test public int m() { return 1; }
         @Test public int n() { return 2;}
-        @Test 
         @Given("#m,#a,#n")
         public Object t() { 
             throw new RuntimeException("Not reachable!");

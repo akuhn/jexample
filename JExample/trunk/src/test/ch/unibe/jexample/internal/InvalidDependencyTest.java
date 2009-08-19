@@ -15,7 +15,7 @@ public class InvalidDependencyTest {
 
     @RunWith(JExample.class)
     public static class A {
-        @Test @Given("^^") public void broken() { assert false; }
+        @Given("^^") public void broken() { assert false; }
     }
     
     @Test

@@ -60,7 +60,6 @@ public class ExampleGraphAddTest {
             return 42;
         }
 
-        @Test
         @Given("provider")
         public void consumer(Object o) {
         }

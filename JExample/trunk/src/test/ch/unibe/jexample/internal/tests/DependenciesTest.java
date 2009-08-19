@@ -34,7 +34,6 @@ public class DependenciesTest {
             return new B();
         }
 
-        @Test
         @Given("empty")
         public A test(A a) {
             return a;
@@ -77,13 +76,11 @@ public class DependenciesTest {
             return new B();
         }
 
-        @Test
         @Given("empty")
         public B b(B b) {
             return b;
         }
 
-        @Test
         @Given("b")
         public A a(A a) {
             return a;
@@ -118,7 +115,6 @@ public class DependenciesTest {
             return new A();
         }
 
-        @Test
         @Given("empty")
         public B b(B b) {
             return b;
@@ -133,7 +129,6 @@ public class DependenciesTest {
         }
 
         @Override
-        @Test
         @Given("another")
         public B b(B b) {
             return b;
@@ -182,7 +177,6 @@ public class DependenciesTest {
             throw new Exception();
         }
 
-        @Test
         @Given("provider")
         public void consumer(Object o) {
             // do nothing
@@ -209,7 +203,6 @@ public class DependenciesTest {
             return new Object();
         }
 
-        @Test
         @Given("provider")
         public void consumer(Object a, Object b) {
             // do nothing

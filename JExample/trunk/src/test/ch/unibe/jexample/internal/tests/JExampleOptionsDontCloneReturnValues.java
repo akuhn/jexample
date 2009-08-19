@@ -19,19 +19,16 @@ public class JExampleOptionsDontCloneReturnValues {
         return new Mutable("root");
     }
 
-    @Test
     @Given("create")
     public Mutable left(Mutable a) {
         return a;
     }
 
-    @Test
     @Given("create")
     public Mutable right(Mutable a) {
         return a;
     }
 
-    @Test
     @Given("left;right")
     public void test(Mutable left, Mutable right) {
         assertSame(left, right);

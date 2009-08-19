@@ -27,7 +27,6 @@ public class InheritanceTest extends JExampleTest {
             return "A delivers";
         }
 
-        @Test
         @Given("m()")
         public void test(String arg) {
             trace(this, arg);
