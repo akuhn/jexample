@@ -11,6 +11,8 @@ import ch.unibe.jexample.demo.ListTest;
 import ch.unibe.jexample.demo.StackTest;
 import ch.unibe.jexample.internal.BrokenDependencyTest;
 import ch.unibe.jexample.internal.InvalidDependencyTest;
+import ch.unibe.jexample.internal.graph.CycleDetectionTest;
+import ch.unibe.jexample.internal.graph.SmallGraph;
 import ch.unibe.jexample.internal.tests.*;
 
 
@@ -18,6 +20,7 @@ import ch.unibe.jexample.internal.tests.*;
 @SuiteClasses( {
     BrokenDependencyTest.class,
     ForceCloneSuperclass.class,
+    CycleDetectionTest.class,
     DeepCloneSerializableObjects.class,
     DeepCloneTest.class,
     DeepCloneHashMapTest.class,
@@ -40,6 +43,7 @@ import ch.unibe.jexample.internal.tests.*;
     JExampleRunnerTest.class,
     ReturnValueTest.class,
     TestClassValidationTest.class,
+    SmallGraph.class,
     StackTest.class,
     ListTest.class })
 public class AllTests {

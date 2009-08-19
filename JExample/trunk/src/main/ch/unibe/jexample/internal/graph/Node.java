@@ -31,7 +31,7 @@ public class Node<E> {
     
     public Collection<E> consumers() {
         ArrayList<E> nodes = new ArrayList<E>();
-        for (Edge<E> each: consumers) nodes.add(each.getProducer().value);
+        for (Edge<E> each: consumers) nodes.add(each.consumer.value);
         return Collections.unmodifiableCollection(nodes);
     }
 
@@ -40,13 +40,16 @@ public class Node<E> {
     }
     
     private Collection<Node<E>> collectTransitiveClosureInto(Collection<Node<E>> all) {
-        for (Node<E> node: producers()) if (all.add(node)) node.collectTransitiveClosureInto(all);
+        for (Edge<E> each: producers) {
+            Node<E> producer = each.getProducer();
+            if (all.add(producer)) producer.collectTransitiveClosureInto(all);
+        }
         return all;
     }
 
-    private Iterable<Node<E>> producers() {
-        ArrayList<Node<E>> nodes = new ArrayList<Node<E>>();
-        for (Edge<E> each: producers) if (!each.isBroken()) nodes.add(each.getProducer());
+    public Collection<E> producers() {
+        ArrayList<E> nodes = new ArrayList<E>();
+        for (Edge<E> each: producers) nodes.add(each.producer.value);
         return Collections.unmodifiableCollection(nodes);
     }
 
