@@ -53,8 +53,8 @@ public class JExampleOptionsDefault {
 
     @Test
     @Given("#isCloneable,#isCloneable")
-    public void testCloning(Mutable a, Mutable b) {
-        assertNotSame(a, b);
+    public void shouldUseSameCloneFactoryFroAllArguments(Mutable a, Mutable b) {
+        assertSame(a, b); 
         assertEquals("root", a.name);
         assertEquals("root", b.name);
     }

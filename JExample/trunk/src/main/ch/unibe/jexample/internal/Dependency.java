@@ -3,17 +3,20 @@ package ch.unibe.jexample.internal;
 
 public class Dependency {
 
+    private final ExampleNode consumer;
     private final ExampleNode producer;
     private final Throwable broken;
     
     public Dependency(ExampleNode producer, ExampleNode consumer) {
+        this.consumer = consumer;
         this.producer = producer;
         this.broken = null;
-        producer.__consumersAdd(consumer.value);
+        producer.__consumersAdd(this);
         consumer.__producersAdd(this);
     }
 
     public Dependency(Throwable broken, ExampleNode consumer) {
+        this.consumer = consumer;
         this.broken = broken;
         this.producer = null;
         consumer.__producersAdd(this);
@@ -39,6 +42,10 @@ public class Dependency {
     @Override
     public String toString() {
         return broken == null ? producer.toString() : broken.toString();
+    }
+
+    public ExampleNode getConsumer() {
+        return consumer;
     }
     
 }

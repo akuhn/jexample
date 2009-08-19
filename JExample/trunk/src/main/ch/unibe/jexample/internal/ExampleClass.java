@@ -12,9 +12,9 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.util.CloneUtil;
 import ch.unibe.jexample.util.JExampleError;
 import ch.unibe.jexample.util.MethodReference;
-import ch.unibe.jexample.util.CloneUtil;
 import ch.unibe.jexample.util.JExampleError.Kind;
 
 /**

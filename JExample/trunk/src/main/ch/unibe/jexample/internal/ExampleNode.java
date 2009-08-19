@@ -15,12 +15,12 @@ public class ExampleNode {
     // TODO 3) rewrite isolated tests for ExampleNode & Dependency
     
     private List<Dependency> producers;
-    private Collection<Example> consumers; // TODO Collection<Dependency>
+    private Collection<Dependency> consumers;
     public final Example value;
     
     public ExampleNode(Example example) {
         this.producers = new ArrayList<Dependency>();
-        this.consumers = new HashSet<Example>();
+        this.consumers = new ArrayList<Dependency>();
         this.value = example;
     }
     
@@ -29,15 +29,19 @@ public class ExampleNode {
     }
     
     public Collection<Example> consumers() {
-        return Collections.unmodifiableCollection(consumers);
+        ArrayList<Example> nodes = new ArrayList<Example>();
+        for (Dependency each: consumers) nodes.add(each.getProducer().value);
+        return Collections.unmodifiableCollection(nodes);
     }
 
-    public void __consumersAdd(Example value2) {
-        consumers.add(value2);
+    public void __consumersAdd(Dependency d) {
+        assert d.getProducer() == this;
+        consumers.add(d);
     }
 
-    public void __producersAdd(Dependency dependency) {
-        producers.add(dependency);
+    public void __producersAdd(Dependency d) {
+        assert d.getConsumer() == this;
+        producers.add(d);
     }
 
     public Collection<ExampleNode> transitiveClosure() {
@@ -73,5 +77,5 @@ public class ExampleNode {
     private void invalidate(Stack<ExampleNode> cycle) {
         for (ExampleNode each: cycle) each.value.errorPartOfCycle();
     }
-    
+        
 }

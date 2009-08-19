@@ -4,9 +4,7 @@ import static ch.unibe.jexample.internal.ExampleColor.NONE;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -14,7 +12,6 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExampleOptions;
-import ch.unibe.jexample.util.CloneUtil;
 import ch.unibe.jexample.util.InvalidDeclarationError;
 import ch.unibe.jexample.util.JExampleError;
 import ch.unibe.jexample.util.MethodLocator;
@@ -111,7 +108,7 @@ public class Example {
 
     protected Object bareInvoke() throws Exception {
         owner.runBeforeClassBefores();
-        InjectionValues injection = InjectionValues.from(this);
+        InjectionValues injection = new InjectionValues(this);
         Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
         returnValue.assign(newResult);
         returnValue.assignInstance(injection.getTestInstance());
