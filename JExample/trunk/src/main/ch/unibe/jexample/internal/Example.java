@@ -1,7 +1,5 @@
 package ch.unibe.jexample.internal;
 
-import static ch.unibe.jexample.internal.ExampleColor.NONE;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,7 +52,7 @@ public class Example {
 
     public static boolean DISPOSE_IF_DONE = false;
 
-    public final ReturnValue returnValue;
+    private ReturnValue returnValue;
     public final MethodReference method;
     public final ExampleClass owner;
     public final Class<? extends Throwable> expectedException;
@@ -70,9 +68,8 @@ public class Example {
         this.owner = owner;
         this.method = method;
         this.description = method.createTestDescription();
-        this.returnValue = new ReturnValue(this);
+        this.returnValue = ReturnValue.R_NONE;
         this.policy = initJExampleOptions(method.getActualClass());
-        this.errors = null; // lazy
         this.expectedException = initExpectedException();
         this.node = new Node<Example>(this);
     }
@@ -105,17 +102,15 @@ public class Example {
         return options;
     }
 
-    protected Object bareInvoke() throws Exception {
+    protected ReturnValue bareInvoke() throws Exception {
         owner.runBeforeClassBefores();
         InjectionValues injection = new InjectionValues(this);
         Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
-        returnValue.assign(newResult);
-        returnValue.assignInstance(injection.getTestInstance());
-        return newResult;
+        return new ReturnValue(newResult, injection.getTestInstance());
     }
 
     public void run(RunNotifier notifier) {
-        if (returnValue.color == NONE) returnValue.color = new ExampleRunner(this, notifier).run();
+        if (returnValue.isNull()) returnValue = new ExampleRunner(this, notifier).run();
         this.maybeRemoveMyselfFromMyProducersConsumersList();
     }
 
@@ -164,7 +159,7 @@ public class Example {
                         each.getError());
                 continue;
             }
-            Example tm = each.getProducerNode().value;
+            Example tm = each.getProducer().value;
             Class<?> r = tm.method.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
@@ -187,7 +182,7 @@ public class Example {
     }
 
     public boolean wasSuccessful() {
-        return returnValue.color == ExampleColor.GREEN;
+        return getReturnValue().isGreen();
     }
 
     public Description getDescription() {
@@ -209,6 +204,10 @@ public class Example {
                 node.makeEdge(d.node);
             }
         }
+    }
+
+    public ReturnValue getReturnValue() {
+        return returnValue;
     }
 
 }

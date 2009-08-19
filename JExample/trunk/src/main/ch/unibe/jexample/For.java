@@ -54,7 +54,7 @@ public abstract class For {
         	if (result.getFailures().size() != 1) throw new RuntimeException("Oops, what do we now!?");
         	throw new RuntimeException(result.getFailures().iterator().next().getException());
         }
-        return e.returnValue.getValue();
+        return e.getReturnValue().getValue();
     }
 
     private static Example findExample(Class jClass, String method) {

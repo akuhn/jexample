@@ -8,27 +8,26 @@ package ch.unibe.jexample.internal;
  */
 public class ReturnValue {
 
-    private Example provider;
+    public static final ReturnValue R_WHITE = new ReturnValue();
+    public static final ReturnValue R_RED = new ReturnValue();
+    public static final ReturnValue R_NONE = new ReturnValue();
+    public static final ReturnValue R_GREEN = new ReturnValue();
+    
     private Object returnValue;
     private Object testCaseInstance;
-    ExampleColor color;
 
-    public ReturnValue(Example provider) {
-        this.color = ExampleColor.NONE;
-        this.provider = provider;
+    public ReturnValue(Object returnValue, Object testCaseInstance) {
+        assert testCaseInstance != null;
+        this.returnValue = returnValue;
+        this.testCaseInstance = testCaseInstance;
+    }
+    
+    private ReturnValue() {
+        // do nothing
     }
 
     public Object getValue() {
         return returnValue;
-    }
-
-    void assign(Object value) {
-        this.returnValue = value;
-    }
-
-    void assignInstance(Object test) {
-        assert this.provider.owner.getImplementingClass().equals(test.getClass());
-        this.testCaseInstance = test;
     }
 
     public boolean isTestCaseInstanceOf(Class<?> jclass) {
@@ -44,4 +43,12 @@ public class ReturnValue {
         return testCaseInstance;
     }
 
+    public boolean isGreen() {
+        return this == R_GREEN || this.testCaseInstance != null;
+    }    
+
+    public boolean isNull() {
+        return this == R_NONE;
+    }
+     
 }

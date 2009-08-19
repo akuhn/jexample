@@ -31,7 +31,7 @@ public class Node<E> {
     
     public Collection<E> consumers() {
         ArrayList<E> nodes = new ArrayList<E>();
-        for (Edge<E> each: consumers) nodes.add(each.getProducerNode().value);
+        for (Edge<E> each: consumers) nodes.add(each.getProducer().value);
         return Collections.unmodifiableCollection(nodes);
     }
 
@@ -46,14 +46,14 @@ public class Node<E> {
 
     private Iterable<Node<E>> producers() {
         ArrayList<Node<E>> nodes = new ArrayList<Node<E>>();
-        for (Edge<E> each: producers) if (!each.isBroken()) nodes.add(each.getProducerNode());
+        for (Edge<E> each: producers) if (!each.isBroken()) nodes.add(each.getProducer());
         return Collections.unmodifiableCollection(nodes);
     }
 
     public E firstProducerOrNull() {
         if (producers.isEmpty()) return null;
         Edge<E> d = producers.get(0);
-        return d.getProducerNode().value;
+        return d.getProducer().value;
     }
 
     public boolean isPartOfCycle() {

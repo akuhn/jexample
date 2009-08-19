@@ -33,7 +33,7 @@ public class Edge<E> {
         return broken != null;
     }
 
-    public Node<E> getProducerNode() {
+    public Node<E> getProducer() {
         if (isBroken()) throw new IllegalStateException();
         return producer;
     }

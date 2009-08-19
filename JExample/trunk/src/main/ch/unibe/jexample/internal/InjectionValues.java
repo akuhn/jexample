@@ -38,7 +38,7 @@ public class InjectionValues {
         if (FORCE_RERUN) return forceRerun(example);
         Iterator<Edge<Example>> it = example.node.dependencies().iterator();
         for (int i = 0; i < arguments.length; i++) {
-            ReturnValue r = it.next().getProducerNode().value.returnValue;
+            ReturnValue r = it.next().getProducer().value.getReturnValue();
             arguments[i] = adaptArgument(example.policy, r.getValue());
         }
         testInstance = adaptReceiver(example);
@@ -48,8 +48,8 @@ public class InjectionValues {
     private Object adaptReceiver(Example example) throws Exception {
         Example first = example.node.firstProducerOrNull();
         if (example.policy.cloneTestCase() && first != null 
-                && first.returnValue.isTestCaseInstanceOf(example.method.getActualClass())) {
-            return clone(first.returnValue.getTestCaseInstance());
+                && first.getReturnValue().isTestCaseInstanceOf(example.method.getActualClass())) {
+            return clone(first.getReturnValue().getTestCaseInstance());
         }
         else {
             return CloneUtil.getConstructor(example.method.getActualClass()).newInstance();
@@ -64,16 +64,16 @@ public class InjectionValues {
     private Void forceRerun(Example example) throws Exception {
         int length = example.method.arity();
         for (int i = 0; i < length; i++) {
-            Example each = example.node.dependencies().get(i).getProducerNode().value;
+            Example each = example.node.dependencies().get(i).getProducer().value;
             each.bareInvoke();
-            arguments[i] = each.returnValue.getValue();
+            arguments[i] = each.getReturnValue().getValue();
         }
         testInstance = null;
         Example first = example.node.firstProducerOrNull();
-        if (first != null && first.returnValue.isTestCaseInstanceOf(
+        if (first != null && first.getReturnValue().isTestCaseInstanceOf(
                     example.method.getActualClass())) {
             if (length == 0) first.bareInvoke(); // loop above was never passed
-            testInstance = first.returnValue.getTestCaseInstance();
+            testInstance = first.getReturnValue().getTestCaseInstance();
         }
         else {
             testInstance = CloneUtil.getConstructor(example.method.getActualClass()).newInstance();
