@@ -57,17 +57,7 @@ public class ExampleGraph {
         if (e != null) return e;
         e = new Example(method, makeExampleClass(method.getActualClass()));
         examples.put(method, e);
-        for (MethodReference m: e.collectDependencies()) {
-            if (m.isBroken()) {
-                new Dependency(m.getError(), e.node);
-            }
-            else {
-                Example d = makeExample(m);
-                new Dependency(d.node, e.node);
-                e.node.validateCycle();
-            }
-        }
-        e.validate();
+        e.initializeDependencies(this);
         return e;
     }
 
@@ -131,7 +121,7 @@ public class ExampleGraph {
         // copy list of values to avoid concurrent modification
         Collection<Example> copy = new ArrayList<Example>(examples.values());
         for (Example e: copy) {
-            for (ExampleNode node: e.node.transitiveClosure()) {
+            for (Node node: e.node.transitiveClosure()) {
                 examples.put(node.value.method, node.value);
             }
         }

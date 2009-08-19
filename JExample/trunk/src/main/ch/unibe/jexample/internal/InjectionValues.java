@@ -37,7 +37,7 @@ public class InjectionValues {
         if (FORCE_RERUN) return forceRerun(example);
         Iterator<Dependency> it = example.node.dependencies().iterator();
         for (int i = 0; i < arguments.length; i++) {
-            ReturnValue r = it.next().dependency().returnValue;
+            ReturnValue r = it.next().getProducer().returnValue;
             arguments[i] = adaptArgument(example.policy, r.getValue());
         }
         testInstance = adaptReceiver(example);
@@ -45,8 +45,10 @@ public class InjectionValues {
     }
     
     private Object adaptReceiver(Example example) throws Exception {
-        if (example.policy.cloneTestCase() && (!example.node.dependencies().isEmpty() && example.node.dependencies().get(0).dependency().returnValue.isTestCaseInstanceOf(example.method.getActualClass()))) {
-            return clone(example.node.dependencies().get(0).dependency().returnValue.getTestCaseInstance());
+        Example first = example.node.firstProducerOrNull();
+        if (example.policy.cloneTestCase() && first != null 
+                && first.returnValue.isTestCaseInstanceOf(example.method.getActualClass())) {
+            return clone(first.returnValue.getTestCaseInstance());
         }
         else {
             return CloneUtil.getConstructor(example.method.getActualClass()).newInstance();
@@ -61,17 +63,16 @@ public class InjectionValues {
     private Void forceRerun(Example example) throws Exception {
         int length = example.method.arity();
         for (int i = 0; i < length; i++) {
-            Example each = example.node.dependencies().get(i).dependency();
+            Example each = example.node.dependencies().get(i).getProducer();
             each.bareInvoke();
             arguments[i] = each.returnValue.getValue();
         }
         testInstance = null;
-        if (!example.node.dependencies().isEmpty() 
-                && example.node.dependencies().get(0)
-                    .dependency().returnValue.isTestCaseInstanceOf(
+        Example first = example.node.firstProducerOrNull();
+        if (first != null && first.returnValue.isTestCaseInstanceOf(
                     example.method.getActualClass())) {
-            if (length == 0) example.node.dependencies().get(0).dependency().bareInvoke();
-            testInstance = example.node.dependencies().get(0).dependency().returnValue.getTestCaseInstance();
+            if (length == 0) first.bareInvoke(); // loop above was never passed
+            testInstance = first.returnValue.getTestCaseInstance();
         }
         else {
             testInstance = CloneUtil.getConstructor(example.method.getActualClass()).newInstance();

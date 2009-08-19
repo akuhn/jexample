@@ -4,6 +4,7 @@ import static ch.unibe.jexample.internal.ExampleColor.NONE;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.junit.Test;
@@ -56,10 +57,10 @@ public class Example {
     public final ExampleClass owner;
     public final Class<? extends Throwable> expectedException;
 
-    public final ExampleNode node;
+    public final Node node;
 
     private final Description description;
-    protected JExampleError errors;
+    JExampleError errors;
     protected JExampleOptions policy;
 
     /*default*/ Example(MethodReference method, ExampleClass owner) {
@@ -69,9 +70,9 @@ public class Example {
         this.description = method.createTestDescription();
         this.returnValue = new ReturnValue(this);
         this.policy = initJExampleOptions(method.getActualClass());
-        this.errors = new JExampleError();
+        this.errors = null; // lazy
         this.expectedException = initExpectedException();
-        this.node = new ExampleNode(this);
+        this.node = new Node(this);
     }
 
     protected Iterable<MethodReference> collectDependencies() {
@@ -84,13 +85,9 @@ public class Example {
                 all.add(each.resolve(method.getActualClass()));
             }
         } catch (InvalidDeclarationError ex) {
-            errors.add(Kind.INVALID_DEPENDS_DECLARATION, ex);
+            return Collections.singleton(new MethodReference(ex));
         }
         return all;
-    }
-
-    protected void errorPartOfCycle() {
-        errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
     }
 
     private Class<? extends Throwable> initExpectedException() {
@@ -125,8 +122,8 @@ public class Example {
         this.returnValue.dispose();
         for (Dependency each: this.node.dependencies()) {
             if (each.isBroken()) continue;
-            each.dependency().node.consumers().remove(this);
-            each.dependency().maybeRemoveMyselfFromMyProducersConsumersList();
+            each.getProducer().node.consumers().remove(this);
+            each.getProducer().maybeRemoveMyselfFromMyProducersConsumersList();
         }
     }
 
@@ -135,7 +132,11 @@ public class Example {
         return "Example: " + method;
     }
 
-    protected void validate() {
+    private void validate() {
+        errors = new JExampleError();
+        if (this.node.isPartOfCycle()) {
+            errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
+        }
         if (!method.isAnnotationPresent(Test.class)) {
             errors.add(Kind.MISSING_TEST_ANNOTATION, "Method %s is not a test method, missing @Test annotation.",
                     toString());
@@ -148,10 +149,6 @@ public class Example {
         } else {
             validateDependencyTypes();
         }
-        // if (providers.transitiveClosure().contains(this)) {
-        // errors.add(Kind.RECURSIVE_DEPENDENCIES,
-        // "Recursive dependency found.");
-        // }
     }
 
     private void validateDependencyTypes() {
@@ -164,7 +161,7 @@ public class Example {
                         each.getError());
                 continue;
             }
-            Example tm = each.dependency();
+            Example tm = each.getProducer();
             Class<?> r = tm.method.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
@@ -192,6 +189,23 @@ public class Example {
 
     public Description getDescription() {
         return description;
+    }
+
+    public boolean hasErrors() {
+        if (errors == null) this.validate();
+        return errors.size() > 0;
+    }
+
+    void initializeDependencies(ExampleGraph exampleGraph) {
+        for (MethodReference m: collectDependencies()) {
+            if (m.isBroken()) {
+                new Dependency(m.getError(), node);
+            }
+            else {
+                Example d = exampleGraph.makeExample(m);
+                new Dependency(d.node, node).validateCycle();
+            }
+        }
     }
 
 }

@@ -65,7 +65,7 @@ class ExampleRunner {
      *         dependencies failed.
      */
     public ExampleColor run() {
-        if (example.errors.size() > 0) return abort(example.errors);
+        if (example.hasErrors()) return abort(example.errors);
         if (toBeIgnored()) return ignore();
         if (!runDependencies()) return ignore();
         started();
@@ -92,7 +92,7 @@ class ExampleRunner {
      */
     private boolean runDependencies() {
         for (Dependency each: example.node.dependencies()) {
-            Example eg = each.dependency();
+            Example eg = each.getProducer();
             eg.run(notifier);
             if (!eg.wasSuccessful()) return false;
         }

@@ -10,6 +10,7 @@ import ch.unibe.jexample.deepclone.DeepCloneTest;
 import ch.unibe.jexample.demo.ListTest;
 import ch.unibe.jexample.demo.StackTest;
 import ch.unibe.jexample.internal.BrokenDependencyTest;
+import ch.unibe.jexample.internal.InvalidDependencyTest;
 import ch.unibe.jexample.internal.tests.*;
 
 
@@ -32,6 +33,7 @@ import ch.unibe.jexample.internal.tests.*;
     ExceptionExpected.class,
     ForExampleTest.class,
     InheritanceTest.class,
+    InvalidDependencyTest.class,
     JExampleOptionsDefault.class,
     JExampleOptionsDontCloneReturnValues.class,
     JExampleTest.class,
@@ -41,5 +43,5 @@ import ch.unibe.jexample.internal.tests.*;
     StackTest.class,
     ListTest.class })
 public class AllTests {
-
+    // TODO add main
 }

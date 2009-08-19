@@ -6,6 +6,8 @@ package ch.unibe.jexample.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -140,7 +142,7 @@ public class DependsParserTest {
 
 	@Test
 	public void packageLookup() throws Exception {
-		MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(Util.class);
+		MethodReference ref = MethodLocator.parse("DependsParserTest$A.unique").resolve(Arrays.class);
 		assertEquals(A.class, ref.getActualClass());
 		assertEquals("unique", ref.getName());
 	}
