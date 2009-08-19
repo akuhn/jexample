@@ -12,6 +12,7 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.internal.graph.Node;
 import ch.unibe.jexample.util.CompositeRunner;
 import ch.unibe.jexample.util.JExampleError;
 import ch.unibe.jexample.util.MethodReference;
@@ -121,7 +122,7 @@ public class ExampleGraph {
         // copy list of values to avoid concurrent modification
         Collection<Example> copy = new ArrayList<Example>(examples.values());
         for (Example e: copy) {
-            for (Node node: e.node.transitiveClosure()) {
+            for (Node<Example> node: e.node.transitiveClosure()) {
                 examples.put(node.value.method, node.value);
             }
         }

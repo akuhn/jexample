@@ -13,6 +13,8 @@ import org.junit.Ignore;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
+import ch.unibe.jexample.internal.graph.Edge;
+
 /**
  * Runs an example, reports to JUnit and returns test color.
  * 
@@ -91,8 +93,8 @@ class ExampleRunner {
      *         If any fails, abort and return <code>false</code>.
      */
     private boolean runDependencies() {
-        for (Dependency each: example.node.dependencies()) {
-            Example eg = each.getProducer();
+        for (Edge<Example> each: example.node.dependencies()) {
+            Example eg = each.getProducerNode().value;
             eg.run(notifier);
             if (!eg.wasSuccessful()) return false;
         }

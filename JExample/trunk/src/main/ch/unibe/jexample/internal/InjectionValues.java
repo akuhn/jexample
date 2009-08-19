@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.deepclone.CloneFactory;
+import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.util.CloneUtil;
 
 /** Creates injection values for test execution.
@@ -35,9 +36,9 @@ public class InjectionValues {
     
     private Void initialize(Example example) throws Exception {
         if (FORCE_RERUN) return forceRerun(example);
-        Iterator<Dependency> it = example.node.dependencies().iterator();
+        Iterator<Edge<Example>> it = example.node.dependencies().iterator();
         for (int i = 0; i < arguments.length; i++) {
-            ReturnValue r = it.next().getProducer().returnValue;
+            ReturnValue r = it.next().getProducerNode().value.returnValue;
             arguments[i] = adaptArgument(example.policy, r.getValue());
         }
         testInstance = adaptReceiver(example);
@@ -63,7 +64,7 @@ public class InjectionValues {
     private Void forceRerun(Example example) throws Exception {
         int length = example.method.arity();
         for (int i = 0; i < length; i++) {
-            Example each = example.node.dependencies().get(i).getProducer();
+            Example each = example.node.dependencies().get(i).getProducerNode().value;
             each.bareInvoke();
             arguments[i] = each.returnValue.getValue();
         }

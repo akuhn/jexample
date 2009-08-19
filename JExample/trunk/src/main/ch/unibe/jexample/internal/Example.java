@@ -13,6 +13,8 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExampleOptions;
+import ch.unibe.jexample.internal.graph.Edge;
+import ch.unibe.jexample.internal.graph.Node;
 import ch.unibe.jexample.util.InvalidDeclarationError;
 import ch.unibe.jexample.util.JExampleError;
 import ch.unibe.jexample.util.MethodLocator;
@@ -57,7 +59,7 @@ public class Example {
     public final ExampleClass owner;
     public final Class<? extends Throwable> expectedException;
 
-    public final Node node;
+    public final Node<Example> node;
 
     private final Description description;
     JExampleError errors;
@@ -72,7 +74,7 @@ public class Example {
         this.policy = initJExampleOptions(method.getActualClass());
         this.errors = null; // lazy
         this.expectedException = initExpectedException();
-        this.node = new Node(this);
+        this.node = new Node<Example>(this);
     }
 
     protected Iterable<MethodReference> collectDependencies() {
@@ -119,12 +121,13 @@ public class Example {
 
     private void maybeRemoveMyselfFromMyProducersConsumersList() {
         if (!DISPOSE_IF_DONE || !node.consumers().isEmpty()) return;
-        this.returnValue.dispose();
-        for (Dependency each: this.node.dependencies()) {
-            if (each.isBroken()) continue;
-            each.getProducer().node.consumers().remove(this);
-            each.getProducer().maybeRemoveMyselfFromMyProducersConsumersList();
-        }
+        throw new RuntimeException("TODO");
+//        this.returnValue.dispose();
+//        for (Edge each: this.node.dependencies()) {
+//            if (each.isBroken()) continue;
+//            each.getProducer().node.consumers().remove(this);
+//            each.getProducer().maybeRemoveMyselfFromMyProducersConsumersList();
+//        }
     }
 
     @Override
@@ -152,16 +155,16 @@ public class Example {
     }
 
     private void validateDependencyTypes() {
-        Iterator<Dependency> tms = this.node.dependencies().iterator();
+        Iterator<Edge<Example>> tms = this.node.dependencies().iterator();
         int position = 1;
         for (Class<?> t: method.getParameterTypes()) {
-            Dependency each = tms.next();
+            Edge<Example> each = tms.next();
             if (each.isBroken()) {
                 errors.add(Kind.NO_SUCH_PROVIDER,
                         each.getError());
                 continue;
             }
-            Example tm = each.getProducer();
+            Example tm = each.getProducerNode().value;
             Class<?> r = tm.method.getReturnType();
             if (!t.isAssignableFrom(r)) {
                 errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
@@ -174,7 +177,7 @@ public class Example {
             position++;
         }
         while (tms.hasNext()) {
-            Dependency each = tms.next();
+            Edge<Example> each = tms.next();
             if (each.isBroken()) {
                 errors.add(Kind.NO_SUCH_PROVIDER,
                         each.getError());
@@ -199,11 +202,11 @@ public class Example {
     void initializeDependencies(ExampleGraph exampleGraph) {
         for (MethodReference m: collectDependencies()) {
             if (m.isBroken()) {
-                new Dependency(m.getError(), node);
+                node.makeBrokenEdge(m.getError());
             }
             else {
                 Example d = exampleGraph.makeExample(m);
-                new Dependency(d.node, node).validateCycle();
+                node.makeEdge(d.node);
             }
         }
     }

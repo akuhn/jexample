@@ -54,7 +54,7 @@ public class DependenciesTest {
         assertNotNull(t);
         assertNotNull(e);
         assertEquals(1, t.node.dependencies().size());
-        assertEquals(e, t.node.dependencies().iterator().next().getProducer());
+        assertEquals(e, t.node.dependencies().iterator().next().getProducerNode().value);
     }
 
     @Test
@@ -106,9 +106,9 @@ public class DependenciesTest {
         assertNotNull(b);
         assertNotNull(e);
         assertEquals(1, b.node.dependencies().size());
-        assertEquals(e, b.node.dependencies().iterator().next().getProducer());
+        assertEquals(e, b.node.dependencies().iterator().next().getProducerNode().value);
         assertEquals(1, a.node.dependencies().size());
-        assertEquals(b, a.node.dependencies().iterator().next().getProducer());
+        assertEquals(b, a.node.dependencies().iterator().next().getProducerNode().value);
     }
 
     @RunWith(JExample.class)
