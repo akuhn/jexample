@@ -8,13 +8,14 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 
 public class DeepCloneStrategyCache {
 
     private static final String[] IMMUTABLES = {
-        "sun.font",
+        "sun.font", // package
         "java.lang.Boolean",
         "java.lang.Character",
         "java.lang.Void",
@@ -24,11 +25,13 @@ public class DeepCloneStrategyCache {
         "java.lang.ClassLoader",
         "java.lang.Throwable",
         "java.lang.Thread",
+        // TODO more...
     };
 
     private static DeepCloneStrategyCache DEFAULT = null;
 
     public Map<Class<?>,DeepCloneStrategy> cache; 
+    public Map<Object,Void> constants;
 
     private boolean isImmutable(Class<?> type) {
         if (type.isEnum()) return true;
@@ -42,25 +45,49 @@ public class DeepCloneStrategyCache {
         return false;
     }
 
-
     public static DeepCloneStrategyCache getDefault() {
         return DEFAULT == null ? DEFAULT = new DeepCloneStrategyCache() : DEFAULT;
     }
 
     public DeepCloneStrategyCache() {
         this.cache = new IdentityHashMap<Class<?>,DeepCloneStrategy>();
+        this.constants = new IdentityHashMap<Object,Void>();
     }
 
     public DeepCloneStrategy lookup(Object object) {
         return lookup(object.getClass());
     }
 
+    public boolean isConstant(Object object) {
+        return constants.containsKey(object);
+    }
+    
     public DeepCloneStrategy lookup(Class<?> type) {
         if (type.isPrimitive()) return IMMUTABLE;
         DeepCloneStrategy result = cache.get(type);
         if (result != null) return result;
         cache.put(type, result = makeStrategy(type));
+        if (result != IMMUTABLE) addConstants(type);
         return result;
+    }
+
+    private void addConstants(Class<?> type) {
+        for (Class<?> curr = type; curr != null; curr = curr.getSuperclass()) {
+            for (Field f: curr.getDeclaredFields()) {
+                if (Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers())) {
+                    f.setAccessible(true);
+                    Object value;
+                    try {
+                        value = f.get(null);
+                        if (value != null) constants.put(value, null);
+                    } catch (IllegalArgumentException ex) {
+                        throw new DeepCloneException(ex);
+                    } catch (IllegalAccessException ex) {
+                        throw new DeepCloneException(ex);
+                    } 
+                }
+            }
+        }
     }
 
     private DeepCloneStrategy makeStrategy(Class<?> type) {
