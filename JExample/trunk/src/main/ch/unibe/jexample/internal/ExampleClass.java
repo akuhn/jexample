@@ -26,11 +26,11 @@ import ch.unibe.jexample.util.JExampleError.Kind;
  */
 public class ExampleClass {
 
-    private final Class<?> jclass;
+    private boolean beforesRunned = false;
     private final JExampleError errors;
     private final ExampleGraph graph;
 
-    private boolean beforesRunned = false;
+    private final Class<?> jclass;
 
 
     /*default*/ ExampleClass(Class<?> jclass, ExampleGraph graph) {
@@ -48,6 +48,14 @@ public class ExampleClass {
         return result;
     }
 
+    public boolean contains(Example m) {
+        return m.method.getActualClass().equals(jclass);
+    }
+
+    public void filter(final Filter filter) {
+        graph.filter(filter);
+    }
+
     public Description getDescription() {
         Description description = Description.createSuiteDescription(jclass);
         for (Example each: graph.getExamples()) {
@@ -56,41 +64,18 @@ public class ExampleClass {
         return description;
     }
 
-    public void run(RunNotifier notifier) {
-        graph.run(this, notifier);
-    }
-
-    public void validate() throws JExampleError {
-        RunWith run = (RunWith) jclass.getAnnotation(RunWith.class);
-        if (run == null || run.value() != JExample.class) {
-            errors.add(Kind.MISSING_RUNWITH_ANNOTATION,
-                    "Class %s is not a JExample test class, annotation @RunWith(JExample.class) missing.", this);
-        }
-        try {
-            CloneUtil.getConstructor(jclass);
-        } catch (NoSuchMethodException ex) {
-            errors.add(Kind.MISSING_CONSTRUCTOR, ex);
-        } catch (SecurityException ex) {
-            errors.add(Kind.MISSING_CONSTRUCTOR, ex);
-        }
-        if (collectTestMethods().isEmpty()) {
-            errors.add(Kind.NO_EXAMPLES_FOUND, "Test class must contain test methods.");
-        }
-        if (!errors.isEmpty()) throw errors;
-    }
-
-    public void filter(final Filter filter) {
-        graph.filter(filter);
-    }
-
-    public boolean contains(Example m) {
-        return m.method.getActualClass().equals(jclass);
+    public Object getImplementingClass() {
+        return jclass;
     }
 
     public void initializeExamples() {
         for (MethodReference m: collectTestMethods()) {
             graph.makeExample(m);
         }
+    }
+
+    public void run(RunNotifier notifier) {
+        graph.run(this, notifier);
     }
 
     public void runBeforeClassBefores() {
@@ -111,8 +96,23 @@ public class ExampleClass {
         beforesRunned = true;
     }
 
-    public Object getImplementingClass() {
-        return jclass;
+    public void validate() throws JExampleError {
+        RunWith run = (RunWith) jclass.getAnnotation(RunWith.class);
+        if (run == null || run.value() != JExample.class) {
+            errors.add(Kind.MISSING_RUNWITH_ANNOTATION,
+                    "Class %s is not a JExample test class, annotation @RunWith(JExample.class) missing.", this);
+        }
+        try {
+            CloneUtil.getConstructor(jclass);
+        } catch (NoSuchMethodException ex) {
+            errors.add(Kind.MISSING_CONSTRUCTOR, ex);
+        } catch (SecurityException ex) {
+            errors.add(Kind.MISSING_CONSTRUCTOR, ex);
+        }
+        if (collectTestMethods().isEmpty()) {
+            errors.add(Kind.NO_EXAMPLES_FOUND, "Test class must contain test methods.");
+        }
+        if (!errors.isEmpty()) throw errors;
     }
 
 }

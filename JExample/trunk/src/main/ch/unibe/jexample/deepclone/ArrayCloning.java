@@ -26,7 +26,12 @@ public class ArrayCloning implements DeepCloneStrategy {
         return clone;
     }
 
-    private void cloneFields(Object original, CloneFactory delegate, int length, Object clone) {
+    @Override
+	public String toString() {
+		return "ArrayCloning";
+	}
+
+	private void cloneFields(Object original, CloneFactory delegate, int length, Object clone) {
         if (componentType.isPrimitive()) {
             System.arraycopy(original, 0, clone, 0, length);
         } 
@@ -34,10 +39,5 @@ public class ArrayCloning implements DeepCloneStrategy {
             Array.set(clone, n, delegate.clone(Array.get(original, n)));
         }
     }
-
-	@Override
-	public String toString() {
-		return "ArrayCloning";
-	}
 
 }

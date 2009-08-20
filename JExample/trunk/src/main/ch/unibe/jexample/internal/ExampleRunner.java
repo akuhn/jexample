@@ -26,6 +26,32 @@ class ExampleRunner {
         this.notifier = notifier;
     }
 
+    /**
+     * Runs the example and returns test color.
+     * 
+     * @return {@link GREEN} if the example was successful,<br> {@link RED} if the
+     *         example is invalid or failed, and<br> {@link WHITE} if any of the
+     *         dependencies failed.
+     */
+    public ReturnValue run() {
+        if (example.hasErrors()) return abort(example.errors);
+        if (example.method.isIgnorePresent()) return ignore();
+        if (!runDependencies()) return ignore();
+        started();
+        try {
+            return runExample();
+        } finally {
+            finished();
+        }
+    }
+
+    private ReturnValue abort(Throwable ex) {
+        notifier.fireTestStarted(example.getDescription());
+        notifier.fireTestFailure(new Failure(example.getDescription(), ex));
+        notifier.fireTestFinished(example.getDescription());
+        return ReturnValue.R_RED;
+    }
+
     private ReturnValue fail(Throwable e) {
         notifier.fireTestFailure(new Failure(example.getDescription(), e));
         return ReturnValue.R_RED;
@@ -52,32 +78,6 @@ class ExampleRunner {
 
     private boolean isUnexpected(Throwable exception) {
         return !example.expectedException.isAssignableFrom(exception.getClass());
-    }
-
-    /**
-     * Runs the example and returns test color.
-     * 
-     * @return {@link GREEN} if the example was successful,<br> {@link RED} if the
-     *         example is invalid or failed, and<br> {@link WHITE} if any of the
-     *         dependencies failed.
-     */
-    public ReturnValue run() {
-        if (example.hasErrors()) return abort(example.errors);
-        if (example.method.isIgnorePresent()) return ignore();
-        if (!runDependencies()) return ignore();
-        started();
-        try {
-            return runExample();
-        } finally {
-            finished();
-        }
-    }
-
-    private ReturnValue abort(Throwable ex) {
-        notifier.fireTestStarted(example.getDescription());
-        notifier.fireTestFailure(new Failure(example.getDescription(), ex));
-        notifier.fireTestFinished(example.getDescription());
-        return ReturnValue.R_RED;
     }
 
     /**

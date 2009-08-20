@@ -8,10 +8,10 @@ package ch.unibe.jexample.internal;
  */
 public class ReturnValue {
 
-    public static final ReturnValue R_WHITE = new ReturnValue();
-    public static final ReturnValue R_RED = new ReturnValue();
-    public static final ReturnValue R_NONE = new ReturnValue();
     public static final ReturnValue R_GREEN = new ReturnValue();
+    public static final ReturnValue R_NONE = new ReturnValue();
+    public static final ReturnValue R_RED = new ReturnValue();
+    public static final ReturnValue R_WHITE = new ReturnValue();
     
     private Object returnValue;
     private Object testCaseInstance;
@@ -26,14 +26,6 @@ public class ReturnValue {
         // do nothing
     }
 
-    public Object getValue() {
-        return returnValue;
-    }
-
-    public boolean isTestCaseInstanceOf(Class<?> jclass) {
-        return testCaseInstance != null && testCaseInstance.getClass() == jclass;
-    }
-
     public void dispose() {
         returnValue = null;
         testCaseInstance = null;
@@ -43,12 +35,20 @@ public class ReturnValue {
         return testCaseInstance;
     }
 
+    public Object getValue() {
+        return returnValue;
+    }
+
     public boolean isGreen() {
         return this == R_GREEN || this.testCaseInstance != null;
-    }    
+    }
 
     public boolean isNull() {
         return this == R_NONE;
+    }    
+
+    public boolean isTestCaseInstanceOf(Class<?> jclass) {
+        return testCaseInstance != null && testCaseInstance.getClass() == jclass;
     }
      
 }

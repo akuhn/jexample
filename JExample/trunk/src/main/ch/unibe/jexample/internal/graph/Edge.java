@@ -30,8 +30,13 @@ public class Edge<E> {
         consumer.producers.add(this);
     }
 
-    public boolean isBroken() {
-        return broken != null;
+    public Collection<Cycle<E>> cycles() {
+        if (cycles == null) return Collections.emptyList();
+        return Collections.unmodifiableCollection(cycles);
+    }
+
+    public Throwable getError() {
+        return broken;
     }
 
     public Node<E> getProducer() {
@@ -39,12 +44,26 @@ public class Edge<E> {
         return producer;
     }
 
-    public Throwable getError() {
-        return broken;
+    public boolean isBroken() {
+        return broken != null;
+    }
+    
+    public boolean isPartOfCycle() {
+        return !(cycles == null || cycles.isEmpty());
+    }
+
+    private void addCycle(Cycle<E> cycle) {
+        if (cycles == null) cycles = new ArrayList<Cycle<E>>();
+        cycles.add(cycle);
     }
 
     private void detectCyclicDependencies() {
         this.validateCycle(this, new Stack<Edge<E>>(), new HashSet<Edge<E>>());
+    }
+
+    private void invalidate(Stack<Edge<E>> stack) {
+        Cycle<E> cycle = new Cycle<E>(stack);
+        for (Edge<E> each: stack) each.addCycle(cycle);
     }
     
     private void validateCycle(Edge<E> initial, Stack<Edge<E>> stack, HashSet<Edge<E>> hashSet) {
@@ -56,25 +75,6 @@ public class Edge<E> {
             }
         }
         stack.pop();
-    }
-
-    private void invalidate(Stack<Edge<E>> stack) {
-        Cycle<E> cycle = new Cycle<E>(stack);
-        for (Edge<E> each: stack) each.addCycle(cycle);
-    }
-
-    private void addCycle(Cycle<E> cycle) {
-        if (cycles == null) cycles = new ArrayList<Cycle<E>>();
-        cycles.add(cycle);
-    }
-
-    public boolean isPartOfCycle() {
-        return !(cycles == null || cycles.isEmpty());
-    }
-    
-    public Collection<Cycle<E>> cycles() {
-        if (cycles == null) return Collections.emptyList();
-        return Collections.unmodifiableCollection(cycles);
     }
     
 }

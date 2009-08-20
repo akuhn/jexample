@@ -16,13 +16,13 @@ import ch.unibe.jexample.util.MethodReference;
  */
 public class InjectionValues {
 
-    private static final boolean FORCE_RERUN = System.getProperty("jexample.rerun") != null;
+    public static long NANOS = 0L;
 
-    private Object testInstance;
+    private static final boolean FORCE_RERUN = System.getProperty("jexample.rerun") != null;
     private Object[] arguments;
     private CloneFactory factory;
 
-    public static long NANOS = 0L;
+    private Object testInstance;
     
     public InjectionValues(Example example) throws Exception {
         this.arguments = new Object[example.method.arity()];
@@ -30,10 +30,22 @@ public class InjectionValues {
         this.initializeMissingTestInstance(example.method);
     }
     
-    private void initializeMissingTestInstance(MethodReference ref) throws Exception {
-        if (!ref.getActualClass().isInstance(testInstance)) testInstance = null;
-        if (testInstance == null) {
-            testInstance = CloneUtil.getConstructor(ref.getActualClass()).newInstance();
+    public Object[] getArguments() {
+        return arguments;
+    }
+
+    public Object getTestInstance() {
+        return testInstance;
+    }
+
+    private <T> T clone(T object) {
+        if (factory == null) factory = new CloneFactory();
+        long time = System.nanoTime();
+        try {
+            return factory.clone(object);
+        }
+        finally {
+            NANOS  += (System.nanoTime() - time);
         }
     }
 
@@ -45,25 +57,28 @@ public class InjectionValues {
         else this.initializeDefault(example);
     }
 
+    private void initializeClone(Example example) {
+        throw new UnsupportedOperationException();
+    }
+
+    private void initializeCopy(Example example) {
+        this.initializeNone(example);
+        arguments = clone(arguments);
+        testInstance = clone(testInstance);
+    }
+
     private void initializeDefault(Example example) {
         //this.initializeClone(example);
         this.initializeCopy(example);
     }
 
-    private void initializeRerun(Example example) throws Exception {
-        arguments = new Object[example.method.arity()];
-        for (int i = 0; i < arguments.length; i++) {
-            Example provider = example.node.dependencies().get(i).getProducer().value;
-            ReturnValue returnValue = provider.bareInvoke();
-            arguments[i] = returnValue.getValue();
-            if (i == 0) testInstance = returnValue.getTestCaseInstance();
-        } 
-        if (arguments.length == 0) {
-            Example first = example.node.firstProducerOrNull();
-            if (first != null) testInstance = first.bareInvoke().getTestCaseInstance();
+    private void initializeMissingTestInstance(MethodReference ref) throws Exception {
+        if (!ref.getActualClass().isInstance(testInstance)) testInstance = null;
+        if (testInstance == null) {
+            testInstance = CloneUtil.getConstructor(ref.getActualClass()).newInstance();
         }
     }
-
+    
     private void initializeNone(Example example) {
         arguments = new Object[example.method.arity()];
         for (int i = 0; i < arguments.length; i++) {
@@ -76,33 +91,18 @@ public class InjectionValues {
             if (first != null) testInstance = first.getReturnValue().getTestCaseInstance();
         }
     }
-
-    private void initializeCopy(Example example) {
-        this.initializeNone(example);
-        arguments = clone(arguments);
-        testInstance = clone(testInstance);
-    }
-
-    private void initializeClone(Example example) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Object getTestInstance() {
-        return testInstance;
-    }
     
-    public Object[] getArguments() {
-        return arguments;
-    }
-    
-    private <T> T clone(T object) {
-        if (factory == null) factory = new CloneFactory();
-        long time = System.nanoTime();
-        try {
-            return factory.clone(object);
-        }
-        finally {
-            NANOS  += (System.nanoTime() - time);
+    private void initializeRerun(Example example) throws Exception {
+        arguments = new Object[example.method.arity()];
+        for (int i = 0; i < arguments.length; i++) {
+            Example provider = example.node.dependencies().get(i).getProducer().value;
+            ReturnValue returnValue = provider.bareInvoke();
+            arguments[i] = returnValue.getValue();
+            if (i == 0) testInstance = returnValue.getTestCaseInstance();
+        } 
+        if (arguments.length == 0) {
+            Example first = example.node.firstProducerOrNull();
+            if (first != null) testInstance = first.bareInvoke().getTestCaseInstance();
         }
     }
     

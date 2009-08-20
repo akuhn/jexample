@@ -31,35 +31,17 @@ public class ExampleGraph {
 
     private static ExampleGraph GRAPH;
     
-    private Map<MethodReference,Example> examples;
-    private Map<Class<?>,ExampleClass> classes;
+    public static ExampleGraph instance() {
+        return GRAPH == null ? GRAPH = new ExampleGraph() : GRAPH;
+    }
     private boolean anyHasBeenRun = false;
+    private Map<Class<?>,ExampleClass> classes;
+
+    private Map<MethodReference,Example> examples;
 
     public ExampleGraph() {
         this.examples = new HashMap<MethodReference,Example>();
         this.classes = new HashMap<Class<?>,ExampleClass>();
-    }
-
-    public static ExampleGraph instance() {
-        return GRAPH == null ? GRAPH = new ExampleGraph() : GRAPH;
-    }
-
-    protected ExampleClass makeExampleClass(Class<?> jclass) {
-        ExampleClass egClass = classes.get(jclass);
-        if (egClass == null) {
-            egClass = new ExampleClass(jclass, this);
-            classes.put(jclass, egClass);
-        }
-        return egClass;
-    }
-
-    protected Example makeExample(MethodReference method) {
-        Example e = examples.get(method);
-        if (e != null) return e;
-        e = new Example(method, makeExampleClass(method.getActualClass()));
-        examples.put(method, e);
-        e.initializeDependencies(this);
-        return e;
     }
 
     public ExampleClass add(Class<?> jclass) throws JExampleError {
@@ -68,48 +50,6 @@ public class ExampleGraph {
         egClass.validate();
         egClass.initializeExamples();
         return egClass;
-    }
-
-    public void run(ExampleClass testClass, RunNotifier notifier) {
-        anyHasBeenRun = true;
-        for (Example e: this.getExamples()) {
-            if (testClass.contains(e)) {
-                e.run(notifier);
-            }
-        }
-    }
-
-    public Collection<MethodReference> getMethods() {
-        return this.examples.keySet();
-    }
-
-    public Collection<Example> getExamples() {
-        return this.examples.values();
-    }
-
-    public Result runJExample() {
-        CompositeRunner runner = new CompositeRunner();
-        for (ExampleClass eg: classes.values()) {
-            runner.add(new JExample(eg));
-        }
-        return new JUnitCore().run(runner);
-    }
-
-    public Result runJExample(Class<?>... tests) throws JExampleError {
-        for (Class<?> each: tests)
-            add(each);
-        return runJExample();
-    }
-
-    public Example findExample(Class<?> c, String name) {
-        Example found = null;
-        for (Example e: getExamples()) {
-            if (e.method.equals(c, name)) {
-                if (found != null) throw new RuntimeException();
-                found = e;
-            }
-        }
-        return found;
     }
 
     public void filter(Filter filter) {
@@ -128,11 +68,71 @@ public class ExampleGraph {
         }
     }
 
+    public Example findExample(Class<?> c, String name) {
+        Example found = null;
+        for (Example e: getExamples()) {
+            if (e.method.equals(c, name)) {
+                if (found != null) throw new RuntimeException();
+                found = e;
+            }
+        }
+        return found;
+    }
+
     public Example findExample(MethodReference ref) {
         for (Example eg: getExamples()) {
             if (ref.equals(eg.method)) return eg;
         }
         return null;
+    }
+
+    public Collection<Example> getExamples() {
+        return this.examples.values();
+    }
+
+    public Collection<MethodReference> getMethods() {
+        return this.examples.keySet();
+    }
+
+    public void run(ExampleClass testClass, RunNotifier notifier) {
+        anyHasBeenRun = true;
+        for (Example e: this.getExamples()) {
+            if (testClass.contains(e)) {
+                e.run(notifier);
+            }
+        }
+    }
+
+    public Result runJExample() {
+        CompositeRunner runner = new CompositeRunner();
+        for (ExampleClass eg: classes.values()) {
+            runner.add(new JExample(eg));
+        }
+        return new JUnitCore().run(runner);
+    }
+
+    public Result runJExample(Class<?>... tests) throws JExampleError {
+        for (Class<?> each: tests)
+            add(each);
+        return runJExample();
+    }
+
+    protected Example makeExample(MethodReference method) {
+        Example e = examples.get(method);
+        if (e != null) return e;
+        e = new Example(method, makeExampleClass(method.getActualClass()));
+        examples.put(method, e);
+        e.initializeDependencies(this);
+        return e;
+    }
+
+    protected ExampleClass makeExampleClass(Class<?> jclass) {
+        ExampleClass egClass = classes.get(jclass);
+        if (egClass == null) {
+            egClass = new ExampleClass(jclass, this);
+            classes.put(jclass, egClass);
+        }
+        return egClass;
     }
 
 }

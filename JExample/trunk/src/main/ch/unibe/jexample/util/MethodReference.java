@@ -16,9 +16,16 @@ import ch.unibe.jexample.InjectionPolicy;
 
 public class MethodReference {
 
-    private Method jmethod;
-    private final Class<?> jclass;
+    public static Collection<MethodReference> all(Class<?> jclass) {
+        Collection<MethodReference> all = new ArrayList<MethodReference>();
+        for (Method m: jclass.getMethods())
+            all.add(new MethodReference(jclass, m));
+        return all;
+    }
     private Throwable error;
+    private final Class<?> jclass;
+
+    private Method jmethod;
 
     public MethodReference(Class<?> jclass, Method jmethod) {
         assert jmethod.getDeclaringClass().isAssignableFrom(jclass);
@@ -26,33 +33,14 @@ public class MethodReference {
         this.jmethod = jmethod;
         this.jclass = jclass;
     }
-
+    
     public MethodReference(Throwable ex) {
         this.error = ex;
         this.jclass = null;
     }
-    
-    public boolean isBroken() {
-        return error != null;
-    }
 
-    @Override
-    public boolean equals(Object other) {
-        return (other instanceof MethodReference) &&
-                ((MethodReference) other).jmethod.equals(jmethod) &&
-                ((MethodReference) other).getActualClass().equals(getActualClass());
-    }
-
-    @Override
-    public int hashCode() {
-        return jmethod.hashCode() ^ getActualClass().hashCode();
-    }
-
-    public static Collection<MethodReference> all(Class<?> jclass) {
-        Collection<MethodReference> all = new ArrayList<MethodReference>();
-        for (Method m: jclass.getMethods())
-            all.add(new MethodReference(jclass, m));
-        return all;
+    public int arity() {
+        return jmethod.getParameterTypes().length;
     }
 
     public Description createTestDescription() {
@@ -63,40 +51,24 @@ public class MethodReference {
         return getActualClass() == c && getName().equals(name);
     }
 
-    public String getDependencyString() {
-        Given given = jmethod.getAnnotation(Given.class);
-        return given == null ? "" : given.value(); 
-    }
-    
-    public Object invoke(Object receiver, Object[] args) throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
-        return jmethod.invoke(receiver, args);
-    }
-
-    public int arity() {
-        return jmethod.getParameterTypes().length;
-    }
-
-    public Class<?>[] getParameterTypes() {
-        return jmethod.getParameterTypes();
-    }
-
-    public Class<?> getReturnType() {
-        return jmethod.getReturnType();
-    }
-
-    public String getName() {
-        return jmethod.getName();
-    }
-
     @Override
-    public String toString() {
-        if (isBroken()) return "Broken: " + error;
-        return getActualClass().toString() + "#" + getName();
+    public boolean equals(Object other) {
+        return (other instanceof MethodReference) &&
+                ((MethodReference) other).jmethod.equals(jmethod) &&
+                ((MethodReference) other).getActualClass().equals(getActualClass());
     }
 
     public boolean exists() {
         return true;
+    }
+
+    public Class<?> getActualClass() {
+        return jclass;
+    }
+    
+    public String getDependencyString() {
+        Given given = jmethod.getAnnotation(Given.class);
+        return given == null ? "" : given.value(); 
     }
 
     public Throwable getError() {
@@ -104,26 +76,6 @@ public class MethodReference {
         return error;
     }
 
-    public Class<?> getActualClass() {
-        return jclass;
-    }
-    
-    public boolean isTestAnnotationPresent() {
-        return jmethod.isAnnotationPresent(Test.class)
-            || jmethod.isAnnotationPresent(Given.class);
-    }
-
-    public Class<? extends Throwable> initExpectedException() {
-        Test annotation = jmethod.getAnnotation(Test.class);
-        if (annotation == null) return null;
-        if (annotation.expected() == None.class) return null;
-        return annotation.expected();
-    }
-
-    public boolean isIgnorePresent() {
-        return jmethod.isAnnotationPresent(Ignore.class);
-    }
-    
     public InjectionPolicy getInjectionPolicy() {
         Injection injection;
         // 1) method
@@ -143,6 +95,54 @@ public class MethodReference {
         }
         // 4) system property
         return getSystemInjectionPolicy();
+    }
+
+    public String getName() {
+        return jmethod.getName();
+    }
+
+    public Class<?>[] getParameterTypes() {
+        return jmethod.getParameterTypes();
+    }
+
+    public Class<?> getReturnType() {
+        return jmethod.getReturnType();
+    }
+
+    @Override
+    public int hashCode() {
+        return jmethod.hashCode() ^ getActualClass().hashCode();
+    }
+
+    public Class<? extends Throwable> initExpectedException() {
+        Test annotation = jmethod.getAnnotation(Test.class);
+        if (annotation == null) return null;
+        if (annotation.expected() == None.class) return null;
+        return annotation.expected();
+    }
+
+    public Object invoke(Object receiver, Object[] args) throws IllegalArgumentException, IllegalAccessException,
+            InvocationTargetException {
+        return jmethod.invoke(receiver, args);
+    }
+    
+    public boolean isBroken() {
+        return error != null;
+    }
+
+    public boolean isIgnorePresent() {
+        return jmethod.isAnnotationPresent(Ignore.class);
+    }
+
+    public boolean isTestAnnotationPresent() {
+        return jmethod.isAnnotationPresent(Test.class)
+            || jmethod.isAnnotationPresent(Given.class);
+    }
+    
+    @Override
+    public String toString() {
+        if (isBroken()) return "Broken: " + error;
+        return getActualClass().toString() + "#" + getName();
     }
 
     private boolean declaresPolicy(Injection injection) {

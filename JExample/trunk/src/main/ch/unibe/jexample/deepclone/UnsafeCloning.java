@@ -10,14 +10,18 @@ import sun.reflect.ReflectionFactory;
 
 public class UnsafeCloning implements DeepCloneStrategy {
 
-	private Constructor<?> constructor;
-	protected Collection<Field> fields;
-
-	public UnsafeCloning(Class<?> type) {
-		this.constructor = makeConstructor(type);
-		this.fields = makeFields(type);
+	private static Constructor<?> makeConstructor(Class<?> type) {
+		try {
+			Constructor<?> constructor = ReflectionFactory.getReflectionFactory().newConstructorForSerialization(type,
+					Object.class.getConstructor());
+			constructor.setAccessible(true);
+			return constructor;
+		} catch (SecurityException ex) {
+			throw new RuntimeException(ex);
+		} catch (NoSuchMethodException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
-
 	private static Collection<Field> makeFields(Class<?> type) {
 		Collection<Field> fields = new ArrayList<Field>();
 		for (Class<?> each = type; each != null; each = each.getSuperclass()) {
@@ -30,17 +34,13 @@ public class UnsafeCloning implements DeepCloneStrategy {
 		return fields;
 	}
 
-	private static Constructor<?> makeConstructor(Class<?> type) {
-		try {
-			Constructor<?> constructor = ReflectionFactory.getReflectionFactory().newConstructorForSerialization(type,
-					Object.class.getConstructor());
-			constructor.setAccessible(true);
-			return constructor;
-		} catch (SecurityException ex) {
-			throw new RuntimeException(ex);
-		} catch (NoSuchMethodException ex) {
-			throw new RuntimeException(ex);
-		}
+	protected Collection<Field> fields;
+
+	private Constructor<?> constructor;
+
+	public UnsafeCloning(Class<?> type) {
+		this.constructor = makeConstructor(type);
+		this.fields = makeFields(type);
 	}
 
 	@Override

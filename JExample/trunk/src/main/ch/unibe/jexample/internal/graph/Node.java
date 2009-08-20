@@ -15,9 +15,9 @@ public class Node<E> {
 
     // TODO 3) rewrite isolated tests for ExampleNode & Dependency
     
-    /*default*/ List<Edge<E>> producers;
-    /*default*/ Collection<Edge<E>> consumers;
     public final E value;
+    /*default*/ Collection<Edge<E>> consumers;
+    /*default*/ List<Edge<E>> producers;
     
     public Node(E example) {
         this.producers = new ArrayList<Edge<E>>();
@@ -25,8 +25,8 @@ public class Node<E> {
         this.value = example;
     }
     
-    public List<Edge<E>> dependencies() {
-        return Collections.unmodifiableList(producers);
+    public void addProvider(Node<E> dependency) {
+        new Edge<E>(this, dependency);
     }
     
     public Collection<E> consumers() {
@@ -35,24 +35,10 @@ public class Node<E> {
         return Collections.unmodifiableCollection(nodes);
     }
 
-    public Collection<Node<E>> transitiveClosure() {
-        return collectTransitiveClosureInto(new HashSet<Node<E>>());
+    public List<Edge<E>> dependencies() {
+        return Collections.unmodifiableList(producers);
     }
     
-    private Collection<Node<E>> collectTransitiveClosureInto(Collection<Node<E>> all) {
-        for (Edge<E> each: producers) {
-            Node<E> producer = each.getProducer();
-            if (all.add(producer)) producer.collectTransitiveClosureInto(all);
-        }
-        return all;
-    }
-
-    public Collection<E> producers() {
-        ArrayList<E> nodes = new ArrayList<E>();
-        for (Edge<E> each: producers) nodes.add(each.producer.value);
-        return Collections.unmodifiableCollection(nodes);
-    }
-
     public E firstProducerOrNull() {
         if (producers.isEmpty()) return null;
         Edge<E> d = producers.get(0);
@@ -63,13 +49,27 @@ public class Node<E> {
         for (Edge<E> each: producers) if (each.isPartOfCycle()) return true;
         return false;
     }
-      
-    public void addProvider(Node<E> dependency) {
-        new Edge<E>(this, dependency);
-    }
 
     public void makeBrokenEdge(Throwable ex) {
         new Edge<E>(this, ex);
+    }
+
+    public Collection<E> producers() {
+        ArrayList<E> nodes = new ArrayList<E>();
+        for (Edge<E> each: producers) nodes.add(each.producer.value);
+        return Collections.unmodifiableCollection(nodes);
+    }
+      
+    public Collection<Node<E>> transitiveClosure() {
+        return collectTransitiveClosureInto(new HashSet<Node<E>>());
+    }
+
+    private Collection<Node<E>> collectTransitiveClosureInto(Collection<Node<E>> all) {
+        for (Edge<E> each: producers) {
+            Node<E> producer = each.getProducer();
+            if (all.add(producer)) producer.collectTransitiveClosureInto(all);
+        }
+        return all;
     }
     
 }

@@ -14,8 +14,12 @@ import java.util.Map;
  */
 public class CloneFactory {
 
-    private Map<Object,Object> done = new IdentityHashMap<Object,Object>();
+    public static <T> T deepClone(T object) {
+        return new CloneFactory().clone(object);
+    }
     private DeepCloneStrategyCache cache = DeepCloneStrategyCache.getDefault();
+
+    private Map<Object,Object> done = new IdentityHashMap<Object,Object>();
 
     @SuppressWarnings("unchecked")
     public <T> T clone(T original) throws DeepCloneException {
@@ -28,10 +32,6 @@ public class CloneFactory {
         } catch (Throwable ex) {
             throw new DeepCloneException(ex);
         }
-    }
-
-    public static <T> T deepClone(T object) {
-        return new CloneFactory().clone(object);
     }
 
     public Object getCachedClone(Object original) {

@@ -38,6 +38,10 @@ public class JExample extends Runner implements Filterable {
         this.testCase = testCase;
     }
 
+    public void filter(Filter filter) throws NoTestsRemainException {
+        testCase.filter(filter);
+    }
+
     @Override
     public Description getDescription() {
         return testCase.getDescription();
@@ -46,10 +50,6 @@ public class JExample extends Runner implements Filterable {
     @Override
     public void run(RunNotifier notifier) {
         testCase.run(notifier);
-    }
-
-    public void filter(Filter filter) throws NoTestsRemainException {
-        testCase.filter(filter);
     }
 
 }

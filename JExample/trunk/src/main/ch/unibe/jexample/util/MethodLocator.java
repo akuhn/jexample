@@ -43,11 +43,23 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class MethodLocator {
 
+    public static MethodLocator parse(String string) {
+        Parser p = new Parser(string);
+        MethodLocator m = p.scanMethodReference();
+        if (p.buf.hasRemaining()) throw p.error();
+        return m;
+    }
+
+    public static Iterable<MethodLocator> parseAll(String string) {
+        Parser p = new Parser(string);
+        return p.scanDeclaration();
+    }
+
+    public final String[] args;
+
     public final String path;
 
     public final String simple;
-
-    public final String[] args;
 
     public MethodLocator(String path, String simple, String[] args) {
         this.path = path;
@@ -55,9 +67,127 @@ public class MethodLocator {
         this.args = args;
     }
 
+    public MethodReference resolve() {
+        return resolve(Object.class);
+    }
+
+    public MethodReference resolve(Class context) {
+        return new Resolver(context).findMethodReference(this);
+    }
+
     @Override
     public String toString() {
         return String.format("%s#%s%s", path == null ? "" : path, simple, args == null ? "" : Arrays.asList(args));
+    }
+
+    public static class Parser {
+
+        private CharBuffer buf;
+
+        private Parser(String string) {
+            buf = CharBuffer.wrap(string);
+        }
+
+        private InvalidDeclarationError error() {
+            return new InvalidDeclarationError(buf);
+        }
+
+        private Iterable<MethodLocator> scanDeclaration() {
+            List<MethodLocator> $ = new ArrayList();
+            skipWhitespace();
+            while (true) {
+                MethodLocator t = scanMethodReference();
+                if (t == null) break;
+                $.add(t);
+                skipWhitespace();
+                if (!buf.hasRemaining()) break;
+                char ch = buf.charAt(0);
+                if (ch != ';' && ch != ',') throw error();
+                buf.get();
+                skipWhitespace();
+            }
+            if (buf.hasRemaining()) throw error();
+            return $;
+        }
+
+        private String scanFullname() {
+            buf.mark();
+            while (true) {
+                if (!buf.hasRemaining()) return null;
+                if (!isJavaIdentifierStart(buf.charAt(0))) return null;
+                buf.get();
+                while (buf.hasRemaining() && isJavaIdentifierPart(buf.charAt(0)))
+                    buf.get();
+                if (!(buf.hasRemaining() && buf.charAt(0) == '.')) break;
+                buf.get();
+            }
+            return yank();
+        }
+
+        private MethodLocator scanMethodReference() {
+            String path, simple = null;
+            String[] args = null;
+            path = scanFullname();
+            if (buf.hasRemaining() && buf.charAt(0) == '#') {
+                buf.get();
+                simple = scanName();
+                if (simple == null) throw error();
+            } else { // be lenient, Javadoc does the same!
+                if (path == null) return null;
+                int n = path.lastIndexOf('.');
+                simple = n < 0 ? path : path.substring(n + 1);
+                path = n < 0 ? null : path.substring(0, n);
+            }
+            skipWhitespace();
+            if (buf.hasRemaining() && buf.charAt(0) == '(') {
+                buf.get();
+                skipWhitespace();
+                args = scanParamlist();
+                if (!(buf.hasRemaining() && buf.charAt(0) == ')')) throw error();
+                buf.get();
+                if (args == null) args = new String[0];
+            }
+            return new MethodLocator(path, simple, args);
+        }
+
+        private String scanName() {
+            buf.mark();
+            if (!buf.hasRemaining()) return null;
+            if (!isJavaIdentifierStart(buf.charAt(0))) return null;
+            buf.get();
+            while (buf.hasRemaining() && isJavaIdentifierPart(buf.charAt(0)))
+                buf.get();
+            return yank();
+        }
+
+        private String[] scanParamlist() {
+            ArrayList<String> $ = new ArrayList();
+            while (true) {
+                String param = scanFullname();
+                if (param == null) return null;
+                $.add(param);
+                skipWhitespace();
+                if (!(buf.hasRemaining() && buf.charAt(0) == ',')) break;
+                buf.get();
+                skipWhitespace();
+            }
+            return $.toArray(new String[$.size()]);
+        }
+
+        private void skipWhitespace() {
+            while (buf.hasRemaining() && isWhitespace(buf.charAt(0)))
+                buf.get();
+        }
+
+        private String yank() {
+            int pos = buf.position();
+            buf.reset();
+            // FIX due to a bug in Java 1.6.0_11 CharBuffer#subSequence is broken.       
+            String $ = buf.toString().substring(0, pos - buf.position());
+            buf.position(pos);
+            return $;
+        }
+
     }
 
     public static class Resolver {
@@ -68,18 +198,12 @@ public class MethodLocator {
             this.base = base;
         }
 
-        private MethodReference findMethodReference(MethodLocator token) {
+        private Class classForName(String fullname) {
             try {
-                Class providerClass = findClass(token);
-                return findMethodReference(providerClass, token);
-            } catch (ClassNotFoundException ex) {
-                return new MethodReference(ex);
-            } catch (SecurityException ex) {
-                return new MethodReference(ex);
-            } catch (NoSuchMethodException ex) {
-                return new MethodReference(ex);
+                return Class.forName(fullname);
+            } catch (ClassNotFoundException _) {
+                return null;
             }
-            
         }
 
         private Class findClass(MethodLocator token) throws ClassNotFoundException {
@@ -94,14 +218,6 @@ public class MethodLocator {
             $ = classForName(name);
             if ($ != null) return $;
             throw new ClassNotFoundException(token.path);
-        }
-
-        private Class classForName(String fullname) {
-            try {
-                return Class.forName(fullname);
-            } catch (ClassNotFoundException _) {
-                return null;
-            }
         }
 
         private MethodReference findMethodReference(Class receiver, MethodLocator token) throws ClassNotFoundException,
@@ -122,6 +238,20 @@ public class MethodLocator {
                 return new MethodReference(receiver, receiver.getMethod(token.simple, this
                         .getParameterClasses(token.args)));
             }
+        }
+
+        private MethodReference findMethodReference(MethodLocator token) {
+            try {
+                Class providerClass = findClass(token);
+                return findMethodReference(providerClass, token);
+            } catch (ClassNotFoundException ex) {
+                return new MethodReference(ex);
+            } catch (SecurityException ex) {
+                return new MethodReference(ex);
+            } catch (NoSuchMethodException ex) {
+                return new MethodReference(ex);
+            }
+            
         }
 
         private Class[] getParameterClasses(String[] parameters) throws ClassNotFoundException {
@@ -153,136 +283,6 @@ public class MethodLocator {
             return $.toArray(new Class[$.size()]);
         }
 
-    }
-
-    public static class Parser {
-
-        private String scanFullname() {
-            buf.mark();
-            while (true) {
-                if (!buf.hasRemaining()) return null;
-                if (!isJavaIdentifierStart(buf.charAt(0))) return null;
-                buf.get();
-                while (buf.hasRemaining() && isJavaIdentifierPart(buf.charAt(0)))
-                    buf.get();
-                if (!(buf.hasRemaining() && buf.charAt(0) == '.')) break;
-                buf.get();
-            }
-            return yank();
-        }
-
-        private String scanName() {
-            buf.mark();
-            if (!buf.hasRemaining()) return null;
-            if (!isJavaIdentifierStart(buf.charAt(0))) return null;
-            buf.get();
-            while (buf.hasRemaining() && isJavaIdentifierPart(buf.charAt(0)))
-                buf.get();
-            return yank();
-        }
-
-        private String[] scanParamlist() {
-            ArrayList<String> $ = new ArrayList();
-            while (true) {
-                String param = scanFullname();
-                if (param == null) return null;
-                $.add(param);
-                skipWhitespace();
-                if (!(buf.hasRemaining() && buf.charAt(0) == ',')) break;
-                buf.get();
-                skipWhitespace();
-            }
-            return $.toArray(new String[$.size()]);
-        }
-
-        private MethodLocator scanMethodReference() {
-            String path, simple = null;
-            String[] args = null;
-            path = scanFullname();
-            if (buf.hasRemaining() && buf.charAt(0) == '#') {
-                buf.get();
-                simple = scanName();
-                if (simple == null) throw error();
-            } else { // be lenient, Javadoc does the same!
-                if (path == null) return null;
-                int n = path.lastIndexOf('.');
-                simple = n < 0 ? path : path.substring(n + 1);
-                path = n < 0 ? null : path.substring(0, n);
-            }
-            skipWhitespace();
-            if (buf.hasRemaining() && buf.charAt(0) == '(') {
-                buf.get();
-                skipWhitespace();
-                args = scanParamlist();
-                if (!(buf.hasRemaining() && buf.charAt(0) == ')')) throw error();
-                buf.get();
-                if (args == null) args = new String[0];
-            }
-            return new MethodLocator(path, simple, args);
-        }
-
-        private InvalidDeclarationError error() {
-            return new InvalidDeclarationError(buf);
-        }
-
-        private Iterable<MethodLocator> scanDeclaration() {
-            List<MethodLocator> $ = new ArrayList();
-            skipWhitespace();
-            while (true) {
-                MethodLocator t = scanMethodReference();
-                if (t == null) break;
-                $.add(t);
-                skipWhitespace();
-                if (!buf.hasRemaining()) break;
-                char ch = buf.charAt(0);
-                if (ch != ';' && ch != ',') throw error();
-                buf.get();
-                skipWhitespace();
-            }
-            if (buf.hasRemaining()) throw error();
-            return $;
-        }
-
-        private void skipWhitespace() {
-            while (buf.hasRemaining() && isWhitespace(buf.charAt(0)))
-                buf.get();
-        }
-
-        private String yank() {
-            int pos = buf.position();
-            buf.reset();
-            // FIX due to a bug in Java 1.6.0_11 CharBuffer#subSequence is broken.       
-            String $ = buf.toString().substring(0, pos - buf.position());
-            buf.position(pos);
-            return $;
-        }
-
-        private CharBuffer buf;
-
-        private Parser(String string) {
-            buf = CharBuffer.wrap(string);
-        }
-
-    }
-
-    public static MethodLocator parse(String string) {
-        Parser p = new Parser(string);
-        MethodLocator m = p.scanMethodReference();
-        if (p.buf.hasRemaining()) throw p.error();
-        return m;
-    }
-
-    public static Iterable<MethodLocator> parseAll(String string) {
-        Parser p = new Parser(string);
-        return p.scanDeclaration();
-    }
-
-    public MethodReference resolve() {
-        return resolve(Object.class);
-    }
-
-    public MethodReference resolve(Class context) {
-        return new Resolver(context).findMethodReference(this);
     }
 
 }

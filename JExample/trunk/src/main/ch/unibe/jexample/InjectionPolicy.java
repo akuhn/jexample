@@ -19,10 +19,6 @@ public enum InjectionPolicy {
      * 
      */
     DEEPCOPY,
-    /** Instead of cloning any cached values, reruns all providers to get fresh values.
-     * 
-     */
-    RERUN,
     /** Uses the default injection policy.
      * 
      */
@@ -36,12 +32,16 @@ public enum InjectionPolicy {
      * (even if those other consumers use a safe injection policy!)
      * 
      */
-    NONE;
+    NONE,
+    /** Instead of cloning any cached values, reruns all providers to get fresh values.
+     * 
+     */
+    RERUN;
 
+    public static final String SYSTEM_PROPERTY = "jexmaple.injection";
+    
     public void useAsSystemDefault() {
         System.setProperty(SYSTEM_PROPERTY, name());
     }
-    
-    public static final String SYSTEM_PROPERTY = "jexmaple.injection";
     
 }

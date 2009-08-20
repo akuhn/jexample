@@ -25,6 +25,12 @@ import ch.unibe.jexample.util.MethodReference;
 @SuppressWarnings("unchecked")
 public abstract class For {
 
+    public static <T> T example(Class jClass, String method) {
+        Example e = findExample(jClass, method);
+        if (e == null) throw new NoSuchMethodError("Method not found.");
+        return (T) runExample(e);
+    }
+
     public static <T> T example(String fullReference) {
         try {
             MethodReference ref = MethodLocator.parse(fullReference).resolve();
@@ -39,10 +45,14 @@ public abstract class For {
         }
     }
 
-    public static <T> T example(Class jClass, String method) {
-        Example e = findExample(jClass, method);
-        if (e == null) throw new NoSuchMethodError("Method not found.");
-        return (T) runExample(e);
+    private static Example findExample(Class jClass, String method) {
+        try {
+            ExampleGraph graph = new ExampleGraph();
+            graph.add(jClass);
+            return graph.findExample(jClass, method);
+        } catch (InitializationError ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private static Object runExample(Example e) {
@@ -55,16 +65,6 @@ public abstract class For {
         	throw new RuntimeException(result.getFailures().iterator().next().getException());
         }
         return e.getReturnValue().getValue();
-    }
-
-    private static Example findExample(Class jClass, String method) {
-        try {
-            ExampleGraph graph = new ExampleGraph();
-            graph.add(jClass);
-            return graph.findExample(jClass, method);
-        } catch (InitializationError ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
 }

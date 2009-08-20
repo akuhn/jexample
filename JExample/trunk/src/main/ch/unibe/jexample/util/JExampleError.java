@@ -28,10 +28,6 @@ public class JExampleError extends InitializationError {
 		return this; 
 	}
 
-	private Entry first() {
-		return (Entry) getCauses().get(0);
-	}
-
 	@Override
 	public Throwable getCause() {
 		return isEmpty() ? null : first().getCause();
@@ -50,8 +46,6 @@ public class JExampleError extends InitializationError {
 		return getCauses().size();
 	}
 
-	
-	
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
@@ -60,6 +54,12 @@ public class JExampleError extends InitializationError {
 			buf.append(entry).append('\n');
 		}
 		return buf.toString();
+	}
+
+	
+	
+	private Entry first() {
+		return (Entry) getCauses().get(0);
 	}
 
 	public class Entry extends RuntimeException {
@@ -79,14 +79,14 @@ public class JExampleError extends InitializationError {
 	}
 
 	public enum Kind {
+		MISSING_ANNOTATION, 
 		MISSING_CONSTRUCTOR, 
 		MISSING_PROVIDERS, 
 		MISSING_RUNWITH_ANNOTATION, 
-		MISSING_ANNOTATION, 
 		NO_EXAMPLES_FOUND, 
+		NO_SUCH_PROVIDER, 
 		PARAMETER_NOT_ASSIGNABLE, 
-		PROVIDER_EXPECTS_EXCEPTION, 
-		NO_SUCH_PROVIDER,
+		PROVIDER_EXPECTS_EXCEPTION,
 		RECURSIVE_DEPENDENCIES,
 	}
 

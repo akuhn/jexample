@@ -23,14 +23,22 @@ import ch.unibe.jexample.internal.ExampleGraph;
 public class CompositeRunner extends Runner implements Filterable, Sortable {
         private final List<Runner> fRunners= new ArrayList<Runner>();
         
-        @Override
-        public void run(RunNotifier notifier) {
-                runChildren(notifier);
+        public void add(Runner runner) {
+                fRunners.add(runner);
         }
 
-        protected void runChildren(RunNotifier notifier) {
-                for (Runner each : fRunners)
-                        each.run(notifier);
+        public void addAll(List<? extends Runner> runners) {
+                fRunners.addAll(runners);
+        }
+
+        public void filter(Filter filter) throws NoTestsRemainException {
+                for (Iterator<Runner> iter= fRunners.iterator(); iter.hasNext();) {
+                        Runner runner= iter.next();
+                        if (filter.shouldRun(runner.getDescription()))
+                                filter.apply(runner);
+                        else
+                                iter.remove();
+                }
         }
 
         @Override
@@ -45,24 +53,11 @@ public class CompositeRunner extends Runner implements Filterable, Sortable {
                 return fRunners;
         }
 
-        public void addAll(List<? extends Runner> runners) {
-                fRunners.addAll(runners);
-        }
-
-        public void add(Runner runner) {
-                fRunners.add(runner);
+        @Override
+        public void run(RunNotifier notifier) {
+                runChildren(notifier);
         }
         
-        public void filter(Filter filter) throws NoTestsRemainException {
-                for (Iterator<Runner> iter= fRunners.iterator(); iter.hasNext();) {
-                        Runner runner= iter.next();
-                        if (filter.shouldRun(runner.getDescription()))
-                                filter.apply(runner);
-                        else
-                                iter.remove();
-                }
-        }
-
         public void sort(final Sorter sorter) {
                 Collections.sort(fRunners, new Comparator<Runner>() {
                         public int compare(Runner o1, Runner o2) {
@@ -71,6 +66,11 @@ public class CompositeRunner extends Runner implements Filterable, Sortable {
                 });
                 for (Runner each : fRunners)
                         sorter.apply(each);
+        }
+
+        protected void runChildren(RunNotifier notifier) {
+                for (Runner each : fRunners)
+                        each.run(notifier);
         }
 }
 

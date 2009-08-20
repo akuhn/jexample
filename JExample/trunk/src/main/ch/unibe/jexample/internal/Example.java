@@ -49,15 +49,15 @@ public class Example {
 
     public static boolean DISPOSE_IF_DONE = false;
 
-    private ReturnValue returnValue;
-    public final MethodReference method;
-    public final ExampleClass owner;
     public final Class<? extends Throwable> expectedException;
-
+    public final MethodReference method;
     public final Node<Example> node;
+    public final ExampleClass owner;
+
+    JExampleError errors;
 
     private final Description description;
-    JExampleError errors;
+    private ReturnValue returnValue;
 
     /*default*/ Example(MethodReference method, ExampleClass owner) {
         assert method != null && owner != null;
@@ -67,6 +67,52 @@ public class Example {
         this.returnValue = ReturnValue.R_NONE;
         this.expectedException = method.initExpectedException();
         this.node = new Node<Example>(this);
+    }
+
+    public Description getDescription() {
+        return description;
+    }
+
+    public ReturnValue getReturnValue() {
+        return returnValue;
+    }
+
+    public boolean hasErrors() {
+        if (errors == null) this.validate();
+        return errors.size() > 0;
+    }
+
+    public void run(RunNotifier notifier) {
+        if (returnValue.isNull()) returnValue = new ExampleRunner(this, notifier).run();
+        this.maybeRemoveMyselfFromMyProducersConsumersList();
+    }
+
+    @Override
+    public String toString() {
+        return "Example: " + method;
+    }
+
+    public boolean wasSuccessful() {
+        return getReturnValue().isGreen();
+    }
+
+    void initializeDependencies(ExampleGraph exampleGraph) {
+        for (MethodReference m: collectDependencies()) {
+            if (m.isBroken()) {
+                node.makeBrokenEdge(m.getError());
+            }
+            else {
+                Example d = exampleGraph.makeExample(m);
+                node.addProvider(d.node);
+            }
+        }
+    }
+
+    protected ReturnValue bareInvoke() throws Exception {
+        owner.runBeforeClassBefores();
+        InjectionValues injection = new InjectionValues(this);
+        Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
+        return new ReturnValue(newResult, injection.getTestInstance());
     }
 
     protected Iterable<MethodReference> collectDependencies() {
@@ -81,18 +127,6 @@ public class Example {
         }
     }
 
-    protected ReturnValue bareInvoke() throws Exception {
-        owner.runBeforeClassBefores();
-        InjectionValues injection = new InjectionValues(this);
-        Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
-        return new ReturnValue(newResult, injection.getTestInstance());
-    }
-
-    public void run(RunNotifier notifier) {
-        if (returnValue.isNull()) returnValue = new ExampleRunner(this, notifier).run();
-        this.maybeRemoveMyselfFromMyProducersConsumersList();
-    }
-
     private void maybeRemoveMyselfFromMyProducersConsumersList() {
         if (!DISPOSE_IF_DONE || !node.consumers().isEmpty()) return;
         throw new RuntimeException("TODO");
@@ -102,11 +136,6 @@ public class Example {
 //            each.getProducer().node.consumers().remove(this);
 //            each.getProducer().maybeRemoveMyselfFromMyProducersConsumersList();
 //        }
-    }
-
-    @Override
-    public String toString() {
-        return "Example: " + method;
     }
 
     private void validate() {
@@ -158,35 +187,6 @@ public class Example {
                 continue;
             }
         }
-    }
-
-    public boolean wasSuccessful() {
-        return getReturnValue().isGreen();
-    }
-
-    public Description getDescription() {
-        return description;
-    }
-
-    public boolean hasErrors() {
-        if (errors == null) this.validate();
-        return errors.size() > 0;
-    }
-
-    void initializeDependencies(ExampleGraph exampleGraph) {
-        for (MethodReference m: collectDependencies()) {
-            if (m.isBroken()) {
-                node.makeBrokenEdge(m.getError());
-            }
-            else {
-                Example d = exampleGraph.makeExample(m);
-                node.addProvider(d.node);
-            }
-        }
-    }
-
-    public ReturnValue getReturnValue() {
-        return returnValue;
     }
 
 }
