@@ -10,8 +10,8 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import ch.unibe.jexample.util.InvalidDeclarationError;
-import ch.unibe.jexample.util.MethodLocator;
+import ch.unibe.jexample.internal.util.InvalidDeclarationError;
+import ch.unibe.jexample.internal.util.MethodLocator;
 
 public class DependsScannerTest {
 

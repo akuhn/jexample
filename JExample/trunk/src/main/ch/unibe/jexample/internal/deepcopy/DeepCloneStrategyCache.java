@@ -1,6 +1,6 @@
-package ch.unibe.jexample.deepclone;
+package ch.unibe.jexample.internal.deepcopy;
 
-import static ch.unibe.jexample.deepclone.DeepCloneStrategy.IMMUTABLE;
+import static ch.unibe.jexample.internal.deepcopy.DeepCloneStrategy.IMMUTABLE;
 
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;

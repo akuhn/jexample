@@ -10,7 +10,7 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.internal.ExampleClass;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.internal.util.JExampleError;
 
 /**
  * Runs JExample tests. Delegates all logic to the singleton

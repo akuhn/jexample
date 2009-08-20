@@ -1,6 +1,6 @@
 package ch.unibe.jexample.internal.graph;
 
-import static ch.unibe.jexample.util.AssertUtil.assertToString;
+import static ch.unibe.jexample.internal.util.AssertUtil.assertToString;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;

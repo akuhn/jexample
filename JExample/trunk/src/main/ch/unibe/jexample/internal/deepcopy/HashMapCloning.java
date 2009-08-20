@@ -1,4 +1,4 @@
-package ch.unibe.jexample.deepclone;
+package ch.unibe.jexample.internal.deepcopy;
 
 import java.util.HashMap;
 import java.util.Map;

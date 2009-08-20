@@ -1,4 +1,4 @@
-package ch.unibe.jexample.util;
+package ch.unibe.jexample.internal.util;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -9,6 +9,9 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 
 import org.junit.Test;
+
+import ch.unibe.jexample.internal.util.InvalidDeclarationError;
+import ch.unibe.jexample.internal.util.MethodLocator;
 
 public class DependsScannerTest {
 

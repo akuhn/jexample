@@ -11,8 +11,8 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.util.MethodLocator;
-import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.internal.util.MethodLocator;
+import ch.unibe.jexample.internal.util.MethodReference;
 
 /**
  * @author Lea Haensenberger

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ch.unibe.jexample.util;
+package ch.unibe.jexample.internal.util;
 
 import static java.lang.Character.isJavaIdentifierPart;
 import static java.lang.Character.isJavaIdentifierStart;

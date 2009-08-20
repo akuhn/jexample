@@ -3,9 +3,9 @@ package ch.unibe.jexample.internal;
 import java.lang.reflect.Method;
 
 import ch.unibe.jexample.InjectionPolicy;
-import ch.unibe.jexample.deepclone.CloneFactory;
-import ch.unibe.jexample.util.CloneUtil;
-import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.internal.deepcopy.CloneFactory;
+import ch.unibe.jexample.internal.util.CloneUtil;
+import ch.unibe.jexample.internal.util.MethodReference;
 
 /** Creates injection values for test execution.
  *<P> 

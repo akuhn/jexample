@@ -10,11 +10,11 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.graph.Node;
-import ch.unibe.jexample.util.InvalidDeclarationError;
-import ch.unibe.jexample.util.JExampleError;
-import ch.unibe.jexample.util.MethodLocator;
-import ch.unibe.jexample.util.MethodReference;
-import ch.unibe.jexample.util.JExampleError.Kind;
+import ch.unibe.jexample.internal.util.InvalidDeclarationError;
+import ch.unibe.jexample.internal.util.JExampleError;
+import ch.unibe.jexample.internal.util.MethodLocator;
+import ch.unibe.jexample.internal.util.MethodReference;
+import ch.unibe.jexample.internal.util.JExampleError.Kind;
 
 /**
  * A test method with dependencies and return value. Test methods are written

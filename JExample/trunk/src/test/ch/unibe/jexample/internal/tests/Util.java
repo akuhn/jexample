@@ -5,7 +5,7 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.internal.util.JExampleError;
 
 public abstract class Util {
 

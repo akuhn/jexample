@@ -1,4 +1,4 @@
-package ch.unibe.jexample.deepclone;
+package ch.unibe.jexample.internal.deepcopy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

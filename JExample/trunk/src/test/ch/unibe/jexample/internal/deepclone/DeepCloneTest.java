@@ -1,4 +1,4 @@
-package ch.unibe.jexample.deepclone;
+package ch.unibe.jexample.internal.deepclone;
 
 
 import static org.junit.Assert.assertArrayEquals;
@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.unibe.jexample.internal.deepcopy.CloneFactory;
 
 public class DeepCloneTest {
 

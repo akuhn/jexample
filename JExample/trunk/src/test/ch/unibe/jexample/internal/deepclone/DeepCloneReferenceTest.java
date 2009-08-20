@@ -1,4 +1,4 @@
-package ch.unibe.jexample.deepclone;
+package ch.unibe.jexample.internal.deepclone;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,8 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 import org.junit.Test;
+
+import ch.unibe.jexample.internal.deepcopy.CloneFactory;
 
 @SuppressWarnings("unchecked")
 public class DeepCloneReferenceTest {

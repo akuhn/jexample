@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ch.unibe.jexample.util;
+package ch.unibe.jexample.internal.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.internal.util.MethodLocator;
+import ch.unibe.jexample.internal.util.MethodReference;
 
 /**
  * @author Lea Haensenberger

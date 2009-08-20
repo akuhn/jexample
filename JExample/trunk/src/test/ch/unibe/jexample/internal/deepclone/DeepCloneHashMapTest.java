@@ -1,4 +1,4 @@
-package ch.unibe.jexample.deepclone;
+package ch.unibe.jexample.internal.deepclone;
 
 import static org.junit.Assert.assertTrue;
 
@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+
+import ch.unibe.jexample.internal.deepcopy.CloneFactory;
 
 @SuppressWarnings("unchecked")
 public class DeepCloneHashMapTest {

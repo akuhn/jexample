@@ -10,8 +10,8 @@ import org.junit.runner.RunWith;
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.util.JExampleError;
-import ch.unibe.jexample.util.JExampleError.Kind;
+import ch.unibe.jexample.internal.util.JExampleError;
+import ch.unibe.jexample.internal.util.JExampleError.Kind;
 
 public class ExampleGraphTest {
 

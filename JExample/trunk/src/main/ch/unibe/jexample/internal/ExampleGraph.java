@@ -13,9 +13,9 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.graph.Node;
-import ch.unibe.jexample.util.CompositeRunner;
-import ch.unibe.jexample.util.JExampleError;
-import ch.unibe.jexample.util.MethodReference;
+import ch.unibe.jexample.internal.util.CompositeRunner;
+import ch.unibe.jexample.internal.util.JExampleError;
+import ch.unibe.jexample.internal.util.MethodReference;
 
 /**
  * Validates, describes and runs all JExample tests. Implemented as a singleton

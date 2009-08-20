@@ -12,10 +12,10 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.util.CloneUtil;
-import ch.unibe.jexample.util.JExampleError;
-import ch.unibe.jexample.util.MethodReference;
-import ch.unibe.jexample.util.JExampleError.Kind;
+import ch.unibe.jexample.internal.util.CloneUtil;
+import ch.unibe.jexample.internal.util.JExampleError;
+import ch.unibe.jexample.internal.util.MethodReference;
+import ch.unibe.jexample.internal.util.JExampleError.Kind;
 
 /**
  * Java class with example methods.

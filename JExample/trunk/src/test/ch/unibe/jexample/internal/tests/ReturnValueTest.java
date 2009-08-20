@@ -15,8 +15,8 @@ import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.util.CloneUtil;
-import ch.unibe.jexample.util.JExampleError;
+import ch.unibe.jexample.internal.util.CloneUtil;
+import ch.unibe.jexample.internal.util.JExampleError;
 
 public class ReturnValueTest {
 
