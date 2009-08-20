@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
 import ch.unibe.jexample.util.CloneUtil;
@@ -22,7 +21,6 @@ import ch.unibe.jexample.util.JExampleError;
 public class ReturnValueTest {
 
     @RunWith(JExample.class)
-    @JExampleOptions(cloneTestCase = true)
     private static class WithStackField {
 
         private Stack<Integer> stack;
@@ -48,7 +46,6 @@ public class ReturnValueTest {
     }
 
     @RunWith(JExample.class)
-    @JExampleOptions(cloneTestCase = true)
     private static class WithField {
         public String aString;
 

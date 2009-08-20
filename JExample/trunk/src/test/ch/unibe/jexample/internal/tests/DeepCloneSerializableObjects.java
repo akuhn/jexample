@@ -10,10 +10,8 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.JExampleOptions;
 
 @RunWith(JExample.class)
-@JExampleOptions(cloneTestCase=true)
 public class DeepCloneSerializableObjects implements Serializable {
 
 	private static final long serialVersionUID = 1L;

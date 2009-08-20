@@ -1,17 +1,15 @@
 package ch.unibe.jexample.internal;
 
-import java.util.Iterator;
-
-import ch.unibe.jexample.JExampleOptions;
+import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.deepclone.CloneFactory;
-import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.util.CloneUtil;
+import ch.unibe.jexample.util.MethodReference;
 
 /** Creates injection values for test execution.
  *<P> 
  * The life cycle of instances is limited to the activation (ie method
  * execution) of {@link Example#bareInvoke}. If used that way, instances
- * are stack contained and thus thread-safe. 
+ * are stack contended and thus thread-safe. 
  * 
  * @author Adrian Kuhn
  *
@@ -28,54 +26,65 @@ public class InjectionValues {
     
     public InjectionValues(Example example) throws Exception {
         this.arguments = new Object[example.method.arity()];
-        this.initialize(example);
+        this.initialize(example.method.getInjectionPolicy(), example);
+        this.initializeMissingTestInstance(example.method);
     }
     
-    private Void initialize(Example example) throws Exception {
-        if (FORCE_RERUN) return forceRerun(example);
-        Iterator<Edge<Example>> it = example.node.dependencies().iterator();
+    private void initializeMissingTestInstance(MethodReference ref) throws Exception {
+        if (!ref.getActualClass().isInstance(testInstance)) testInstance = null;
+        if (testInstance == null) {
+            testInstance = CloneUtil.getConstructor(ref.getActualClass()).newInstance();
+        }
+    }
+
+    private void initialize(InjectionPolicy policy, Example example) throws Exception {
+        if (policy == InjectionPolicy.CLONE) this.initializeClone(example);
+        else if (policy == InjectionPolicy.DEEPCOPY) this.initializeCopy(example);
+        else if (policy == InjectionPolicy.NONE) this.initializeNone(example);
+        else if (policy == InjectionPolicy.RERUN) this.initializeRerun(example);
+        else this.initializeDefault(example);
+    }
+
+    private void initializeDefault(Example example) {
+        //this.initializeClone(example);
+        this.initializeCopy(example);
+    }
+
+    private void initializeRerun(Example example) throws Exception {
+        arguments = new Object[example.method.arity()];
         for (int i = 0; i < arguments.length; i++) {
-            ReturnValue r = it.next().getProducer().value.getReturnValue();
-            arguments[i] = adaptArgument(example.policy, r.getValue());
-        }
-        testInstance = adaptReceiver(example);
-        return null;
-    }
-    
-    private Object adaptReceiver(Example example) throws Exception {
-        Example first = example.node.firstProducerOrNull();
-        if (example.policy.cloneTestCase() && first != null 
-                && first.getReturnValue().isTestCaseInstanceOf(example.method.getActualClass())) {
-            return clone(first.getReturnValue().getTestCaseInstance());
-        }
-        else {
-            return CloneUtil.getConstructor(example.method.getActualClass()).newInstance();
+            Example provider = example.node.dependencies().get(i).getProducer().value;
+            ReturnValue returnValue = provider.bareInvoke();
+            arguments[i] = returnValue.getValue();
+            if (i == 0) testInstance = returnValue.getTestCaseInstance();
+        } 
+        if (arguments.length == 0) {
+            Example first = example.node.firstProducerOrNull();
+            if (first != null) testInstance = first.bareInvoke().getTestCaseInstance();
         }
     }
 
-    private Object adaptArgument(JExampleOptions policy, Object value) {
-        if (!policy.cloneReturnValues()) return value;
-        return clone(value);
+    private void initializeNone(Example example) {
+        arguments = new Object[example.method.arity()];
+        for (int i = 0; i < arguments.length; i++) {
+            Example provider = example.node.dependencies().get(i).getProducer().value;
+            arguments[i] = provider.getReturnValue().getValue();
+            if (i == 0) testInstance = provider.getReturnValue().getTestCaseInstance();
+        } 
+        if (arguments.length == 0) {
+            Example first = example.node.firstProducerOrNull();
+            if (first != null) testInstance = first.getReturnValue().getTestCaseInstance();
+        }
     }
 
-    private Void forceRerun(Example example) throws Exception {
-        int length = example.method.arity();
-        for (int i = 0; i < length; i++) {
-            Example each = example.node.dependencies().get(i).getProducer().value;
-            each.bareInvoke();
-            arguments[i] = each.getReturnValue().getValue();
-        }
-        testInstance = null;
-        Example first = example.node.firstProducerOrNull();
-        if (first != null && first.getReturnValue().isTestCaseInstanceOf(
-                    example.method.getActualClass())) {
-            if (length == 0) first.bareInvoke(); // loop above was never passed
-            testInstance = first.getReturnValue().getTestCaseInstance();
-        }
-        else {
-            testInstance = CloneUtil.getConstructor(example.method.getActualClass()).newInstance();
-        }
-        return null;
+    private void initializeCopy(Example example) {
+        this.initializeNone(example);
+        arguments = clone(arguments);
+        testInstance = clone(testInstance);
+    }
+
+    private void initializeClone(Example example) {
+        throw new UnsupportedOperationException();
     }
 
     public Object getTestInstance() {
@@ -86,7 +95,7 @@ public class InjectionValues {
         return arguments;
     }
     
-    private Object clone(Object object) {
+    private <T> T clone(T object) {
         if (factory == null) factory = new CloneFactory();
         long time = System.nanoTime();
         try {

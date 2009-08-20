@@ -6,12 +6,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
+import ch.unibe.jexample.Injection;
+import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.internal.tests.JExampleOptionsDefault.Mutable;
 
 @RunWith(JExample.class)
-@JExampleOptions(cloneReturnValues = false)
+@Injection(InjectionPolicy.NONE)
 public class JExampleOptionsDontCloneReturnValues {
 
     @Test

@@ -8,7 +8,6 @@ import java.util.Iterator;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-import ch.unibe.jexample.JExampleOptions;
 import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.graph.Node;
 import ch.unibe.jexample.util.InvalidDeclarationError;
@@ -59,7 +58,6 @@ public class Example {
 
     private final Description description;
     JExampleError errors;
-    protected JExampleOptions policy;
 
     /*default*/ Example(MethodReference method, ExampleClass owner) {
         assert method != null && owner != null;
@@ -67,7 +65,6 @@ public class Example {
         this.method = method;
         this.description = method.createTestDescription();
         this.returnValue = ReturnValue.R_NONE;
-        this.policy = initJExampleOptions(method.getActualClass());
         this.expectedException = method.initExpectedException();
         this.node = new Node<Example>(this);
     }
@@ -82,12 +79,6 @@ public class Example {
         } catch (InvalidDeclarationError ex) {
             return Collections.singleton(new MethodReference(ex));
         }
-    }
-
-    private JExampleOptions initJExampleOptions(Class<?> jclass) {
-        final JExampleOptions options = (JExampleOptions) jclass.getAnnotation(JExampleOptions.class);
-        if (options == null) return JExampleOptions.class.getAnnotation(JExampleOptions.class);
-        return options;
     }
 
     protected ReturnValue bareInvoke() throws Exception {

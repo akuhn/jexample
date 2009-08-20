@@ -16,13 +16,11 @@ public class CycleDetectionTest {
 
     @Given("SmallGraph#path2")
     public N[] cycle2(N... n) {
-        N aa = n[0];
-        N bb = n[1];
-        assertEquals(F, aa.isPartOfCycle());
-        assertEquals(F, bb.isPartOfCycle());
-        aa.addProvider(bb);
-        assertEquals(true, aa.isPartOfCycle());
-        assertEquals(true, bb.isPartOfCycle());
+        assertEquals(F, n[0].isPartOfCycle());
+        assertEquals(F, n[1].isPartOfCycle());
+        n[0].addProvider(n[1]);
+        assertEquals(true, n[0].isPartOfCycle());
+        assertEquals(true, n[1].isPartOfCycle());
         return n;
     }
 
@@ -46,21 +44,14 @@ public class CycleDetectionTest {
     }
     
     @Given("cycle3")
-    public void shouldHave1321Cycle(N... n) {
-        Edge<String> edge = n[0].dependencies().get(0);
-        assertEquals(1, edge.cycles().size());
-        assertToString("[(1st < 3rd < 2nd < 1st)]", edge.cycles());
-    }
-    
-    @Given("cycle3,shouldHave1321Cycle")
-    public void shouldAllHaveSameCycle(N... n) {
+    public void cycle3cycles(N... n) {
         assertToString("[(1st < 3rd < 2nd < 1st)]", n[0].dependencies().get(0).cycles());
         assertToString("[(1st < 3rd < 2nd < 1st)]", n[1].dependencies().get(0).cycles());
         assertToString("[(1st < 3rd < 2nd < 1st)]", n[2].dependencies().get(0).cycles());
     }
     
     @Given("SmallGraph#path3")
-    public void cactus2(N... n) {
+    public N[] cactus2(N... n) {
         assertEquals(F, n[0].isPartOfCycle());
         assertEquals(F, n[1].isPartOfCycle());
         assertEquals(F, n[2].isPartOfCycle());
@@ -68,6 +59,15 @@ public class CycleDetectionTest {
         assertEquals(true, n[0].isPartOfCycle());
         assertEquals(true, n[1].isPartOfCycle());
         assertEquals(F, n[2].isPartOfCycle());
+        return n;
+    }
+    
+    @Given("cactus2")
+    public void cactus2cycles(N... n) {
+        String cycles = "[(1st < 2nd < 1st)]";
+        assertToString(cycles, n[0].dependencies().get(0).cycles());
+        assertToString(cycles, n[1].dependencies().get(0).cycles());
+        assertToString("[]", n[2].dependencies().get(0).cycles());
     }
 
     @Given("SmallGraph#fork2join")

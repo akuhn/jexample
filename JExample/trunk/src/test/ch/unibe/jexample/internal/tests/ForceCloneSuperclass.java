@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.JExampleOptions;
 
 
 public class ForceCloneSuperclass {
@@ -29,7 +28,6 @@ public class ForceCloneSuperclass {
 	
 	
 	@RunWith(JExample.class)
-	@JExampleOptions(cloneTestCase = true)
 	public static class ClonedTestCase extends AbstractClonedTestCase {
 		
 		@Test

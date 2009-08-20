@@ -65,5 +65,5 @@ import ch.unibe.jexample.internal.tests.TestClassValidationTest;
     StackTest.class,
     ListTest.class })
 public class AllTests {
-    // TODO add main
+
 }

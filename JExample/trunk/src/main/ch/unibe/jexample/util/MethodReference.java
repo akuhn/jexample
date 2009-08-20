@@ -11,6 +11,8 @@ import org.junit.Test.None;
 import org.junit.runner.Description;
 
 import ch.unibe.jexample.Given;
+import ch.unibe.jexample.Injection;
+import ch.unibe.jexample.InjectionPolicy;
 
 public class MethodReference {
 
@@ -120,6 +122,42 @@ public class MethodReference {
 
     public boolean isIgnorePresent() {
         return jmethod.isAnnotationPresent(Ignore.class);
+    }
+    
+    public InjectionPolicy getInjectionPolicy() {
+        Injection injection;
+        // 1) method
+        injection = jmethod.getAnnotation(Injection.class);
+        if (declaresPolicy(injection)) return injection.value();
+        // 2) class, then superclass chain
+        for (Class<?> curr = jclass; curr != null; curr = curr.getSuperclass()) {
+            injection = curr.getAnnotation(Injection.class);
+            if (declaresPolicy(injection)) return injection.value();
+        }
+        // 3) package of class, than package of superclass chain
+        for (Class<?> curr = jclass; curr != null; curr = curr.getSuperclass()) {
+            Package pack = curr.getPackage();
+            if (pack == null) continue;
+            injection = pack.getAnnotation(Injection.class);
+            if (declaresPolicy(injection)) return injection.value();
+        }
+        // 4) system property
+        return getSystemInjectionPolicy();
+    }
+
+    private boolean declaresPolicy(Injection injection) {
+        return injection != null && injection.value() != InjectionPolicy.DEFAULT;
+    }
+
+    private InjectionPolicy getSystemInjectionPolicy() {
+        String property = System.getProperty(InjectionPolicy.SYSTEM_PROPERTY);
+        if (property == null) return InjectionPolicy.DEFAULT;
+        try {
+            return InjectionPolicy.valueOf(property);
+        }
+        catch (IllegalArgumentException ex) {
+            return InjectionPolicy.DEFAULT;
+        }
     }
 
 }
