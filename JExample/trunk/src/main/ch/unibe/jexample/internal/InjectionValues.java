@@ -1,5 +1,7 @@
 package ch.unibe.jexample.internal;
 
+import java.lang.reflect.Method;
+
 import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.deepclone.CloneFactory;
 import ch.unibe.jexample.util.CloneUtil;
@@ -16,12 +18,11 @@ import ch.unibe.jexample.util.MethodReference;
  */
 public class InjectionValues {
 
-    public static long NANOS = 0L;
+    public static long NANOS = 0L; // XXX for icse paper
+    private static final boolean FORCE_RERUN = System.getProperty("jexample.rerun") != null; // XXX for icse paper
 
-    private static final boolean FORCE_RERUN = System.getProperty("jexample.rerun") != null;
     private Object[] arguments;
     private CloneFactory factory;
-
     private Object testInstance;
     
     public InjectionValues(Example example) throws Exception {
@@ -50,14 +51,17 @@ public class InjectionValues {
     }
 
     private void initialize(InjectionPolicy policy, Example example) throws Exception {
-        if (policy == InjectionPolicy.CLONE) this.initializeClone(example);
+        if (FORCE_RERUN) this.initializeRerun(example);
+        else if (policy == InjectionPolicy.CLONE) this.initializeClone(example);
         else if (policy == InjectionPolicy.DEEPCOPY) this.initializeCopy(example);
         else if (policy == InjectionPolicy.NONE) this.initializeNone(example);
         else if (policy == InjectionPolicy.RERUN) this.initializeRerun(example);
         else this.initializeDefault(example);
     }
 
-    private void initializeClone(Example example) {
+    private void initializeClone(Example example) throws Exception {
+        Method m = Object.class.getDeclaredMethod("clone");
+        m.setAccessible(true);
         throw new UnsupportedOperationException();
     }
 
