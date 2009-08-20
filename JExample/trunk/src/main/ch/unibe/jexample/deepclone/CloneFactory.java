@@ -25,7 +25,6 @@ public class CloneFactory {
     public <T> T clone(T original) throws DeepCloneException {
         try {
             if (original == null) return null;
-            if (cache.isConstant(original)) return original;
             return (T) cache.lookup(original).makeClone(original, this);
         } catch (DeepCloneException ex) {
             throw ex;

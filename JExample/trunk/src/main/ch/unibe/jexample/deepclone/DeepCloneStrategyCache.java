@@ -27,6 +27,7 @@ public class DeepCloneStrategyCache {
         "java.lang.Throwable",
         "java.lang.Thread",
         // TODO more...
+        "org.jfree.ui.RectangleEdge", // XXX for icse paper
     };
 
     public static DeepCloneStrategyCache getDefault() {
@@ -34,15 +35,8 @@ public class DeepCloneStrategyCache {
     } 
     public Map<Class<?>,DeepCloneStrategy> cache;
 
-    public Map<Object,Void> constants;
-
     public DeepCloneStrategyCache() {
         this.cache = new IdentityHashMap<Class<?>,DeepCloneStrategy>();
-        this.constants = new IdentityHashMap<Object,Void>();
-    }
-
-    public boolean isConstant(Object object) {
-        return constants.containsKey(object);
     }
 
     public DeepCloneStrategy lookup(Class<?> type) {
@@ -50,7 +44,6 @@ public class DeepCloneStrategyCache {
         DeepCloneStrategy result = cache.get(type);
         if (result != null) return result;
         cache.put(type, result = makeStrategy(type));
-        if (result != IMMUTABLE) addConstants(type);
         return result;
     }
 
@@ -58,25 +51,6 @@ public class DeepCloneStrategyCache {
         return lookup(object.getClass());
     }
     
-    private void addConstants(Class<?> type) {
-        for (Class<?> curr = type; curr != null; curr = curr.getSuperclass()) {
-            for (Field f: curr.getDeclaredFields()) {
-                if (Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers())) {
-                    f.setAccessible(true);
-                    Object value;
-                    try {
-                        value = f.get(null);
-                        if (value != null) constants.put(value, null);
-                    } catch (IllegalArgumentException ex) {
-                        throw new DeepCloneException(ex);
-                    } catch (IllegalAccessException ex) {
-                        throw new DeepCloneException(ex);
-                    } 
-                }
-            }
-        }
-    }
-
     private boolean isImmutable(Class<?> type) {
         if (type.isEnum()) return true;
         if (type.isAnnotation()) return true;
