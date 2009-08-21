@@ -84,7 +84,7 @@ public class Example {
 
     public void run(RunNotifier notifier) {
         if (returnValue.isNull()) returnValue = new ExampleRunner(this, notifier).run();
-        this.maybeRemoveMyselfFromMyProducersConsumersList();
+        this.maybeRemoveMyselfFromMyProducersConsumersList(); // FIXME wrong place to call this???
     }
 
     @Override
@@ -128,14 +128,16 @@ public class Example {
     }
 
     private void maybeRemoveMyselfFromMyProducersConsumersList() {
-        if (!DISPOSE_IF_DONE || !node.consumers().isEmpty()) return;
-        throw new RuntimeException("TODO");
-//        this.returnValue.dispose();
-//        for (Edge each: this.node.dependencies()) {
-//            if (each.isBroken()) continue;
-//            each.getProducer().node.consumers().remove(this);
-//            each.getProducer().maybeRemoveMyselfFromMyProducersConsumersList();
-//        }
+        if (!DISPOSE_IF_DONE) return;
+        if (!node.consumers().isEmpty()) return; // only run on leaves
+        this.returnValue.dispose();
+        // TODO why does iterating over producers not work here?
+        for (Edge<Example> d: this.node.dependencies()) {
+            if (d.isBroken()) continue;
+            Example each = d.getProducer().value;
+            each.node.__consumerRemove(this);
+            each.maybeRemoveMyselfFromMyProducersConsumersList();
+        }
     }
 
     private void validate() {

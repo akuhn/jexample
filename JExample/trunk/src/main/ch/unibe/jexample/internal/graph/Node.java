@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import ch.unibe.jexample.internal.Example;
+
 /** Node in a graph.
  * 
  * @author Adrian Kuhn, 2009
@@ -70,6 +72,10 @@ public class Node<E> {
             if (all.add(producer)) producer.collectTransitiveClosureInto(all);
         }
         return all;
+    }
+
+    public void __consumerRemove(Example example) {
+        this.consumers.remove(example);
     }
     
 }
