@@ -150,7 +150,7 @@ public class MethodReference {
     }
 
     private InjectionPolicy getSystemInjectionPolicy() {
-        String property = System.getProperty(InjectionPolicy.SYSTEM_PROPERTY);
+        String property = System.getProperty(InjectionPolicy.JEXAMPLE_INJECTION);
         if (property == null) return InjectionPolicy.DEFAULT;
         try {
             return InjectionPolicy.valueOf(property);

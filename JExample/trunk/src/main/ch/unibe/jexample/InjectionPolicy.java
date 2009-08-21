@@ -38,10 +38,20 @@ public enum InjectionPolicy {
      */
     RERUN;
 
-    public static final String SYSTEM_PROPERTY = "jexmaple.injection";
+    public static final String JEXAMPLE_INJECTION = "jexmaple.injection"; // TODO track down users!?
+    public static final String JEXAMPLE_RERUN = "jexample.rerun";
     
-    public void useAsSystemDefault() {
-        System.setProperty(SYSTEM_PROPERTY, name());
+    
+    private static InjectionPolicy RESOLUTION = CLONE;
+    
+    public static void setDefaultPolicy(InjectionPolicy resolution) {
+        if (resolution == DEFAULT) throw new IllegalArgumentException();
+        RESOLUTION = resolution;
+    }
+    
+    public InjectionPolicy resolve() {
+        if (System.getProperty("jexample.rerun") != null) return RERUN;
+        return this == DEFAULT ? RESOLUTION : this;
     }
     
 }

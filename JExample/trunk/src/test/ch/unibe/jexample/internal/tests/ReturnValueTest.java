@@ -12,6 +12,7 @@ import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
+import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
@@ -46,7 +47,7 @@ public class ReturnValueTest {
     }
 
     @RunWith(JExample.class)
-    private static class WithField {
+    public static class WithField {
         public String aString;
 
         @Test

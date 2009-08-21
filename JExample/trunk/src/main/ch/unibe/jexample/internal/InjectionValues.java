@@ -1,5 +1,9 @@
 package ch.unibe.jexample.internal;
 
+import static ch.unibe.jexample.InjectionPolicy.CLONE;
+import static ch.unibe.jexample.InjectionPolicy.DEEPCOPY;
+import static ch.unibe.jexample.InjectionPolicy.NONE;
+import static ch.unibe.jexample.InjectionPolicy.RERUN;
 import static ch.unibe.jexample.internal.InjectionStrategy.MISSING;
 import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.internal.util.CloneUtil;
@@ -16,7 +20,6 @@ import ch.unibe.jexample.internal.util.CloneUtil;
 public class InjectionValues {
 
     public static long NANOS = 0L; // XXX for icse paper
-    private static final boolean FORCE_RERUN = System.getProperty("jexample.rerun") != null; // XXX for icse paper
 
     private Object[] arguments;
     private Object testInstance;
@@ -62,12 +65,12 @@ public class InjectionValues {
     }
 
     private static InjectionStrategy pickStrategy(InjectionPolicy policy) {
-        if (FORCE_RERUN) return new RerunInjectionStrategy();
-        if (policy == InjectionPolicy.CLONE) return new CloneInjectionStrategy();
-        if (policy == InjectionPolicy.DEEPCOPY) return new DeepcopyInjectionStrategy();
-        if (policy == InjectionPolicy.NONE) return new NoneInjectionStrategy();
-        if (policy == InjectionPolicy.RERUN) return new RerunInjectionStrategy();
-        return new DeepcopyInjectionStrategy(); // use clone instead
+        InjectionPolicy resolution = policy.resolve();
+        if (resolution == CLONE) return new CloneInjectionStrategy();
+        if (resolution == DEEPCOPY) return new DeepcopyInjectionStrategy();
+        if (resolution == NONE) return new NoneInjectionStrategy();
+        if (resolution == RERUN) return new RerunInjectionStrategy();
+        throw new AssertionError();
     }
      
     public Object[] getArguments() {

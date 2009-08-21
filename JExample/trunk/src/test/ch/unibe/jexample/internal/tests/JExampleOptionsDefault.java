@@ -8,9 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
+import ch.unibe.jexample.Injection;
+import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
 
 @RunWith(JExample.class)
+@Injection(InjectionPolicy.DEEPCOPY)
 public class JExampleOptionsDefault {
 
     @Test
@@ -48,7 +51,7 @@ public class JExampleOptionsDefault {
     }
 
     @Given("#isCloneable,#isCloneable")
-    public void shouldUseSameCloneFactoryFroAllArguments(Mutable a, Mutable b) {
+    public void shouldUseSameCloneFactoryForAllArguments(Mutable a, Mutable b) {
         assertSame(a, b); 
         assertEquals("root", a.name);
         assertEquals("root", b.name);

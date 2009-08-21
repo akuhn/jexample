@@ -2,7 +2,6 @@ package ch.unibe.jexample.internal;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -15,10 +14,13 @@ import ch.unibe.jexample.JExample;
 @Injection(InjectionPolicy.CLONE)
 public class CloneInjectionPolicyTest {
 
+    private static int FIELD, VALUE;
+    
     private D field;
 
     @Test
     public D producer() {
+        assertEquals("should not rerun #producer()", 1, ++VALUE);
         return new D("value");
     }
     
@@ -35,11 +37,11 @@ public class CloneInjectionPolicyTest {
     
     @Test
     public void field() {
+        assertEquals("should not rerun #field()", 1, ++FIELD);
         field = new D("field");
     }
 
     @Given("field")
-    @Test(expected=AssertionError.class) // FIXME broken
     public void shouldCloneField() {
         assertEquals("clone of field", field.name);
     }
@@ -49,7 +51,7 @@ public class CloneInjectionPolicyTest {
     
 class D implements Cloneable {
     
-    public final String name;
+    public String name;
     
     public D(String name) {
         this.name = name;

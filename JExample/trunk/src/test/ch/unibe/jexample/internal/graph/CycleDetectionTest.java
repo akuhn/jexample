@@ -7,9 +7,12 @@ import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
+import ch.unibe.jexample.Injection;
+import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
 
 @RunWith(JExample.class)
+@Injection(InjectionPolicy.DEEPCOPY)
 public class CycleDetectionTest {
 
     private static final boolean F = false;
