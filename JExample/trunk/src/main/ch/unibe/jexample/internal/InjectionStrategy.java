@@ -13,14 +13,14 @@ public interface InjectionStrategy {
 
     public static final Object MISSING = new Object();
     
-    public InjectionValues makeInjectionValues(Object receiver, Object[] arguments);
+    public InjectionValues makeInjectionValues(Object receiver, Object... arguments);
 
 }
 
 class RerunInjectionStrategy implements InjectionStrategy {
 
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object[] args) {
+    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
         for (int n = 0; n < args.length; n++) args[n] = MISSING;
         return new InjectionValues(MISSING, args);
     }
@@ -30,7 +30,7 @@ class RerunInjectionStrategy implements InjectionStrategy {
 class NoneInjectionStrategy implements InjectionStrategy {
     
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object[] args) {
+    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
         return new InjectionValues(receiver, args);
     }
 
@@ -41,7 +41,7 @@ class DeepcopyInjectionStrategy implements InjectionStrategy {
     private CloneFactory factory = new CloneFactory();
 
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object[] args) {
+    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
         return new InjectionValues(deepcopy(receiver), deepcopy(args));
     }
     
@@ -62,18 +62,20 @@ class CloneInjectionStrategy implements InjectionStrategy {
     private static final Method OBJECT_CLONE = initializeCloneMethod();
     
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object[] args) {
+    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
         for (int n = 0; n < args.length; n++) args[n] = cloneArgument(args[n]);
         return new InjectionValues(cloneReceiver(receiver), args);
     }
     
     private Object cloneReceiver(Object receiver) {
+        if (receiver == null) return null;
         try {
             Object clone = CloneUtil.getConstructor(receiver.getClass()).newInstance();
             for (Field f: receiver.getClass().getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 if (Modifier.isFinal(f.getModifiers())) continue;
                 if (ImmutableClasses.contains(f.getType())) {
+                    f.setAccessible(true);
                     f.set(clone, f.get(receiver));
                 }
                 else {

@@ -12,7 +12,7 @@ import ch.unibe.jexample.JExample;
 
 @RunWith(JExample.class)
 @Injection(InjectionPolicy.CLONE)
-public class CloneInjectionPolicyTest {
+public class CloneInjectionValuesTest {
 
     private static int FIELD, VALUE;
     

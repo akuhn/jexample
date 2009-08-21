@@ -77,7 +77,7 @@ public class InjectionValues {
         return arguments;
     }
 
-    public Object getTestInstance() {
+    public Object getReceiver() {
         return testInstance;
     }
     

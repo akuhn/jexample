@@ -111,8 +111,8 @@ public class Example {
     protected ReturnValue bareInvoke() throws Exception {
         owner.runBeforeClassBefores();
         InjectionValues injection = InjectionValues.make(this);
-        Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
-        return new ReturnValue(newResult, injection.getTestInstance());
+        Object newResult = method.invoke(injection.getReceiver(), injection.getArguments());
+        return new ReturnValue(newResult, injection.getReceiver());
     }
 
     protected Iterable<MethodReference> collectDependencies() {
