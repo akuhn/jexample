@@ -34,10 +34,21 @@ class NoneInjectionStrategy implements InjectionStrategy {
 
 class DeepcopyInjectionStrategy implements InjectionStrategy {
     
+    private CloneFactory factory = new CloneFactory();
+
     @Override
     public InjectionValues makeInjectionValues(Object receiver, Object[] args) {
-        CloneFactory f = new CloneFactory();
-        return new InjectionValues(f.clone(receiver), f.clone(args));
+        return new InjectionValues(deepcopy(receiver), deepcopy(args));
+    }
+    
+    private <T> T deepcopy(T object) {
+        long time = System.nanoTime();
+        try {
+            return factory.clone(object);
+        }
+        finally {
+            InjectionValues.NANOS += (System.nanoTime() - time);
+        }
     }
 
 }
