@@ -110,7 +110,7 @@ public class Example {
 
     protected ReturnValue bareInvoke() throws Exception {
         owner.runBeforeClassBefores();
-        InjectionValues injection = new InjectionValues(this);
+        InjectionValues injection = InjectionValues.make(this);
         Object newResult = method.invoke(injection.getTestInstance(), injection.getArguments());
         return new ReturnValue(newResult, injection.getTestInstance());
     }

@@ -7,7 +7,9 @@ import org.junit.runners.Suite.SuiteClasses;
 import ch.unibe.jexample.demo.ListTest;
 import ch.unibe.jexample.demo.StackTest;
 import ch.unibe.jexample.internal.BrokenDependencyTest;
+import ch.unibe.jexample.internal.CloneInjectionPolicyTest;
 import ch.unibe.jexample.internal.InvalidDependencyTest;
+import ch.unibe.jexample.internal.RerunInjectionStrategyTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneHashMapTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneReferenceTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneTest;
@@ -36,6 +38,8 @@ import ch.unibe.jexample.internal.tests.TestClassValidationTest;
 
 @RunWith(Suite.class)
 @SuiteClasses( {
+    CloneInjectionPolicyTest.class,
+    RerunInjectionStrategyTest.class,
     BrokenDependencyTest.class,
     ForceCloneSuperclass.class,
     CycleDetectionTest.class,
