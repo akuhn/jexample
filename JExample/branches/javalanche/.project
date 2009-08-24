@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JExample</name>
+	<name>JExample-javalanche</name>
 	<comment>JExample is an extensions of JUnit that improves defect localizaton by
     changing the way you structure your tests. It introduces first-class
     dependencies. If test B depends on A, the return value of A can be used as
