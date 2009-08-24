@@ -45,14 +45,23 @@ public class ExampleGraph {
     }
 
     public ExampleClass add(Class<?> jclass) throws JExampleError {
-        if (anyHasBeenRun) throw new RuntimeException("Cannot add test to running system.");
+        if (anyHasBeenRun) {
+        	throwAwayResults();
+        	anyHasBeenRun = false;
+        }
         ExampleClass egClass = makeExampleClass(jclass);
         egClass.validate();
         egClass.initializeExamples();
         return egClass;
     }
 
-    public void filter(Filter filter) {
+    private void throwAwayResults() {
+		for ( Example ex : examples.values()) {
+			ex.resetReturnValue();
+		}
+	}
+
+	public void filter(Filter filter) {
         Iterator<Example> it = examples.values().iterator();
         while (it.hasNext()) {
             if (!filter.shouldRun(it.next().getDescription())) {

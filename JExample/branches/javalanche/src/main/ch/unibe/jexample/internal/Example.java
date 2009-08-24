@@ -191,4 +191,8 @@ public class Example {
         }
     }
 
+	public void resetReturnValue() {
+		returnValue = ReturnValue.R_NONE;
+	}
+
 }
