@@ -36,125 +36,125 @@ import org.eclipse.ui.PlatformUI;
 
 public class JExampleQuickFixProcessor implements IQuickFixProcessor {
 
-	public IJavaCompletionProposal[] getCorrections(IInvocationContext context, IProblemLocation[] locations) throws CoreException {
-		ArrayList<IJavaCompletionProposal> result = new ArrayList<IJavaCompletionProposal>(locations.length);
-		for (IProblemLocation problem: locations) {
-			if (IProblem.UndefinedType != problem.getProblemId()) continue;
-			addJExampleToBuildPathProposals(context, problem, result); 
-		}
-		return result.toArray(new IJavaCompletionProposal[result.size()]);	
-	}
+    public IJavaCompletionProposal[] getCorrections(IInvocationContext context, IProblemLocation[] locations) throws CoreException {
+        ArrayList<IJavaCompletionProposal> result = new ArrayList<IJavaCompletionProposal>(locations.length);
+        for (IProblemLocation problem: locations) {
+            if (IProblem.UndefinedType != problem.getProblemId()) continue;
+            addJExampleToBuildPathProposals(context, problem, result); 
+        }
+        return result.toArray(new IJavaCompletionProposal[result.size()]);	
+    }
 
-	private void addJExampleToBuildPathProposals(IInvocationContext context, IProblemLocation location, ArrayList<IJavaCompletionProposal> proposals) throws JavaModelException {
-		ICompilationUnit unit= context.getCompilationUnit();
-		String qualifiedName= null;
-		String s= unit.getBuffer().getText(location.getOffset(), location.getLength());
-		/*if (s.equals("RunWith")) { 
+    private void addJExampleToBuildPathProposals(IInvocationContext context, IProblemLocation location, ArrayList<IJavaCompletionProposal> proposals) throws JavaModelException {
+        ICompilationUnit unit= context.getCompilationUnit();
+        String qualifiedName= null;
+        String s= unit.getBuffer().getText(location.getOffset(), location.getLength());
+        /*if (s.equals("RunWith")) { 
 			qualifiedName= "org.junit.runner.RunWith"; 
 		} else if (s.equals("Test")) { 
 			qualifiedName= "org.junit.Test"; 
 		} else*/ if (s.equals("Given")) { 
-			qualifiedName= "ch.unibe.jexample.Given"; 
+		    qualifiedName= "ch.unibe.jexample.Given"; 
 		} else if (s.equals("JExample")) { 
-			qualifiedName= "ch.unibe.jexample.JExample"; 
+		    qualifiedName= "ch.unibe.jexample.JExample"; 
 		}
 		if (qualifiedName == null) return;
 		IJavaProject javaProject= unit.getJavaProject();
 		if (javaProject.findType(qualifiedName) != null) return;
 		ClasspathFixProposal[] fixProposals= ClasspathFixProcessor.getContributedFixImportProposals(javaProject, qualifiedName, null);
 		for (ClasspathFixProposal each: fixProposals) {
-			proposals.add(new JExampleClasspathFixCorrectionProposal(javaProject, each, getImportRewrite(context.getASTRoot(), qualifiedName)));
+		    proposals.add(new JExampleClasspathFixCorrectionProposal(javaProject, each, getImportRewrite(context.getASTRoot(), qualifiedName)));
 		}
-	}
+    }
 
-	private ImportRewrite getImportRewrite(CompilationUnit astRoot, String typeToImport) {
-		if (typeToImport != null) {
-			ImportRewrite importRewrite= CodeStyleConfiguration.createImportRewrite(astRoot, true);
-			importRewrite.addImport(typeToImport);
-			return importRewrite;
-		}
-		return null;
-	}	
-	
-	public boolean hasCorrections(ICompilationUnit unit, int problemId) {
-		return problemId == IProblem.UndefinedType;
-	}
+    private ImportRewrite getImportRewrite(CompilationUnit astRoot, String typeToImport) {
+        if (typeToImport != null) {
+            ImportRewrite importRewrite= CodeStyleConfiguration.createImportRewrite(astRoot, true);
+            importRewrite.addImport(typeToImport);
+            return importRewrite;
+        }
+        return null;
+    }	
 
-	private static class JExampleClasspathFixCorrectionProposal implements IJavaCompletionProposal {
+    public boolean hasCorrections(ICompilationUnit unit, int problemId) {
+        return problemId == IProblem.UndefinedType;
+    }
 
-		private final ClasspathFixProposal fClasspathFixProposal;
-		private final ImportRewrite fImportRewrite;
-		private final IJavaProject fJavaProject;
+    private static class JExampleClasspathFixCorrectionProposal implements IJavaCompletionProposal {
 
-		public JExampleClasspathFixCorrectionProposal(IJavaProject javaProject, ClasspathFixProposal cpfix, ImportRewrite rewrite) {
-			fJavaProject= javaProject;
-			fClasspathFixProposal= cpfix;
-			fImportRewrite= rewrite;
-		}
+        private final ClasspathFixProposal fClasspathFixProposal;
+        private final ImportRewrite fImportRewrite;
+        private final IJavaProject fJavaProject;
 
-		protected Change createChange() throws CoreException {
-			Change change= fClasspathFixProposal.createChange(null);
-			if (fImportRewrite != null) {
-				TextFileChange cuChange= new TextFileChange("Add import", (IFile) fImportRewrite.getCompilationUnit().getResource()); //$NON-NLS-1$
-				cuChange.setEdit(fImportRewrite.rewriteImports(null));
+        public JExampleClasspathFixCorrectionProposal(IJavaProject javaProject, ClasspathFixProposal cpfix, ImportRewrite rewrite) {
+            fJavaProject= javaProject;
+            fClasspathFixProposal= cpfix;
+            fImportRewrite= rewrite;
+        }
 
-				CompositeChange composite= new CompositeChange(getDisplayString());
-				composite.add(change);
-				composite.add(cuChange);
-				return composite;
-			}
-			return change;
-		}
+        protected Change createChange() throws CoreException {
+            Change change= fClasspathFixProposal.createChange(null);
+            if (fImportRewrite != null) {
+                TextFileChange cuChange= new TextFileChange("Add import", (IFile) fImportRewrite.getCompilationUnit().getResource()); //$NON-NLS-1$
+                cuChange.setEdit(fImportRewrite.rewriteImports(null));
 
-		@SuppressWarnings("deprecation")
-		public void apply(IDocument document) {
-			try {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(false, true, new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-						try {
-							Change change= createChange();
-							change.initializeValidationData(new NullProgressMonitor());
-							PerformChangeOperation op= RefactoringUI.createUIAwareChangeOperation(change);
-							op.setUndoManager(RefactoringCore.getUndoManager(), getDisplayString());
-							op.setSchedulingRule(fJavaProject.getProject().getWorkspace().getRoot());
-							op.run(monitor);
-						} catch (CoreException e) {
-							throw new InvocationTargetException(e);
-						} catch (OperationCanceledException e) {
-							throw new InterruptedException();
-						}
-					}
-				});
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+                CompositeChange composite= new CompositeChange(getDisplayString());
+                composite.add(change);
+                composite.add(cuChange);
+                return composite;
+            }
+            return change;
+        }
 
-		public String getAdditionalProposalInfo() {
-			return fClasspathFixProposal.getAdditionalProposalInfo();
-		}
+        @SuppressWarnings("deprecation")
+        public void apply(IDocument document) {
+            try {
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(false, true, new IRunnableWithProgress() {
+                    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                        try {
+                            Change change= createChange();
+                            change.initializeValidationData(new NullProgressMonitor());
+                            PerformChangeOperation op= RefactoringUI.createUIAwareChangeOperation(change);
+                            op.setUndoManager(RefactoringCore.getUndoManager(), getDisplayString());
+                            op.setSchedulingRule(fJavaProject.getProject().getWorkspace().getRoot());
+                            op.run(monitor);
+                        } catch (CoreException e) {
+                            throw new InvocationTargetException(e);
+                        } catch (OperationCanceledException e) {
+                            throw new InterruptedException();
+                        }
+                    }
+                });
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-		public int getRelevance() {
-			return fClasspathFixProposal.getRelevance();
-		}
+        public String getAdditionalProposalInfo() {
+            return fClasspathFixProposal.getAdditionalProposalInfo();
+        }
 
-		public IContextInformation getContextInformation() {
-			return null;
-		}
+        public int getRelevance() {
+            return fClasspathFixProposal.getRelevance();
+        }
 
-		public String getDisplayString() {
-			return fClasspathFixProposal.getDisplayString();
-		}
+        public IContextInformation getContextInformation() {
+            return null;
+        }
 
-		public Image getImage() {
-			return fClasspathFixProposal.getImage();
-		}
+        public String getDisplayString() {
+            return fClasspathFixProposal.getDisplayString();
+        }
 
-		public Point getSelection(IDocument document) {
-			return null;
-		}
-	}
-	
+        public Image getImage() {
+            return fClasspathFixProposal.getImage();
+        }
+
+        public Point getSelection(IDocument document) {
+            return null;
+        }
+    }
+
 }

@@ -20,87 +20,87 @@ import org.eclipse.swt.graphics.Image;
 
 public class JExampleClasspathFixProcessor extends ClasspathFixProcessor {
 
-	@Override
-	public ClasspathFixProposal[] getFixImportProposals(IJavaProject project, String name) throws CoreException {
-		if (!match(name)) return null;
-		return new ClasspathFixProposal[] { new JExampleClasspathFixProposal(project, 15) 	};
-	}
+    @Override
+    public ClasspathFixProposal[] getFixImportProposals(IJavaProject project, String name) throws CoreException {
+        if (!match(name)) return null;
+        return new ClasspathFixProposal[] { new JExampleClasspathFixProposal(project, 15) 	};
+    }
 
-	private boolean match(String name) {
-		return name != null && (name.equals("Test") || name.equals("Given") || name.equals("RunWith")
-				|| name.startsWith("org.junit.") || name.startsWith("ch.unibe.jexample."));
-	}
+    private boolean match(String name) {
+        return name != null && (name.equals("Test") || name.equals("Given") || name.equals("RunWith")
+                || name.startsWith("org.junit.") || name.startsWith("ch.unibe.jexample."));
+    }
 
-	private static class JExampleClasspathFixProposal extends ClasspathFixProposal {
+    private static class JExampleClasspathFixProposal extends ClasspathFixProposal {
 
-		private final int fRelevance;
-		private final IJavaProject fProject;
+        private final int fRelevance;
+        private final IJavaProject fProject;
 
-		public JExampleClasspathFixProposal(IJavaProject project, int relevance) {
-			fProject= project;
-			fRelevance= relevance;
-		}
+        public JExampleClasspathFixProposal(IJavaProject project, int relevance) {
+            fProject= project;
+            fRelevance= relevance;
+        }
 
-		@Override
-		public String getAdditionalProposalInfo() {
-			return "Adds the JExample library to the build path.";
-		}
+        @Override
+        public String getAdditionalProposalInfo() {
+            return "Adds the JExample library to the build path.";
+        }
 
-		@Override
-		public Change createChange(IProgressMonitor monitor) throws CoreException {
-			return createChange2(monitor == null ? new NullProgressMonitor() : monitor);
-		}
+        @Override
+        public Change createChange(IProgressMonitor monitor) throws CoreException {
+            return createChange2(monitor == null ? new NullProgressMonitor() : monitor);
+        }
 
-		private Change createChange2(IProgressMonitor monitor) throws JavaModelException {
-			monitor.beginTask("Adding JExample library", 1);
-			try {
-				IClasspathEntry entry= null;
-				entry= JavaCore.newContainerEntry(new Path(JExampleContainerInitializer.JEXAMPLE_PATH));
-				IClasspathEntry[] oldEntries= fProject.getRawClasspath();
-				ArrayList<IClasspathEntry> newEntries= new ArrayList<IClasspathEntry>(oldEntries.length + 1);
-				boolean added= false;
-				for (int i= 0; i < oldEntries.length; i++) {
-					IClasspathEntry curr= oldEntries[i];
-					if (curr.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-						IPath path= curr.getPath();
-						if (path.equals(entry.getPath())) {
-							return new NullChange(); // already on build path
-						} 
-					} 
-					if (curr != null) {
-						newEntries.add(curr);
-					}
-				}
-				if (!added) {
-					newEntries.add(entry);
-				}
+        private Change createChange2(IProgressMonitor monitor) throws JavaModelException {
+            monitor.beginTask("Adding JExample library", 1);
+            try {
+                IClasspathEntry entry= null;
+                entry= JavaCore.newContainerEntry(new Path(JExampleContainerInitializer.JEXAMPLE_PATH));
+                IClasspathEntry[] oldEntries= fProject.getRawClasspath();
+                ArrayList<IClasspathEntry> newEntries= new ArrayList<IClasspathEntry>(oldEntries.length + 1);
+                boolean added= false;
+                for (int i= 0; i < oldEntries.length; i++) {
+                    IClasspathEntry curr= oldEntries[i];
+                    if (curr.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+                        IPath path= curr.getPath();
+                        if (path.equals(entry.getPath())) {
+                            return new NullChange(); // already on build path
+                        } 
+                    } 
+                    if (curr != null) {
+                        newEntries.add(curr);
+                    }
+                }
+                if (!added) {
+                    newEntries.add(entry);
+                }
 
-				final IClasspathEntry[] newCPEntries= (IClasspathEntry[]) newEntries.toArray(new IClasspathEntry[newEntries.size()]);
-				Change newClasspathChange= newClasspathChange(fProject, newCPEntries, fProject.getOutputLocation());
-				if (newClasspathChange != null) {
-					return newClasspathChange;
-				}
-			} finally {
-				monitor.done();
-			}
-			return new NullChange();
-		}
+                final IClasspathEntry[] newCPEntries= (IClasspathEntry[]) newEntries.toArray(new IClasspathEntry[newEntries.size()]);
+                Change newClasspathChange= newClasspathChange(fProject, newCPEntries, fProject.getOutputLocation());
+                if (newClasspathChange != null) {
+                    return newClasspathChange;
+                }
+            } finally {
+                monitor.done();
+            }
+            return new NullChange();
+        }
 
-		@Override
-		public String getDisplayString() {
-			return "Add JExample library to the build path";
-		}
+        @Override
+        public String getDisplayString() {
+            return "Add JExample library to the build path";
+        }
 
-		@Override
-		public Image getImage() {
-			return JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_LIBRARY);
-		}
+        @Override
+        public Image getImage() {
+            return JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_LIBRARY);
+        }
 
-		@Override
-		public int getRelevance() {
-			return fRelevance;
-		}
-	}
-	
-	
+        @Override
+        public int getRelevance() {
+            return fRelevance;
+        }
+    }
+
+
 }
