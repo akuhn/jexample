@@ -144,7 +144,7 @@ public class MethodReference {
         if (isBroken()) return "Broken: " + error;
         return getActualClass().toString() + "#" + getName();
     }
-
+    
     private boolean declaresPolicy(Injection injection) {
         return injection != null && injection.value() != InjectionPolicy.DEFAULT;
     }

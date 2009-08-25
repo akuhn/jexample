@@ -1,7 +1,11 @@
 package ch.unibe.jexample.internal;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +16,7 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.graph.Node;
 import ch.unibe.jexample.internal.util.CompositeRunner;
 import ch.unibe.jexample.internal.util.JExampleError;
@@ -38,6 +43,7 @@ public class ExampleGraph {
     private Map<Class<?>,ExampleClass> classes;
 
     private Map<MethodReference,Example> examples;
+    private boolean writeDotFile = System.getProperty("jexample.dotfile") != null;
 
     public ExampleGraph() {
         this.examples = new HashMap<MethodReference,Example>();
@@ -95,11 +101,37 @@ public class ExampleGraph {
     }
 
     public void run(ExampleClass testClass, RunNotifier notifier) {
+        if (!anyHasBeenRun) onStartRunning();
         anyHasBeenRun = true;
         for (Example e: this.getExamples()) {
             if (testClass.contains(e)) {
                 e.run(notifier);
             }
+        }
+    }
+
+    private void onStartRunning() {
+        if (!writeDotFile) return;
+        StringBuffer buf = new StringBuffer();
+        buf.append("digraph G {\n");
+        buf.append("graph[rankdir=BT,overlap=scale,size=\"8.5,11\"];\n");
+        buf.append("node[label=\" \",shape=box];\n");
+        for (Example each: examples.values()) {
+            String name = "\"" + each.method + "\"";
+            buf.append(name).append(";\n");
+            for (Edge<Example> d: each.node.dependencies()) {
+                String d_name = d.isBroken() ? "__broken__"+name
+                        : ("\"" + d.getProducer().value.method + "\"");
+                buf.append(name).append(" -> ").append(d_name).append(";\n");
+            }
+        }
+        buf.append("}\n");
+        try {
+            FileWriter f = new FileWriter("jexample-"+new SimpleDateFormat("yyyyMMdd-hhmmssSSSS").format(new Date())+".dot");
+            f.append(buf);
+            f.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -111,7 +143,9 @@ public class ExampleGraph {
         return new JUnitCore().run(runner);
     }
 
+    /** To run tests from tests. */
     public Result runJExample(Class<?>... tests) throws JExampleError {
+        writeDotFile = false;
         for (Class<?> each: tests)
             add(each);
         return runJExample();
