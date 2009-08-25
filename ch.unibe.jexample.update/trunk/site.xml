@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/ch.unibe.jexample.feature_4.5.333.r332.jar" id="ch.unibe.jexample.feature" version="4.5.333.r332">
+   <feature url="features/ch.unibe.jexample.feature_4.5.375.r374.jar" id="ch.unibe.jexample.feature" version="4.5.375.r374">
       <category name="JExample"/>
    </feature>
    <category-def name="JExample" label="JExample">
