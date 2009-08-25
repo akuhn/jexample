@@ -74,15 +74,14 @@ class CloneInjectionStrategy implements InjectionStrategy {
             for (Field f: receiver.getClass().getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 if (Modifier.isFinal(f.getModifiers())) continue;
-                if (ImmutableClasses.contains(f.getType())) {
-                    f.setAccessible(true);
-                    f.set(clone, f.get(receiver));
+                f.setAccessible(true);
+                Object value = f.get(receiver);
+                if (value == null || ImmutableClasses.contains(value.getClass())) {
+                    f.set(clone, value);
                 }
                 else {
-                    if (!(Cloneable.class.isAssignableFrom(f.getType()))) return MISSING;
-                    f.setAccessible(true);
-                    Object value = f.get(receiver);
-                    f.set(clone, value == null ? null : OBJECT_CLONE.invoke(value));
+                    if (!(Cloneable.class.isAssignableFrom(value.getClass()))) return MISSING;
+                    f.set(clone, OBJECT_CLONE.invoke(value));
                 }
             }
             return clone;

@@ -62,4 +62,9 @@ class D implements Cloneable {
         return new D("clone of " + name);
     }
     
+    @Override
+    public String toString() {
+        return name;
+    }
+    
 }
