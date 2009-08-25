@@ -71,7 +71,7 @@ import ch.unibe.jexample.internal.tests.TestClassValidationTest;
     TestClassValidationTest.class,
     SmallGraph.class,
     StackTest.class,
-    ListTest.class,
+    ListTest.class
 })
 public class AllTests {
 

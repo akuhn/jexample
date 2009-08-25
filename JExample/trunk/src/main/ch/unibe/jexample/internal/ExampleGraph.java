@@ -117,11 +117,11 @@ public class ExampleGraph {
         buf.append("graph[rankdir=BT,overlap=scale,size=\"8.5,11\"];\n");
         buf.append("node[label=\" \",shape=box];\n");
         for (Example each: examples.values()) {
-            String name = "\"" + each.method + "\"";
+            String name = "\"" + each.node + "\"";
             buf.append(name).append(";\n");
             for (Edge<Example> d: each.node.dependencies()) {
                 String d_name = d.isBroken() ? "__broken__"+name
-                        : ("\"" + d.getProducer().value.method + "\"");
+                        : ("\"" + d.getProducer().value.node + "\"");
                 buf.append(name).append(" -> ").append(d_name).append(";\n");
             }
         }
