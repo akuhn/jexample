@@ -37,7 +37,7 @@ Dependent tests are not only more fun to write than isolated ones &mdash; they a
         @Given("#shouldPush")
         public void shouldPop(Stack stack) {
             int size = stack.size();
-            String string = stack.pop();
+            Object string = stack.pop();
             assertEquals("element", string);
             assertEquals(size - 1, stack.size());
         }
@@ -49,17 +49,17 @@ For more information, please refer to the <A HREF="http://scg.unibe.ch/research/
  <A HREF="http://twitter.com/jexample">follow us on twitter</A>. 
 <H1>Release Notes</H1>
 
-<P>r378, fixed bug in immutable classes matcher.
-<P>r374, writes dot file if "jexample.dot" system property is set.
-<P>r372, @Injection annotation allows you to declare injection policy. Available policies are CLONE, DEEPCLONE, NONE, and RERUN, see InjectionPolicy's javadoc.
-<P>r344, if "jexample.rerun" system property is set, we force all injection values (including the test class) to be re-created instead of cloned. 
-<P>r339, shows browser with release notes in "Add Library" wizard page.
-<P>r337, deepcopy: don't clone transient field of references (ie weak and soft reference).
-<P>r329, deepcopy: don't clone instances of immutable classes (an immutable class has no, or primitive-immutable fields only).
-<P>r328, deepcopy: if you deep-clone threads, bad things happen, thus we don't clone Threads.
-<P>r327, deepcopy: all clone factories share the same clone strategy cache,
+<P>Release 378, fixed bug in immutable classes matcher.
+<P>Release 374, writes dot file if "jexample.dot" system property is set.
+<P>Release 372, @Injection annotation allows you to declare injection policy. Available policies are CLONE, DEEPCLONE, NONE, and RERUN, see InjectionPolicy's javadoc.
+<P>Release 344, if "jexample.rerun" system property is set, we force all injection values (including the test class) to be re-created instead of cloned. 
+<P>Release 339, shows browser with release notes in "Add Library" wizard page.
+<P>Release 337, deepcopy: don't clone transient field of references (ie weak and soft reference).
+<P>Release 329, deepcopy: don't clone instances of immutable classes (an immutable class has no, or primitive-immutable fields only).
+<P>Release 328, deepcopy: if you deep-clone threads, bad things happen, thus we don't clone Threads.
+<P>Release 327, deepcopy: all clone factories share the same clone strategy cache,
  this improves performance (before 24% of test running time was spent in UnsafeCloneStrategy#makeConstructor).
-<P>r324, merged deep-clone branch into trunk. 
+<P>Release 324, merged deep-clone branch into trunk. 
 <P>Here starts prehistory&hellip; :)
 
 <P>&nbsp;
