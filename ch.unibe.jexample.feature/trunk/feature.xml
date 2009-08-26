@@ -10,7 +10,7 @@
    </description>
 
    <copyright url="http://scg.unibe.ch/research/jexample">
-      Copyright (c) 2007-2009, %author.
+      Copyright (c) 2007-2009, %author
    </copyright>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
@@ -21,7 +21,7 @@
          id="ch.unibe.jexample.library"
          download-size="0"
          install-size="0"
-         version="4.5.375.r374"
+         version="4.5.379.r378"
          unpack="false"/>
 
 </feature>
