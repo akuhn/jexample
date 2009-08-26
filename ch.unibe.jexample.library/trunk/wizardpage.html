@@ -9,27 +9,55 @@
 <P><span id="name">JExample</span> is a small framework to write unit tests that <i>depend on each other</i>. 
  Brought to you by Adrian Kuhn and Lea H&auml;nsenberger.
 <P>
-Dependent tests are not only more fun to write than isolated ones&mdash;they also run faster,
+Dependent tests are not only more fun to write than isolated ones &mdash; they also run faster,
  reduce code duplication and provide better failure localization. How come?
- Given dependencies A, B and C had been executed successfully, 
- test T can reuse all of their fixtures.
- This saves both setup costs and code duplication.
- On the other hand, if one of the dependencies fails, test T and all its dependents are skipped. 
- This helps to pin-point failures to their very cause.
+ Given all dependencies had been executed successfully, 
+ a test T can reuse their fixtures (ie return values).
+ This helps you to save setup costs and avoids code duplication.
+ If, however, one of the dependencies fails, test T and all its dependents are skipped. 
+ This helps you to pin-point failures to their very cause.
+<PRE>
+    @RunWith(JExample.class)
+    public class StackTest {
+    
+        @Test
+        public Stack emptyStack() {
+            Stack stack = new Stack();
+            assertEquals(0, stack.size());
+            return stack;
+        }
+
+        @Given("#emptyStack")
+        public Stack shouldPush(Stack stack) {
+            stack.push("element");
+            assertEquals(1, stack.size());
+            return stack;
+        }
+    
+        @Given("#shouldPush")
+        public void shouldPop(Stack stack) {
+            int size = stack.size();
+            String string = stack.pop();
+            assertEquals("element", string);
+            assertEquals(size - 1, stack.size());
+        }
+    
+    }
+</PRE>
 <P>
 For more information, please refer to the <A HREF="http://scg.unibe.ch/research/jexample">JExample website</A> or 
  <A HREF="http://twitter.com/jexample">follow us on twitter</A>. 
 <H1>Release Notes</H1>
 
-<P>r339, shows browser with release notes in add library wizard page.
-<P>r337, don't clone transient field of references (ie weak and soft reference).
-<P>r334, hidden developer flag, now possible to dispose cached test results
- when all their consumers (and co-consumers) are run.
-<P>r332, fixed deep clone test (had to fix the dummy,
- since immutable objects aren't cloned anymore. Thus our test dummy now includes a mutable field).
-<P>r329, don't clone instances of immutable classes (an immutable class has no, or primitive-immutable fields only).
-<P>r328, if you deep-clone threads, bad things happen, thus we don't clone Threads.
-<P>r327, all clone factories share the same clone strategy cache,
+<P>r378, fixed bug in immutable classes matcher.
+<P>r374, writes dot file if "jexample.dot" system property is set.
+<P>r372, @Injection annotation allows you to declare injection policy. Available policies are CLONE, DEEPCLONE, NONE, and RERUN, see InjectionPolicy's javadoc.
+<P>r344, if "jexample.rerun" system property is set, we force all injection values (including the test class) to be re-created instead of cloned. 
+<P>r339, shows browser with release notes in "Add Library" wizard page.
+<P>r337, deepcopy: don't clone transient field of references (ie weak and soft reference).
+<P>r329, deepcopy: don't clone instances of immutable classes (an immutable class has no, or primitive-immutable fields only).
+<P>r328, deepcopy: if you deep-clone threads, bad things happen, thus we don't clone Threads.
+<P>r327, deepcopy: all clone factories share the same clone strategy cache,
  this improves performance (before 24% of test running time was spent in UnsafeCloneStrategy#makeConstructor).
 <P>r324, merged deep-clone branch into trunk. 
 <P>Here starts prehistory&hellip; :)
@@ -38,6 +66,6 @@ For more information, please refer to the <A HREF="http://scg.unibe.ch/research/
 
 <HR/>
 
-JExample, revision 339, Copyright &copy; 2007-2009 Adrian Kuhn and Lea H&auml;nsenberger, distributed under Eclipse Public License 1.0 
+JExample, revision 379, Copyright &copy; 2007-2009 Adrian Kuhn and Lea H&auml;nsenberger, distributed under Eclipse Public License 1.0 
  
 </BODY>
