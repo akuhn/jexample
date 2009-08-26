@@ -15,6 +15,7 @@ import ch.unibe.jexample.internal.RerunInjectionValuesTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneHashMapTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneReferenceTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneTest;
+import ch.unibe.jexample.internal.deepclone.ImmutableClassesTest;
 import ch.unibe.jexample.internal.graph.CycleDetectionTest;
 import ch.unibe.jexample.internal.graph.SmallGraph;
 import ch.unibe.jexample.internal.tests.BeforeClassTest;
@@ -61,6 +62,7 @@ import ch.unibe.jexample.internal.tests.TestClassValidationTest;
     ForExampleTest.class,
     InheritanceTest.class,
     InvalidDependencyTest.class,
+    ImmutableClassesTest.class,
     JExampleOptionsDefault.class,
     JExampleOptionsDontCloneReturnValues.class,
     JExampleTest.class,

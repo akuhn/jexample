@@ -28,7 +28,7 @@ public class ImmutableClasses {
         if (Object.class == type) return true;
         for (Class<?> curr = type; curr != null; curr = curr.getSuperclass()) {
             String fqn = curr.getName();
-            for (String each: IMMUTABLES) if (fqn.startsWith(each)) return true;
+            for (String each: PATTERNS) if (match(each, fqn)) return true;
         }
         return noFieldsOrFinalFieldsOnly(type);
     }
@@ -43,9 +43,7 @@ public class ImmutableClasses {
         return true;
     }
     
-    
-    private static final String[] IMMUTABLES = {
-        "sun.font", // package
+    private static final String[] PATTERNS = {
         "java.lang.Boolean",
         "java.lang.Character",
         "java.lang.Void",
@@ -55,6 +53,13 @@ public class ImmutableClasses {
         "java.lang.ClassLoader",
         "java.lang.Throwable",
         "java.lang.Thread",
+        "sun.font.*", // caused illegal memory access
     };    
+
+    public static boolean match(String pattern, String string) {
+        return pattern.endsWith("*")
+                ? string.startsWith(pattern.substring(0, pattern.length() - 1))
+                : string.equals(pattern);
+    }
     
 }
