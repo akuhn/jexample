@@ -6,7 +6,7 @@ import static ch.unibe.jexample.InjectionPolicy.NONE;
 import static ch.unibe.jexample.InjectionPolicy.RERUN;
 import static ch.unibe.jexample.internal.InjectionStrategy.MISSING;
 import ch.unibe.jexample.InjectionPolicy;
-import ch.unibe.jexample.internal.util.CloneUtil;
+import ch.unibe.jexample.internal.util.Reflection;
 
 /** Creates injection values for test execution.
  *<P> 
@@ -60,7 +60,7 @@ public class InjectionValues {
 
     private static Object fixReceiver(Example example, Object receiver) throws Exception {
         Object result = example.method.getActualClass().isInstance(receiver) ? receiver : null;
-        if (result == null) result = CloneUtil.getConstructor(example.method.getActualClass()).newInstance();
+        if (result == null) result = Reflection.newInstance(example.method.getActualClass());
         return result;        
     }
 

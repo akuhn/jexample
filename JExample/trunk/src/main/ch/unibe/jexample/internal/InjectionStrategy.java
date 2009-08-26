@@ -1,13 +1,12 @@
 package ch.unibe.jexample.internal;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import ch.unibe.jexample.internal.deepcopy.CloneFactory;
 import ch.unibe.jexample.internal.deepcopy.ImmutableClasses;
-import ch.unibe.jexample.internal.util.CloneUtil;
+import ch.unibe.jexample.internal.util.Reflection;
 
 public interface InjectionStrategy {
 
@@ -70,7 +69,7 @@ class CloneInjectionStrategy implements InjectionStrategy {
     private Object cloneReceiver(Object receiver) {
         if (receiver == null) return null;
         try {
-            Object clone = CloneUtil.getConstructor(receiver.getClass()).newInstance();
+            Object clone = Reflection.newInstance(receiver.getClass());
             for (Field f: receiver.getClass().getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 if (Modifier.isFinal(f.getModifiers())) continue;
@@ -81,7 +80,7 @@ class CloneInjectionStrategy implements InjectionStrategy {
                 }
                 else {
                     if (!(Cloneable.class.isAssignableFrom(value.getClass()))) return MISSING;
-                    f.set(clone, OBJECT_CLONE.invoke(value));
+                    f.set(clone, Reflection.invoke(OBJECT_CLONE, value));
                 }
             }
             return clone;
@@ -89,30 +88,16 @@ class CloneInjectionStrategy implements InjectionStrategy {
             throw new RuntimeException(ex);
         } catch (SecurityException ex) {
             throw new RuntimeException(ex);
-        } catch (InstantiationException ex) {
-            throw new RuntimeException(ex);
         } catch (IllegalAccessException ex) {
             throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex.getTargetException());
-        } catch (NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        }
+        } 
     }
     
     private Object cloneArgument(Object object) {
         if (object == null) return null;
         if (ImmutableClasses.contains(object.getClass())) return object;
         if (!(object instanceof Cloneable)) return MISSING;
-        try {
-            return OBJECT_CLONE.invoke(object);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex.getTargetException());
-        }
+        return Reflection.invoke(OBJECT_CLONE, object);
     }
 
     private static Method initializeCloneMethod() {

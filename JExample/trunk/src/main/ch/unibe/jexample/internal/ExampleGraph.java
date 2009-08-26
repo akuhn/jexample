@@ -114,7 +114,7 @@ public class ExampleGraph {
         if (!writeDotFile) return;
         StringBuffer buf = new StringBuffer();
         buf.append("digraph G {\n");
-        buf.append("graph[rankdir=BT,overlap=scale,size=\"8.5,11\"];\n");
+        buf.append("graph[rankdir=BT,overlap=scale,size=\"11,8.5\"];\n");
         buf.append("node[label=\" \",shape=box];\n");
         for (Example each: examples.values()) {
             String name = "\"" + each.node + "\"";
@@ -127,12 +127,17 @@ public class ExampleGraph {
         }
         buf.append("}\n");
         try {
-            FileWriter f = new FileWriter("jexample-"+new SimpleDateFormat("yyyyMMdd-hhmmssSSSS").format(new Date())+".dot");
+            FileWriter f = new FileWriter(getDotFilename());
             f.append(buf);
             f.close();
+            writeDotFile = false;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private String getDotFilename() {
+        return "jexample-"+new SimpleDateFormat("yyyyMMdd-hhmmss").format(new Date())+".dot";
     }
 
     public Result runJExample() {

@@ -16,7 +16,7 @@ import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.util.CloneUtil;
+import ch.unibe.jexample.internal.util.Reflection;
 import ch.unibe.jexample.internal.util.JExampleError;
 
 public class ReturnValueTest {
@@ -96,7 +96,7 @@ public class ReturnValueTest {
         Example e = runWithField("testChangeString");
 
         assertNull(e.getReturnValue().getValue());
-        assertEquals("Hello, World", CloneUtil.getField(e.getReturnValue().getTestCaseInstance(), "aString"));
+        assertEquals("Hello, World", Reflection.getField(e.getReturnValue().getTestCaseInstance(), "aString"));
     }
 
     @Test

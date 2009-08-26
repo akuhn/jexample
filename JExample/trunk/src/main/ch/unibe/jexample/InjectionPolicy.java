@@ -1,5 +1,18 @@
 package ch.unibe.jexample;
 
+/** Dependency injection policy.
+ * The constants of this enumerated type describe the various policies for
+ * injecting cached return values. They are used in conjunction with the
+ * {@link Injection} annotation type to specify how the cached return values
+ * are cloned before executing a test method.
+ *<P>
+ * If two or more JExample test methods depend on the same return value,
+ * something must be done to avoid side effects. The default policy is to
+ * clone values before injection.
+ * 
+ * @author Adrian Kuhn, 2009
+ *
+ */
 public enum InjectionPolicy {
 
     /** Uses the {@link Object#clone #clone} method to clone

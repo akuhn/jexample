@@ -26,18 +26,19 @@ import ch.unibe.jexample.internal.util.JExampleError.Kind;
  * value. If an example method declares dependencies and has arguments, the
  * framework will inject the cache return values of the dependencies as
  * parameters into the method execution. For more details, please refer to
- * {@link ch.unibe.jexample.JExampleOptions @InjectionPolicy}.
+ * {@link ch.unibe.jexample.InjectionPolicy @InjectionPolicy}.
  * <p>
- * An example method must have at least a {@link org.junit.Test @Test}
- * annotation. The enclosing class must use an {@link org.junit.RunWith
- * &#64;RunWith} annotation to declare {@link ch.unibe.jexample.JExample
- * JExampleRunner} as test runner.
+ * An example method must have an {@link org.junit.Test @Test}
+ * annotation or an {@link ch.unibe.jexample.Given @Given}.
+ * The enclosing class must use an {@link org.junit.RunWith &#64;RunWith}
+ * annotation to declare {@link ch.unibe.jexample.JExample
+ * JExample} as test runner.
  * <p>
  * An example method may return an instance of its unit under test.
  * <p>
  * An example method may depend on both successful execution and return value of
  * other examples. If it does, it must declare the dependencies using an
- * {@link ch.unibe.jexample.Given @Depends} annotation. An example methods with
+ * {@link ch.unibe.jexample.Given @Given} annotation. An example method with
  * dependencies may have method parameters. The number of parameters must be
  * less than or equal to the number of dependencies. The type of the n-th
  * parameter must match the return type of the n-th dependency.

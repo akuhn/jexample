@@ -19,8 +19,8 @@ import ch.unibe.jexample.internal.util.JExampleError;
  * {@link #run(RunNotifier)} on any of these instances. Current versions of
  * JUnit's eclipse plug-in do so (as of Eclipse 3.4 and JUnit 4.4).
  * <p>
- * All test classes passed to this Runner must be annotated with &#64;
- * {@link RunWith}(JExample.class) annotations.
+ * All test classes passed to this Runner must be annotated with
+ * &#64;{@link RunWith}(JExample.class) annotations.
  * 
  * @author Adrian Kuhn, 2007-2008
  * @author Lea Haensenberger, 2007

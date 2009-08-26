@@ -1,6 +1,5 @@
 package ch.unibe.jexample.internal;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,9 +11,9 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
-import ch.unibe.jexample.internal.util.CloneUtil;
 import ch.unibe.jexample.internal.util.JExampleError;
 import ch.unibe.jexample.internal.util.MethodReference;
+import ch.unibe.jexample.internal.util.Reflection;
 import ch.unibe.jexample.internal.util.JExampleError.Kind;
 
 /**
@@ -81,17 +80,8 @@ public class ExampleClass {
     public void runBeforeClassBefores() {
         if (beforesRunned) return;
         for (Method m: jclass.getMethods()) {
-            if (m.isAnnotationPresent(BeforeClass.class)) {
-                try {
-                    m.invoke(null);
-                } catch (IllegalArgumentException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InvocationTargetException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+            if (!m.isAnnotationPresent(BeforeClass.class)) continue;
+            Reflection.invoke(m, null);
         }
         beforesRunned = true;
     }
@@ -103,7 +93,7 @@ public class ExampleClass {
                     "Class %s is not a JExample test class, annotation @RunWith(JExample.class) missing.", this);
         }
         try {
-            CloneUtil.getConstructor(jclass);
+            Reflection.hasConstructorOrFail(jclass);
         } catch (NoSuchMethodException ex) {
             errors.add(Kind.MISSING_CONSTRUCTOR, ex);
         } catch (SecurityException ex) {
