@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import ch.unibe.jexample.internal.Example;
-
 /** Node in a graph.
  * 
  * @author Adrian Kuhn, 2009

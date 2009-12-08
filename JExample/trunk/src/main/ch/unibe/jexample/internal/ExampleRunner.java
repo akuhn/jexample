@@ -8,8 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 
-import ch.unibe.jexample.internal.graph.Edge;
-
 /**
  * Runs an example, reports to JUnit and returns test color.
  * 

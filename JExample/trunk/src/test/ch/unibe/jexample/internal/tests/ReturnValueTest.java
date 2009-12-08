@@ -12,12 +12,11 @@ import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
-import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.Example;
 import ch.unibe.jexample.internal.ExampleGraph;
-import ch.unibe.jexample.internal.util.Reflection;
 import ch.unibe.jexample.internal.util.JExampleError;
+import ch.unibe.jexample.internal.util.Reflection;
 
 public class ReturnValueTest {
 

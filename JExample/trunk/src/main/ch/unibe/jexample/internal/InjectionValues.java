@@ -5,11 +5,7 @@ import static ch.unibe.jexample.InjectionPolicy.DEEPCOPY;
 import static ch.unibe.jexample.InjectionPolicy.NONE;
 import static ch.unibe.jexample.InjectionPolicy.RERUN;
 import static ch.unibe.jexample.internal.InjectionStrategy.MISSING;
-
-import java.util.List;
-
 import ch.unibe.jexample.InjectionPolicy;
-import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.util.Reflection;
 
 /** Creates injection values for test execution.

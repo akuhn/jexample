@@ -9,8 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.unibe.jexample.Given;
-import ch.unibe.jexample.Injection;
-import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.JExample;
 
 @RunWith(JExample.class)
