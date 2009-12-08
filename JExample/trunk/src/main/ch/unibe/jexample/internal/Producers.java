@@ -48,7 +48,7 @@ public class Producers implements Iterable<Example> {
         return producers.get(index);
     }
 
-    public Object first() {
+    public Example first() {
         return producers.get(0);
     }
     

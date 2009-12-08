@@ -36,17 +36,10 @@ public class InjectionValues {
     public static InjectionValues make(Example example) throws Exception {
         if (example.producers().isEmpty()) 
             return new InjectionValues(fixReceiver(example, null), new Object[] {});
-        if (hasLinearDependenciesOnly(example)) {
-            Object[] arguments = new Object[example.method.arity()];
-            for (int n = 0; n < arguments.length; n++) {
-                arguments[n] = example.producers().get(n).getReturnValue().getValue(); // FIXME Demeter!?
-            }
-            return new InjectionValues(fixReceiver(example, null), arguments);
-        }
         Object[] arguments = new Object[example.method.arity()];
         InjectionPolicy policy = example.method.getInjectionPolicy();
         InjectionStrategy strategy = pickStrategy(policy);
-        Object receiver = example.producers().get(0).getReturnValue().getTestCaseInstance();
+        Object receiver = example.producers().first().getReturnValue().getTestCaseInstance();
         for (int n = 0; n < arguments.length; n++) {
             arguments[n] = example.producers().get(n).getReturnValue().getValue(); // FIXME Demeter!?
         }
@@ -54,23 +47,10 @@ public class InjectionValues {
         return strategy.makeInjectionValues(receiver, arguments).rerunMissingValues(example);
     }
 
-    private static boolean hasLinearDependenciesOnly(Example example) {
-        return false;
-//        for (Example current = example;;) {
-//            if (current.consumers().size() > 1) return false;
-//            if (current.consumers().size() == 0) break;
-//            current = current.consumers().iterator().next();
-//        }
-//        for (int n = 0; n < example.method.arity(); n++) {
-//            if (example.producers().get(n).consumers().size() > 1) return false;
-//        }
-//        return true;
-    }
-
     private InjectionValues rerunMissingValues(Example example) throws Exception {
         if (testInstance == MISSING ||
                 (arguments.length > 0 && arguments[0] == MISSING)) {
-            ReturnValue value = example.producers().get(0).getReturnValueAndFlush();
+            ReturnValue value = example.producers().first().getReturnValueAndFlush();
             testInstance = value.getTestCaseInstance();
             if (arguments.length > 0 && arguments[0] == MISSING) arguments[0] = value.getValue();
         }
