@@ -13,6 +13,7 @@ import ch.unibe.jexample.internal.GivenLinearDependenciesTest;
 import ch.unibe.jexample.internal.InvalidDependencyTest;
 import ch.unibe.jexample.internal.RerunInjectionStrategyTest;
 import ch.unibe.jexample.internal.RerunInjectionValuesTest;
+import ch.unibe.jexample.internal.WhenReturnValueMissing;
 import ch.unibe.jexample.internal.deepclone.DeepCloneHashMapTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneReferenceTest;
 import ch.unibe.jexample.internal.deepclone.DeepCloneTest;
@@ -75,7 +76,8 @@ import ch.unibe.jexample.internal.tests.TestClassValidationTest;
     TestClassValidationTest.class,
     SmallGraph.class,
     StackTest.class,
-    ListTest.class
+    ListTest.class,
+    WhenReturnValueMissing.class
 })
 public class AllTests {
 

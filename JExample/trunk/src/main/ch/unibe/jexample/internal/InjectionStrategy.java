@@ -7,11 +7,10 @@ import java.lang.reflect.Modifier;
 import ch.unibe.jexample.internal.deepcopy.CloneFactory;
 import ch.unibe.jexample.internal.deepcopy.ImmutableClasses;
 import ch.unibe.jexample.internal.util.Reflection;
+import static ch.unibe.jexample.internal.ReturnValue.MISSING;
 
 public interface InjectionStrategy {
 
-    public static final Object MISSING = new Object();
-    
     public InjectionValues makeInjectionValues(Object receiver, Object... arguments);
 
 }

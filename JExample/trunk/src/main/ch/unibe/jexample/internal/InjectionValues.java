@@ -4,7 +4,7 @@ import static ch.unibe.jexample.InjectionPolicy.CLONE;
 import static ch.unibe.jexample.InjectionPolicy.DEEPCOPY;
 import static ch.unibe.jexample.InjectionPolicy.NONE;
 import static ch.unibe.jexample.InjectionPolicy.RERUN;
-import static ch.unibe.jexample.internal.InjectionStrategy.MISSING;
+import static ch.unibe.jexample.internal.ReturnValue.MISSING;
 import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.internal.util.Reflection;
 

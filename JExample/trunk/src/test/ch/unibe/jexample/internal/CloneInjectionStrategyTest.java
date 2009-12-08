@@ -90,14 +90,14 @@ public class CloneInjectionStrategyTest {
         Object cannotClone = new Object() { };
         InjectionValues values = strategy.makeInjectionValues(new Object(), cannotClone);
         assertEquals(1, values.getArguments().length);
-        assertEquals(InjectionStrategy.MISSING, values.getArguments()[0]);
+        assertEquals(ReturnValue.MISSING, values.getArguments()[0]);
     }
     
     public void shouldRerunIfCloneFails() {
         Object cannotClone = new BrokenCloneable();
         InjectionValues values = strategy.makeInjectionValues(new Object(), cannotClone);
         assertEquals(1, values.getArguments().length);
-        assertEquals(InjectionStrategy.MISSING, values.getArguments()[0]);
+        assertEquals(ReturnValue.MISSING, values.getArguments()[0]);
     }
     
     static class BrokenCloneable implements Cloneable { 

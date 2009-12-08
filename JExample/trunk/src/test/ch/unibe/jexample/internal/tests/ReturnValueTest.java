@@ -79,8 +79,10 @@ public class ReturnValueTest {
 
     private Example runNullExample() throws JExampleError {
         ExampleGraph egg = new ExampleGraph();
-        egg.runJExample(Null.class);
+        egg.add(Null.class);
         Example e = egg.findExample(Null.class, "returnNull");
+        e.dontFlushWhenDone = true;
+        egg.runJExample();
         return e;
     }
 

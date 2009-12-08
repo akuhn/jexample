@@ -14,31 +14,32 @@ package ch.unibe.jexample.internal;
  */
 public class ReturnValue {
 
-    private enum Color { NONE, WHITE, RED, GREEN };
+    public static final Object MISSING = new Object();
     
-    public static final ReturnValue SUCCESS = new ReturnValue(Color.GREEN);
-    public static final ReturnValue PENDING = new ReturnValue(Color.NONE);
-    public static final ReturnValue FAILURE = new ReturnValue(Color.RED);
-    public static final ReturnValue SKIPPED = new ReturnValue(Color.WHITE);
+    public static final ReturnValue SUCCESS = new ReturnValue();
+    public static final ReturnValue PENDING = new ReturnValue();
+    public static final ReturnValue FAILURE = new ReturnValue();
+    public static final ReturnValue SKIPPED = new ReturnValue();
     
-    private final Color color;
+    private final ReturnValue kind;
     private final Object returnValue;
     private final Object testCaseInstance;
 
     public ReturnValue(Object returnValue, Object testCaseInstance) {
         assert testCaseInstance != null;
-        this.color = Color.GREEN;
-        this.returnValue = returnValue;
         this.testCaseInstance = testCaseInstance;
+        this.returnValue = returnValue;
+        kind = SUCCESS;
     }
     
-    private ReturnValue(Color color) {
-        this.color = color;
-        this.returnValue = this.testCaseInstance = null;
+    private ReturnValue() {
+        testCaseInstance = MISSING;
+        returnValue = MISSING;
+        kind = this;
     }
 
     public ReturnValue withoutCache() {
-        return this.testCaseInstance == null ? this : SUCCESS;
+        return testCaseInstance == MISSING ? this : SUCCESS;
     }
 
     public Object getTestCaseInstance() {
@@ -50,19 +51,27 @@ public class ReturnValue {
     }
 
     public boolean isGreen() {
-        return this == SUCCESS || this.testCaseInstance != null;
+        return kind == SUCCESS;
     }
 
     public boolean isMissing() {
-        return this == PENDING || this == SUCCESS;
+        return kind == PENDING || (kind == SUCCESS && testCaseInstance == MISSING);
     }    
 
     public boolean isTestCaseInstanceOf(Class<?> jclass) {
-        return testCaseInstance != null && testCaseInstance.getClass() == jclass;
+        return testCaseInstance != MISSING && testCaseInstance.getClass() == jclass;
     }
      
     public boolean hasBeenRun() {
-        return this != PENDING;
+        return kind != PENDING;
+    }
+    
+    @Override
+    public String toString() {
+        if (kind == PENDING) return "PENDING";
+        if (kind == FAILURE) return "FAILURE";
+        if (kind == SKIPPED) return "SKIPPED";
+        return "SUCCESS " + (testCaseInstance == MISSING ? "without" : "with") + " value";
     }
     
 }
