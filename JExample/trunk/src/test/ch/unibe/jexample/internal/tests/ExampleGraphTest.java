@@ -38,10 +38,10 @@ public class ExampleGraphTest {
     @Test
     public void testAddDependenciesOfOneClass() throws JExampleError, SecurityException, NoSuchMethodException {
         graph.add(OneClass.class);
-        assertEquals(0, graph.findExample(OneClass.class, "testMethod").node.dependencies().size());
-        assertEquals(1, graph.findExample(OneClass.class, "anotherTestMethod").node.dependencies().size());
-        assertEquals(1, graph.findExample(OneClass.class, "depOnOtherTest").node.dependencies().size());
-        assertEquals(0, graph.findExample(DependsParserTest.B.class, "otherTest").node.dependencies().size());
+        assertEquals(0, graph.findExample(OneClass.class, "testMethod").producers().size());
+        assertEquals(1, graph.findExample(OneClass.class, "anotherTestMethod").producers().size());
+        assertEquals(1, graph.findExample(OneClass.class, "depOnOtherTest").producers().size());
+        assertEquals(0, graph.findExample(DependsParserTest.B.class, "otherTest").producers().size());
     }
 
     @Test

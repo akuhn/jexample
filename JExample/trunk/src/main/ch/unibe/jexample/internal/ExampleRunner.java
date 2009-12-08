@@ -88,10 +88,9 @@ class ExampleRunner {
      *         If any fails, abort and return <code>false</code>.
      */
     private boolean runDependencies() {
-        for (Edge<Example> each: example.node.dependencies()) {
-            Example eg = each.getProducer().value;
-            eg.run(notifier);
-            if (!eg.wasSuccessful()) return false;
+        for (Example each: example.producers()) {
+            each.run(notifier);
+            if (!each.wasSuccessful()) return false;
         }
         return true;
     }

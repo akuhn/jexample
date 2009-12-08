@@ -46,6 +46,8 @@ public class CloneInjectionValuesTest {
         assertEquals("clone of field", field.name);
     }
     
+    @Given("shouldCloneArgumentAgain,shouldCloneField") public void leftDummy() {};
+    @Given("shouldCloneArgumentAgain,shouldCloneField") public void rightDummy() {};
     
 }
     

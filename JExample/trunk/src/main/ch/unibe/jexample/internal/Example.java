@@ -52,7 +52,7 @@ public class Example {
 
     public final Class<? extends Throwable> expectedException;
     public final MethodReference method;
-    public final Node<Example> node;
+    final Node<Example> node;
     public final ExampleClass owner;
 
     JExampleError errors;
@@ -191,5 +191,20 @@ public class Example {
             }
         }
     }
-
+    
+    public Producers producers() {
+        return new Producers(method.arity(), node.producers());
+    }
+    
+    public Consumers consumers() {
+        return new Consumers(node.consumers());
+    }
+ 
+    public ReturnValue getReturnValueAndDispose() throws Exception {
+        ReturnValue value = returnValue;
+        if (returnValue.isGreen()) returnValue = ReturnValue.R_NONE;
+        if (value.isNull()) value = this.bareInvoke();
+        return value;
+    }
+    
 }

@@ -9,6 +9,7 @@ import ch.unibe.jexample.demo.StackTest;
 import ch.unibe.jexample.internal.BrokenDependencyTest;
 import ch.unibe.jexample.internal.CloneInjectionStrategyTest;
 import ch.unibe.jexample.internal.CloneInjectionValuesTest;
+import ch.unibe.jexample.internal.GivenLinearDependenciesTest;
 import ch.unibe.jexample.internal.InvalidDependencyTest;
 import ch.unibe.jexample.internal.RerunInjectionStrategyTest;
 import ch.unibe.jexample.internal.RerunInjectionValuesTest;
@@ -60,6 +61,7 @@ import ch.unibe.jexample.internal.tests.TestClassValidationTest;
     ExampleGraphTest.class,
     ExceptionExpected.class,
     ForExampleTest.class,
+    GivenLinearDependenciesTest.class,
     InheritanceTest.class,
     InvalidDependencyTest.class,
     ImmutableClassesTest.class,

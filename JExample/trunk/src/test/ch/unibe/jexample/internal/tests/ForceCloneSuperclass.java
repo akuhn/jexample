@@ -56,4 +56,8 @@ public class ForceCloneSuperclass {
         assertEquals(0, result.getFailureCount());
     }
 
+    @Given("superClassIsCloned") public void leftDummy() { }
+    @Given("superClassIsCloned") public void rightDummy() { }
+    
+    
 }

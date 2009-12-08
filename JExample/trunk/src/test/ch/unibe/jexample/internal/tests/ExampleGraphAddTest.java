@@ -76,9 +76,9 @@ public class ExampleGraphAddTest {
 
         Example p = g.findExample(C.class, "provider");
         Example c = g.findExample(C.class, "consumer");
-        assertEquals(0, p.node.dependencies().size());
-        assertEquals(1, c.node.dependencies().size());
-        assertEquals(p, c.node.dependencies().iterator().next().getProducer().value);
+        assertEquals(0, p.producers().size());
+        assertEquals(1, c.producers().size());
+        assertEquals(p, c.producers().first());
     }
 
 }
