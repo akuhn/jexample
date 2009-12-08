@@ -59,13 +59,14 @@ public class DependenciesTest {
     @Test
     public void runPolymorphicDepedency() throws Exception {
         ExampleGraph g = new ExampleGraph();
-        Result result = g.runJExample(C.class);
-        assertTrue(result.wasSuccessful());
-        assertEquals(2, result.getRunCount());
-
+        g.add(C.class);
         Example t = g.findExample(C.class, "test");
         Example e = g.findExample(C.class, "empty");
-
+        t.dontFlushWhenDone = true;
+        e.dontFlushWhenDone = true;
+        Result result = g.runJExample();
+        assertTrue(result.wasSuccessful());
+        assertEquals(2, result.getRunCount());
         assertNotSame(e.getReturnValue(), t.getReturnValue());
     }
 

@@ -74,8 +74,4 @@ public class Node<E> {
         return all;
     }
 
-    public void __consumerRemove(Example example) {
-        this.consumers.remove(example);
-    }
-    
 }

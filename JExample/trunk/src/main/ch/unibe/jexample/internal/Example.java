@@ -48,12 +48,12 @@ import ch.unibe.jexample.internal.util.JExampleError.Kind;
  */
 public class Example {
 
-    public static boolean DISPOSE_IF_DONE = false;
-
     public final Class<? extends Throwable> expectedException;
     public final MethodReference method;
     final Node<Example> node;
     public final ExampleClass owner;
+    
+    /*for testing*/ public boolean dontFlushWhenDone = false;
 
     JExampleError errors;
 
@@ -65,7 +65,7 @@ public class Example {
         this.owner = owner;
         this.method = method;
         this.description = method.createTestDescription();
-        this.returnValue = ReturnValue.R_NONE;
+        this.returnValue = ReturnValue.PENDING;
         this.expectedException = method.initExpectedException();
         this.node = new Node<Example>(this);
     }
@@ -84,8 +84,8 @@ public class Example {
     }
 
     public void run(RunNotifier notifier) {
-        if (returnValue.isNull()) returnValue = new ExampleRunner(this, notifier).run();
-        this.maybeRemoveMyselfFromMyProducersConsumersList(); // FIXME wrong place to call this???
+        if (!returnValue.hasBeenRun()) returnValue = new ExampleRunner(this, notifier).run();
+        if (this.isDone() && !dontFlushWhenDone) returnValue = returnValue.withoutCache();
     }
 
     @Override
@@ -125,19 +125,6 @@ public class Example {
             return all;
         } catch (InvalidDeclarationError ex) {
             return Collections.singleton(new MethodReference(ex));
-        }
-    }
-
-    private void maybeRemoveMyselfFromMyProducersConsumersList() {
-        if (!DISPOSE_IF_DONE) return;
-        if (!node.consumers().isEmpty()) return; // only run on leaves
-        this.returnValue.dispose();
-        // TODO why does iterating over producers not work here?
-        for (Edge<Example> d: this.node.dependencies()) {
-            if (d.isBroken()) continue;
-            Example each = d.getProducer().value;
-            each.node.__consumerRemove(this);
-            each.maybeRemoveMyselfFromMyProducersConsumersList();
         }
     }
 
@@ -200,11 +187,16 @@ public class Example {
         return new Consumers(node.consumers());
     }
  
-    public ReturnValue getReturnValueAndDispose() throws Exception {
+    public ReturnValue getReturnValueAndFlush() throws Exception {
         ReturnValue value = returnValue;
-        if (returnValue.isGreen()) returnValue = ReturnValue.R_NONE;
-        if (value.isNull()) value = this.bareInvoke();
-        return value;
+        returnValue = returnValue.withoutCache();
+        return value.isMissing() ? this.bareInvoke() : value;
+    }
+    
+    public boolean isDone() {
+        if (returnValue.hasBeenRun() && !returnValue.isGreen()) return true;
+        for (Example each: consumers()) if (!each.isDone()) return false;
+        return returnValue.hasBeenRun();
     }
     
 }

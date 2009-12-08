@@ -49,12 +49,12 @@ class ExampleRunner {
         notifier.fireTestStarted(example.getDescription());
         notifier.fireTestFailure(new Failure(example.getDescription(), ex));
         notifier.fireTestFinished(example.getDescription());
-        return ReturnValue.R_RED;
+        return ReturnValue.FAILURE;
     }
 
     private ReturnValue fail(Throwable e) {
         notifier.fireTestFailure(new Failure(example.getDescription(), e));
-        return ReturnValue.R_RED;
+        return ReturnValue.FAILURE;
     }
 
     private ReturnValue failExpectedException() {
@@ -73,7 +73,7 @@ class ExampleRunner {
 
     private ReturnValue ignore() {
         notifier.fireTestIgnored(example.getDescription());
-        return ReturnValue.R_WHITE;
+        return ReturnValue.SKIPPED;
     }
 
     private boolean isUnexpected(Throwable exception) {
@@ -111,7 +111,7 @@ class ExampleRunner {
             Throwable actual = e.getTargetException();
             if (example.expectedException == null) return fail(actual);
             if (isUnexpected(actual)) return failUnexpectedException(actual);
-            return ReturnValue.R_GREEN;
+            return ReturnValue.SUCCESS;
         } catch (Throwable e) {
             return fail(e);
         }

@@ -107,8 +107,10 @@ public class ReturnValueTest {
 
     private Example runWithField(String example) throws JExampleError {
         ExampleGraph $ = new ExampleGraph();
-        $.runJExample(WithField.class);
+        $.add(WithField.class);
         Example e = $.findExample(WithField.class, example);
+        e.dontFlushWhenDone = true;
+        $.runJExample();
         return e;
     }
 

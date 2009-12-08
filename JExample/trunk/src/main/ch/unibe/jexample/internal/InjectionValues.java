@@ -70,13 +70,13 @@ public class InjectionValues {
     private InjectionValues rerunMissingValues(Example example) throws Exception {
         if (testInstance == MISSING ||
                 (arguments.length > 0 && arguments[0] == MISSING)) {
-            ReturnValue value = example.producers().get(0).getReturnValueAndDispose();
+            ReturnValue value = example.producers().get(0).getReturnValueAndFlush();
             testInstance = value.getTestCaseInstance();
             if (arguments.length > 0 && arguments[0] == MISSING) arguments[0] = value.getValue();
         }
         for (int n = 1; n < arguments.length; n++) {
             if (arguments[n] != MISSING) continue;
-            arguments[n] = example.producers().get(n).getReturnValueAndDispose().getValue(); // FIXME Demeter!?
+            arguments[n] = example.producers().get(n).getReturnValueAndFlush().getValue(); // FIXME Demeter!?
         }
         return this;
     }
