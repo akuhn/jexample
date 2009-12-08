@@ -4,7 +4,7 @@
 
   <groupId>net.sf.jexample</groupId>
   <artifactId>jexample</artifactId>
-  <version>4.4-378-SNAPSHOT</version>
+  <version>4.4-${env.SVNVERSION}-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <dependencies>
@@ -21,6 +21,7 @@
       <id>ssh-haddock</id>
       <url>scpexe://haddock.unibe.ch/home/scg/download/jexample/maven</url>
     </repository>
+    <snapshotRepository>
       <uniqueVersion>true</uniqueVersion>
       <id>ssh-jexample-snapshot</id>
       <url>scpexe://web.sourceforge.net/home/groups/j/je/jexample/htdocs/maven2-snapshot</url>
