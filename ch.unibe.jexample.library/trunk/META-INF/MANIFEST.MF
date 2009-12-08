@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JExample library
 Bundle-SymbolicName: ch.unibe.jexample.library;singleton:=true
-Bundle-Version: 4.5.379.r378
+Bundle-Version: 4.5.389.r388
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.jface.text,
