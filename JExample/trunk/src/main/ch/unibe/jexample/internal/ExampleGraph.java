@@ -67,7 +67,7 @@ public class ExampleGraph {
         // copy list of values to avoid concurrent modification
         Collection<Example> copy = new ArrayList<Example>(examples.values());
         for (Example e: copy) {
-            for (Example node: e.node.transitiveClosure()) {
+            for (Example node: e.producers().transitiveClosure()) {
                 examples.put(node.method, node);
             }
         }
@@ -116,11 +116,11 @@ public class ExampleGraph {
         buf.append("graph[rankdir=BT,overlap=scale,size=\"11,8.5\"];\n");
         buf.append("node[label=\" \",shape=box];\n");
         for (Example each: examples.values()) {
-            String name = "\"" + each.node + "\"";
+            String name = "\"" + each + "\"";
             buf.append(name).append(";\n");
-            for (Edge<Example> d: each.node.producers().edges()) {
+            for (Edge<Example> d: each.producers().edges()) {
                 String d_name = d.isBroken() ? "__broken__"+name
-                        : ("\"" + d.getProducer().value.node + "\"");
+                        : ("\"" + d.getProducer().value + "\"");
                 buf.append(name).append(" -> ").append(d_name).append(";\n");
             }
         }

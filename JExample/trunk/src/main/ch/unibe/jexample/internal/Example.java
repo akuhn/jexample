@@ -54,12 +54,12 @@ public class Example {
 
     public final Class<? extends Throwable> expectedException;
     public final MethodReference method;
-    final Node<Example> node;
     public final ExampleClass owner;
-    private boolean sticky = false;
 
     JExampleError errors;
 
+    private boolean sticky = false;
+    private final Node<Example> node;
     private final Description description;
     private ReturnValue returnValue;
 
