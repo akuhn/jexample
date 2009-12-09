@@ -30,8 +30,8 @@ public class CycleDetectionTest {
     @Given("cycle2")
     public void cycle2cycles(N... n) {
         String cycles = "[(1st < 2nd < 1st)]";
-        assertToString(cycles, n[0].dependencies().get(0).cycles());
-        assertToString(cycles, n[1].dependencies().get(0).cycles());
+        assertToString(cycles, n[0].producers().edges().get(0).cycles());
+        assertToString(cycles, n[1].producers().edges().get(0).cycles());
     }
     
     @Given("SmallGraph#path3")
@@ -48,9 +48,9 @@ public class CycleDetectionTest {
     
     @Given("cycle3")
     public void cycle3cycles(N... n) {
-        assertToString("[(1st < 3rd < 2nd < 1st)]", n[0].dependencies().get(0).cycles());
-        assertToString("[(1st < 3rd < 2nd < 1st)]", n[1].dependencies().get(0).cycles());
-        assertToString("[(1st < 3rd < 2nd < 1st)]", n[2].dependencies().get(0).cycles());
+        assertToString("[(1st < 3rd < 2nd < 1st)]", n[0].producers().edges().get(0).cycles());
+        assertToString("[(1st < 3rd < 2nd < 1st)]", n[1].producers().edges().get(0).cycles());
+        assertToString("[(1st < 3rd < 2nd < 1st)]", n[2].producers().edges().get(0).cycles());
     }
     
     @Given("SmallGraph#path3")
@@ -68,9 +68,9 @@ public class CycleDetectionTest {
     @Given("cactus2")
     public void cactus2cycles(N... n) {
         String cycles = "[(1st < 2nd < 1st)]";
-        assertToString(cycles, n[0].dependencies().get(0).cycles());
-        assertToString(cycles, n[1].dependencies().get(0).cycles());
-        assertToString("[]", n[2].dependencies().get(0).cycles());
+        assertToString(cycles, n[0].producers().edges().get(0).cycles());
+        assertToString(cycles, n[1].producers().edges().get(0).cycles());
+        assertToString("[]", n[2].producers().edges().get(0).cycles());
     }
 
     @Given("SmallGraph#fork2join")
@@ -85,7 +85,7 @@ public class CycleDetectionTest {
         assertEquals(true, n[2].isPartOfCycle());
         assertEquals(true, n[3].isPartOfCycle());
         //
-        Edge<String> edge = n[0].dependencies().get(0);
+        Edge<String> edge = n[0].producers().edges().get(0);
         assertEquals("source", edge.consumer.value);
         assertEquals("sink", edge.producer.value);
         assertEquals(2, edge.cycles().size());
@@ -115,13 +115,13 @@ public class CycleDetectionTest {
     public void diamond84cycles(N... n) {
         String l = "(source < sink < L < source)";
         String r = "(source < sink < R < source)";
-        assertToString("[]", n[1].dependencies().get(0).cycles());
-        assertToStringFormat("[%s, %s]", n[1].dependencies().get(1).cycles(), l, r);
-        assertToStringFormat("[%s]", n[2].dependencies().get(0).cycles(), l);
-        assertToStringFormat("[%s]", n[3].dependencies().get(0).cycles(), r);
-        assertToStringFormat("[%s]", n[4].dependencies().get(0).cycles(), l);
-        assertToStringFormat("[%s]", n[4].dependencies().get(1).cycles(), r);
-        assertToString("[]", n[5].dependencies().get(0).cycles());
+        assertToString("[]", n[1].producers().edges().get(0).cycles());
+        assertToStringFormat("[%s, %s]", n[1].producers().edges().get(1).cycles(), l, r);
+        assertToStringFormat("[%s]", n[2].producers().edges().get(0).cycles(), l);
+        assertToStringFormat("[%s]", n[3].producers().edges().get(0).cycles(), r);
+        assertToStringFormat("[%s]", n[4].producers().edges().get(0).cycles(), l);
+        assertToStringFormat("[%s]", n[4].producers().edges().get(1).cycles(), r);
+        assertToString("[]", n[5].producers().edges().get(0).cycles());
     }
     
 }

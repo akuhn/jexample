@@ -1,10 +1,7 @@
 package ch.unibe.jexample.internal.graph;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 /** Node in a graph.
  * 
@@ -13,63 +10,47 @@ import java.util.List;
  */
 public class Node<E> {
 
-    // TODO 3) rewrite isolated tests for ExampleNode & Dependency
-    
     public final E value;
-    /*default*/ Collection<Edge<E>> consumers;
-    /*default*/ List<Edge<E>> producers;
+    protected Consumers<E> consumers;
+    protected Producers<E> producers;
     
     public Node(E example) {
-        this.producers = new ArrayList<Edge<E>>();
-        this.consumers = new ArrayList<Edge<E>>();
+        this.producers = new Producers<E>();
+        this.consumers = new Consumers<E>();
         this.value = example;
     }
     
-    public void addProvider(Node<E> dependency) {
-        new Edge<E>(this, dependency);
-    }
-    
-    public Collection<E> consumers() {
-        ArrayList<E> nodes = new ArrayList<E>();
-        for (Edge<E> each: consumers) nodes.add(each.consumer.value);
-        return Collections.unmodifiableCollection(nodes);
-    }
-
-    public List<Edge<E>> dependencies() {
-        return Collections.unmodifiableList(producers);
-    }
-    
-    public E firstProducerOrNull() {
-        if (producers.isEmpty()) return null;
-        Edge<E> d = producers.get(0);
-        return d.getProducer().value;
+    public Consumers<E> consumers() {
+        return consumers;
     }
 
     public boolean isPartOfCycle() {
-        for (Edge<E> each: producers) if (each.isPartOfCycle()) return true;
+        for (Edge<E> each: producers.edges()) if (each.isPartOfCycle()) return true;
         return false;
     }
 
-    public void makeBrokenEdge(Throwable ex) {
-        new Edge<E>(this, ex);
-    }
-
-    public Collection<E> producers() {
-        ArrayList<E> nodes = new ArrayList<E>();
-        for (Edge<E> each: producers) nodes.add(each.producer.value);
-        return Collections.unmodifiableCollection(nodes);
+    public Producers<E> producers() {
+        return producers;
     }
       
-    public Collection<Node<E>> transitiveClosure() {
-        return collectTransitiveClosureInto(new HashSet<Node<E>>());
+    public Collection<E> transitiveClosure() {
+        return collectTransitiveClosureInto(new HashSet<E>());
     }
 
-    private Collection<Node<E>> collectTransitiveClosureInto(Collection<Node<E>> all) {
-        for (Edge<E> each: producers) {
+    private Collection<E> collectTransitiveClosureInto(Collection<E> all) {
+        for (Edge<E> each: producers.edges()) {
             Node<E> producer = each.getProducer();
-            if (all.add(producer)) producer.collectTransitiveClosureInto(all);
+            if (all.add(producer.value)) producer.collectTransitiveClosureInto(all);
         }
         return all;
+    }
+    
+    public void addProvider(Node<E> node) {
+        new Edge<E>(this, node); // adds edge to producers and consumers
+    }
+
+    public void makeBrokenEdge(Throwable error) {
+        new Edge<E>(this, error); // adds broken edge to producers
     }
 
 }

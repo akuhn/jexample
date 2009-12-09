@@ -11,8 +11,10 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.InjectionPolicy;
+import ch.unibe.jexample.internal.graph.Consumers;
 import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.graph.Node;
+import ch.unibe.jexample.internal.graph.Producers;
 import ch.unibe.jexample.internal.util.JExampleError;
 import ch.unibe.jexample.internal.util.MethodReference;
 import ch.unibe.jexample.internal.util.Reflection;
@@ -54,8 +56,7 @@ public class Example {
     public final MethodReference method;
     final Node<Example> node;
     public final ExampleClass owner;
-    
-    /*for testing*/ public boolean dontFlushWhenDone = false;
+    private boolean sticky = false;
 
     JExampleError errors;
 
@@ -87,7 +88,7 @@ public class Example {
 
     public void run(RunNotifier notifier) {
         if (!returnValue.hasBeenRun()) returnValue = new ExampleRunner(this, notifier).run();
-        if (this.isDone() && !dontFlushWhenDone) returnValue = returnValue.withoutCache();
+        if (this.isDone() && !sticky) returnValue = returnValue.withoutCache();
     }
 
     @Override
@@ -127,7 +128,7 @@ public class Example {
                 Kind.MISSING_ANNOTATION, 
                 "Method %s is not a test method, missing @Test or @Given annotation.",
                 this);
-        int d = this.node.dependencies().size();
+        int d = this.node.producers().size();
         int p = method.arity();
         if (p > d) {
             errors.add(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p,
@@ -138,7 +139,7 @@ public class Example {
     }
 
     private void validateDependencyTypes() {
-        Iterator<Edge<Example>> tms = this.node.dependencies().iterator();
+        Iterator<Edge<Example>> tms = this.node.producers().edges().iterator();
         int position = 1;
         for (Class<?> t: method.getParameterTypes()) {
             Edge<Example> each = tms.next();
@@ -169,12 +170,12 @@ public class Example {
         }
     }
     
-    public Producers producers() {
-        return new Producers(method.arity(), node.producers());
+    public Producers<Example> producers() {
+        return node.producers();
     }
     
-    public Consumers consumers() {
-        return new Consumers(node.consumers());
+    public Consumers<Example> consumers() {
+        return node.consumers();
     }
  
     /** Used to fetch return values when cloning had been failed
@@ -193,7 +194,7 @@ public class Example {
      * 
      */
     public boolean isDone() {
-        if (returnValue.isRed() || returnValue.isWhite()) return true;
+        if (hasErrors() || returnValue.isRed() || returnValue.isWhite()) return true;
         for (Example each: consumers()) if (!each.isDone()) return false;
         return returnValue.hasBeenRun();
     }
@@ -229,6 +230,13 @@ public class Example {
         if (resolution == NONE) return new NoneInjectionStrategy();
         if (resolution == RERUN) return new RerunInjectionStrategy();
         throw new AssertionError();
+    }
+
+    /** Do not flush cache of this example when done.
+     * 
+     */
+    public void beSticky() {
+        this.sticky = true;
     }
    
 }

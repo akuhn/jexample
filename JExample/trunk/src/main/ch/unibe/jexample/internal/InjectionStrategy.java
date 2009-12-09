@@ -1,5 +1,7 @@
 package ch.unibe.jexample.internal;
 
+import static ch.unibe.jexample.internal.ReturnValue.MISSING;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -7,7 +9,6 @@ import java.lang.reflect.Modifier;
 import ch.unibe.jexample.internal.deepcopy.CloneFactory;
 import ch.unibe.jexample.internal.deepcopy.ImmutableClasses;
 import ch.unibe.jexample.internal.util.Reflection;
-import static ch.unibe.jexample.internal.ReturnValue.MISSING;
 
 public interface InjectionStrategy {
 

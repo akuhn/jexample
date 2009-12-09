@@ -69,7 +69,7 @@ public class Edge<E> {
     private void validateCycle(Edge<E> initial, Stack<Edge<E>> stack, HashSet<Edge<E>> hashSet) {
         stack.push(this);
         if (hashSet.add(this)) {
-            for (Edge<E> each: this.producer.dependencies()) {
+            for (Edge<E> each: this.producer.producers().edges()) {
                 if (initial == each) invalidate(stack);
                 each.validateCycle(initial, stack, hashSet);
             }

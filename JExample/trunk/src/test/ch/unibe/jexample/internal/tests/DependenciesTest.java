@@ -62,8 +62,8 @@ public class DependenciesTest {
         g.add(C.class);
         Example t = g.findExample(C.class, "test");
         Example e = g.findExample(C.class, "empty");
-        t.dontFlushWhenDone = true;
-        e.dontFlushWhenDone = true;
+        t.beSticky();
+        e.beSticky();
         Result result = g.runJExample();
         assertTrue(result.wasSuccessful());
         assertEquals(2, result.getRunCount());

@@ -17,7 +17,6 @@ import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.JExample;
 import ch.unibe.jexample.internal.graph.Edge;
-import ch.unibe.jexample.internal.graph.Node;
 import ch.unibe.jexample.internal.util.CompositeRunner;
 import ch.unibe.jexample.internal.util.JExampleError;
 import ch.unibe.jexample.internal.util.MethodReference;
@@ -68,8 +67,8 @@ public class ExampleGraph {
         // copy list of values to avoid concurrent modification
         Collection<Example> copy = new ArrayList<Example>(examples.values());
         for (Example e: copy) {
-            for (Node<Example> node: e.node.transitiveClosure()) {
-                examples.put(node.value.method, node.value);
+            for (Example node: e.node.transitiveClosure()) {
+                examples.put(node.method, node);
             }
         }
     }
@@ -119,7 +118,7 @@ public class ExampleGraph {
         for (Example each: examples.values()) {
             String name = "\"" + each.node + "\"";
             buf.append(name).append(";\n");
-            for (Edge<Example> d: each.node.dependencies()) {
+            for (Edge<Example> d: each.node.producers().edges()) {
                 String d_name = d.isBroken() ? "__broken__"+name
                         : ("\"" + d.getProducer().value.node + "\"");
                 buf.append(name).append(" -> ").append(d_name).append(";\n");

@@ -81,7 +81,7 @@ public class ReturnValueTest {
         ExampleGraph egg = new ExampleGraph();
         egg.add(Null.class);
         Example e = egg.findExample(Null.class, "returnNull");
-        e.dontFlushWhenDone = true;
+        e.beSticky();
         egg.runJExample();
         return e;
     }
@@ -110,7 +110,7 @@ public class ReturnValueTest {
         ExampleGraph $ = new ExampleGraph();
         $.add(WithField.class);
         Example e = $.findExample(WithField.class, example);
-        e.dontFlushWhenDone = true;
+        e.beSticky();
         $.runJExample();
         return e;
     }

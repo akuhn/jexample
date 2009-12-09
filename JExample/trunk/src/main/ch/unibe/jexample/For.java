@@ -28,7 +28,7 @@ public abstract class For {
     public static <T> T example(Class jClass, String method) {
         Example e = findExample(jClass, method);
         if (e == null) throw new NoSuchMethodError("Method not found.");
-        e.dontFlushWhenDone = true;
+        e.beSticky();
         return (T) runExample(e);
     }
 
