@@ -85,7 +85,7 @@ public class CycleDetectionTest {
         assertEquals(true, n[2].isPartOfCycle());
         assertEquals(true, n[3].isPartOfCycle());
         //
-        Edge<String> edge = n[0].producers().edges().get(0);
+        Dependency<String> edge = n[0].producers().edges().get(0);
         assertEquals("source", edge.consumer.value);
         assertEquals("sink", edge.producer.value);
         assertEquals(2, edge.cycles().size());

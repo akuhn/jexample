@@ -6,10 +6,10 @@ import java.util.List;
 
 public class Cycle<E> {
 
-    private List<Edge<E>> cycle;
+    private List<Dependency<E>> cycle;
 
-    public Cycle(Collection<Edge<E>> cycle) {
-        this.cycle = new ArrayList<Edge<E>>(cycle);
+    public Cycle(Collection<Dependency<E>> cycle) {
+        this.cycle = new ArrayList<Dependency<E>>(cycle);
     }
     
     public int length() {
@@ -21,7 +21,7 @@ public class Cycle<E> {
         StringBuffer buf = new StringBuffer();
         buf.append("(");
         if (!cycle.isEmpty()) buf.append(cycle.get(0).consumer.value);
-        for (Edge<?> each: cycle) buf.append(" < ").append(each.producer.value);
+        for (Dependency<?> each: cycle) buf.append(" < ").append(each.producer.value);
         buf.append(")");
         return buf.toString();
     }

@@ -11,7 +11,7 @@ import java.util.Collections;
 public class Producers<E> extends Consumers<E> {
 
     @Override
-    protected E value(Edge<E> edge) {
+    protected E value(Dependency<E> edge) {
        return edge.producer.value;
     }
 

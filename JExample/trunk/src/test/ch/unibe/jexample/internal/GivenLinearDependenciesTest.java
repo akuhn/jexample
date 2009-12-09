@@ -52,7 +52,6 @@ public class GivenLinearDependenciesTest {
         list.add("D");
     }
 
-    // @Ignore // FIXME kwnon to be broken
     @Given("shouldRunOnceD")
     public void shouldRunAllExamplesOnceAndOnlyOnce() {
         assertEquals("[A, B, C, D]", list.toString());

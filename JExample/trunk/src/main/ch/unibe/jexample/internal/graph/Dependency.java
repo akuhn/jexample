@@ -7,14 +7,15 @@ import java.util.HashSet;
 import java.util.Stack;
 
 
-public class Edge<E> {
+public class Dependency<E> {
 
     /*default*/ final Node<E> consumer;
     /*default*/ final Node<E> producer;
     private final Throwable broken;
+    private boolean isInjection = false;
     private Collection<Cycle<E>> cycles;
     
-    /*default*/ Edge(Node<E> consumer, Node<E> producer) {
+    /*default*/ Dependency(Node<E> consumer, Node<E> producer) {
         this.consumer = consumer;
         this.producer = producer;
         this.broken = null;
@@ -23,7 +24,7 @@ public class Edge<E> {
         this.detectCyclicDependencies();
     }
 
-    /*default*/ Edge(Node<E> consumer, Throwable broken) {
+    /*default*/ Dependency(Node<E> consumer, Throwable broken) {
         this.consumer = consumer;
         this.broken = broken;
         this.producer = null;
@@ -58,23 +59,31 @@ public class Edge<E> {
     }
 
     private void detectCyclicDependencies() {
-        this.validateCycle(this, new Stack<Edge<E>>(), new HashSet<Edge<E>>());
+        this.validateCycle(this, new Stack<Dependency<E>>(), new HashSet<Dependency<E>>());
     }
 
-    private void invalidate(Stack<Edge<E>> stack) {
+    private void invalidate(Stack<Dependency<E>> stack) {
         Cycle<E> cycle = new Cycle<E>(stack);
-        for (Edge<E> each: stack) each.addCycle(cycle);
+        for (Dependency<E> each: stack) each.addCycle(cycle);
     }
     
-    private void validateCycle(Edge<E> initial, Stack<Edge<E>> stack, HashSet<Edge<E>> hashSet) {
+    private void validateCycle(Dependency<E> initial, Stack<Dependency<E>> stack, HashSet<Dependency<E>> hashSet) {
         stack.push(this);
         if (hashSet.add(this)) {
-            for (Edge<E> each: this.producer.producers().edges()) {
+            for (Dependency<E> each: this.producer.producers().edges()) {
                 if (initial == each) invalidate(stack);
                 each.validateCycle(initial, stack, hashSet);
             }
         }
         stack.pop();
+    }
+
+    public void setInjection(boolean isInjection) {
+        this.isInjection = isInjection;
+    }
+
+    public boolean isInjection() {
+        return isInjection;
     }
     
 }

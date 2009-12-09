@@ -25,7 +25,7 @@ public class Node<E> {
     }
 
     public boolean isPartOfCycle() {
-        for (Edge<E> each: producers.edges()) if (each.isPartOfCycle()) return true;
+        for (Dependency<E> each: producers.edges()) if (each.isPartOfCycle()) return true;
         return false;
     }
 
@@ -38,19 +38,19 @@ public class Node<E> {
     }
 
     private Collection<E> collectTransitiveClosureInto(Collection<E> all) {
-        for (Edge<E> each: producers.edges()) {
+        for (Dependency<E> each: producers.edges()) {
             Node<E> producer = each.getProducer();
             if (all.add(producer.value)) producer.collectTransitiveClosureInto(all);
         }
         return all;
     }
     
-    public void addProvider(Node<E> node) {
-        new Edge<E>(this, node); // adds edge to producers and consumers
+    public Dependency<E> addProvider(Node<E> node) {
+        return new Dependency<E>(this, node); // adds edge to producers and consumers
     }
 
-    public void makeBrokenEdge(Throwable error) {
-        new Edge<E>(this, error); // adds broken edge to producers
+    public Dependency<E> makeBrokenEdge(Throwable error) {
+        return new Dependency<E>(this, error); // adds broken edge to producers
     }
 
 }

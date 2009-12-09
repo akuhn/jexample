@@ -5,15 +5,12 @@ import static ch.unibe.jexample.InjectionPolicy.DEEPCOPY;
 import static ch.unibe.jexample.InjectionPolicy.NONE;
 import static ch.unibe.jexample.InjectionPolicy.RERUN;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
 import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.internal.graph.Consumers;
-import ch.unibe.jexample.internal.graph.Edge;
+import ch.unibe.jexample.internal.graph.Dependency;
 import ch.unibe.jexample.internal.graph.Node;
 import ch.unibe.jexample.internal.graph.Producers;
 import ch.unibe.jexample.internal.util.JExampleError;
@@ -147,13 +144,11 @@ public class Example {
     }
 
     /** Returns true of this example and all its descendants are done.
-     *<P> 
-     * TODO take into account whether a consumer actually requires a return value or not!
      * 
      */
     public boolean isDone() {
         if (hasErrors() || returnValue.isRed() || returnValue.isWhite()) return true;
-        for (Example each: consumers()) if (!each.isDone()) return false;
+        for (Example each: consumers().isInjection()) if (!each.isDone()) return false;
         return returnValue.hasBeenRun();
     }
 
@@ -200,14 +195,16 @@ public class Example {
     }
     
     /*default*/ void initializeDependencies(ExampleGraph exampleGraph) {
+        int arity = Math.max(method.arity(),1), n = 0;
         for (MethodReference m: method.collectDependencies()) {
             if (m.isBroken()) {
-                node.makeBrokenEdge(m.getError());
+                node.makeBrokenEdge(m.getError()).setInjection(n < arity);
             }
             else {
                 Example d = exampleGraph.makeExample(m);
-                node.addProvider(d.node);
+                node.addProvider(d.node).setInjection(n < arity);
             }
+            n++;
         }
     }
  
@@ -223,7 +220,7 @@ public class Example {
     }
     
     private void dependenciesShouldExist() {
-        for (Edge<Example> each: node.producers().edges()) {
+        for (Dependency<Example> each: node.producers().edges()) {
             if (each.isBroken()) errors.add(Kind.NO_SUCH_PROVIDER, each.getError());
         }
     }
@@ -235,7 +232,7 @@ public class Example {
     private void producersShouldBeAssignable() {
         Class<?>[] types = this.method.getParameterTypes();
         int n = 0;
-        for (Edge<Example> edge: producers().edges()) {
+        for (Dependency<Example> edge: producers().edges()) {
             if (++n > method.arity()) break; // skip non-injected producers
             if (edge.isBroken()) continue;
             Example producer = edge.getProducer().value;
@@ -249,7 +246,7 @@ public class Example {
 
     private void producersShouldNotExpectException() {
         int n = 0;
-        for (Edge<Example> edge: producers().edges()) {
+        for (Dependency<Example> edge: producers().edges()) {
             if (++n > method.arity()) break; // skip non-injected producers
             if (edge.isBroken()) continue;
             Example each = edge.getProducer().value;
