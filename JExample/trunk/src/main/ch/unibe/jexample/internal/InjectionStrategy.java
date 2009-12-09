@@ -11,14 +11,14 @@ import static ch.unibe.jexample.internal.ReturnValue.MISSING;
 
 public interface InjectionStrategy {
 
-    public InjectionValues makeInjectionValues(Object receiver, Object... arguments);
+    public InjectionValues cloneInjectionValues(Object receiver, Object... arguments);
 
 }
 
 class RerunInjectionStrategy implements InjectionStrategy {
 
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
+    public InjectionValues cloneInjectionValues(Object receiver, Object... args) {
         for (int n = 0; n < args.length; n++) args[n] = MISSING;
         return new InjectionValues(MISSING, args);
     }
@@ -28,7 +28,7 @@ class RerunInjectionStrategy implements InjectionStrategy {
 class NoneInjectionStrategy implements InjectionStrategy {
     
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
+    public InjectionValues cloneInjectionValues(Object receiver, Object... args) {
         return new InjectionValues(receiver, args);
     }
 
@@ -39,18 +39,12 @@ class DeepcopyInjectionStrategy implements InjectionStrategy {
     private CloneFactory factory = new CloneFactory();
 
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
+    public InjectionValues cloneInjectionValues(Object receiver, Object... args) {
         return new InjectionValues(deepcopy(receiver), deepcopy(args));
     }
     
     private <T> T deepcopy(T object) {
-        long time = System.nanoTime();
-        try {
-            return factory.clone(object);
-        }
-        finally {
-            InjectionValues.NANOS += (System.nanoTime() - time);
-        }
+        return factory.clone(object);
     }
 
 }
@@ -60,7 +54,7 @@ class CloneInjectionStrategy implements InjectionStrategy {
     private static final Method OBJECT_CLONE = initializeCloneMethod();
     
     @Override
-    public InjectionValues makeInjectionValues(Object receiver, Object... args) {
+    public InjectionValues cloneInjectionValues(Object receiver, Object... args) {
         for (int n = 0; n < args.length; n++) args[n] = cloneArgument(args[n]);
         return new InjectionValues(cloneReceiver(receiver), args);
     }

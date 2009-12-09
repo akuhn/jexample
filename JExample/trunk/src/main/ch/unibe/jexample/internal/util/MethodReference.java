@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -157,6 +158,18 @@ public class MethodReference {
         }
         catch (IllegalArgumentException ex) {
             return InjectionPolicy.DEFAULT;
+        }
+    }
+
+    public Iterable<MethodReference> collectDependencies() {
+        String declaration = getDependencyString();
+        try {
+            Collection<MethodReference> all = new ArrayList<MethodReference>();
+            Iterable<MethodLocator> locators = MethodLocator.parseAll(declaration);
+            for (MethodLocator each: locators) all.add(each.resolve(getActualClass()));
+            return all;
+        } catch (InvalidDeclarationError ex) {
+            return Collections.singleton(new MethodReference(ex));
         }
     }
 

@@ -11,7 +11,7 @@ public class RerunInjectionStrategyTest {
     public void shouldAllRerun() {
         Object receiver = new Object();
         Object[] arguments = { new Object(), new Object(), new Object() };
-        InjectionValues values = new RerunInjectionStrategy().makeInjectionValues(receiver, arguments);
+        InjectionValues values = new RerunInjectionStrategy().cloneInjectionValues(receiver, arguments);
         assertNotNull(values);
         assertEquals(ReturnValue.MISSING, values.getReceiver());
         assertEquals(3, values.getArguments().length);

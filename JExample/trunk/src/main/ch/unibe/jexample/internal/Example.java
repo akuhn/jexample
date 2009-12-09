@@ -1,19 +1,21 @@
 package ch.unibe.jexample.internal;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import static ch.unibe.jexample.InjectionPolicy.CLONE;
+import static ch.unibe.jexample.InjectionPolicy.DEEPCOPY;
+import static ch.unibe.jexample.InjectionPolicy.NONE;
+import static ch.unibe.jexample.InjectionPolicy.RERUN;
+
 import java.util.Iterator;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
+import ch.unibe.jexample.InjectionPolicy;
 import ch.unibe.jexample.internal.graph.Edge;
 import ch.unibe.jexample.internal.graph.Node;
-import ch.unibe.jexample.internal.util.InvalidDeclarationError;
 import ch.unibe.jexample.internal.util.JExampleError;
-import ch.unibe.jexample.internal.util.MethodLocator;
 import ch.unibe.jexample.internal.util.MethodReference;
+import ch.unibe.jexample.internal.util.Reflection;
 import ch.unibe.jexample.internal.util.JExampleError.Kind;
 
 /**
@@ -98,7 +100,7 @@ public class Example {
     }
 
     void initializeDependencies(ExampleGraph exampleGraph) {
-        for (MethodReference m: collectDependencies()) {
+        for (MethodReference m: method.collectDependencies()) {
             if (m.isBroken()) {
                 node.makeBrokenEdge(m.getError());
             }
@@ -114,18 +116,6 @@ public class Example {
         InjectionValues injection = InjectionValues.make(this);
         Object newResult = method.invoke(injection.getReceiver(), injection.getArguments());
         return new ReturnValue(newResult, injection.getReceiver());
-    }
-
-    protected Iterable<MethodReference> collectDependencies() {
-        String declaration = method.getDependencyString();
-        try {
-            Collection<MethodReference> all = new ArrayList<MethodReference>();
-            Iterable<MethodLocator> locators = MethodLocator.parseAll(declaration);
-            for (MethodLocator each: locators) all.add(each.resolve(method.getActualClass()));
-            return all;
-        } catch (InvalidDeclarationError ex) {
-            return Collections.singleton(new MethodReference(ex));
-        }
     }
 
     private void validate() {
@@ -187,16 +177,58 @@ public class Example {
         return new Consumers(node.consumers());
     }
  
-    public ReturnValue getReturnValueAndFlush() throws Exception {
+    /** Used to fetch return values when cloning had been failed
+     * (see callers of this method). Reruns this example if no
+     * cached return value is available, returns the cached value
+     * and flushes the cache.  
+     * 
+     */
+    public ReturnValue fetchReturnValueAndFlush() throws Exception {
         ReturnValue value = returnValue;
         returnValue = returnValue.withoutCache();
         return value.isMissing() ? this.bareInvoke() : value;
     }
     
+    /** Returns true of this example and all its descendants are done.
+     * 
+     */
     public boolean isDone() {
-        if (returnValue.hasBeenRun() && !returnValue.isGreen()) return true;
+        if (returnValue.isRed() || returnValue.isWhite()) return true;
         for (Example each: consumers()) if (!each.isDone()) return false;
         return returnValue.hasBeenRun();
     }
-    
+
+    /** Returns cached receiver of first producer (or creates a new receiver instance).
+     * The receiver of an example must be an instance of the defining class. 
+     * If the producer is not defined in the same class as this example, a new receiver is created.
+     * 
+     */
+    public Object fetchReceiver() {
+        Object receiver = null;
+        if (!producers().isEmpty()) receiver = producers().first().getReturnValue().getTestCaseInstance();
+        if (!method.getActualClass().isInstance(receiver)) receiver = null;
+        if (receiver == null) receiver = Reflection.newInstance(method.getActualClass());
+        assert receiver != null;
+        return receiver;        
+    }
+
+    /** Returns cached return values of all producers (up to the number of required arguments).
+     * 
+     */
+    public Object[] fetchArguments() {
+        Object[] arguments = new Object[method.arity()];
+        for (int n = 0; n < arguments.length; n++) arguments[n] = producers().get(n).getReturnValue().getValue();
+        return arguments;
+    }
+
+    public InjectionStrategy resolveInjectionStrategy() {
+        InjectionPolicy policy = method.getInjectionPolicy();
+        InjectionPolicy resolution = policy.resolve();
+        if (resolution == CLONE) return new CloneInjectionStrategy();
+        if (resolution == DEEPCOPY) return new DeepcopyInjectionStrategy();
+        if (resolution == NONE) return new NoneInjectionStrategy();
+        if (resolution == RERUN) return new RerunInjectionStrategy();
+        throw new AssertionError();
+    }
+   
 }

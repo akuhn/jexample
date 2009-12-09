@@ -19,13 +19,13 @@ public class CloneInjectionStrategyTest {
 
     @Test
     public void shouldAcceptNullReceiver() {
-        InjectionValues values = strategy.makeInjectionValues(null);
+        InjectionValues values = strategy.cloneInjectionValues(null);
         assertEquals(null, values.getReceiver());
         assertEquals(0, values.getArguments().length);
     }
     
     private void shouldNotClone(Object arg) {
-        InjectionValues values = strategy.makeInjectionValues(new Object(), arg);
+        InjectionValues values = strategy.cloneInjectionValues(new Object(), arg);
         assertEquals(1, values.getArguments().length);
         assertSame(arg, values.getArguments()[0]);
     }
@@ -68,14 +68,14 @@ public class CloneInjectionStrategyTest {
     @Test
     public void shouldCloneArgument() {
         D d = new D("dummy");
-        InjectionValues values = strategy.makeInjectionValues(new Object(), d);
+        InjectionValues values = strategy.cloneInjectionValues(new Object(), d);
         assertEquals(1, values.getArguments().length);
         assertToString("clone of dummy", values.getArguments()[0]);
     }
     
     @Given("shouldCloneArgument")
     public void shouldCloneAllArguments() {
-        InjectionValues values = strategy.makeInjectionValues(new Object(),
+        InjectionValues values = strategy.cloneInjectionValues(new Object(),
                 new D("1st"),
                 new D("2nd"),
                 new D("3rd"));
@@ -88,14 +88,14 @@ public class CloneInjectionStrategyTest {
     @Test
     public void shouldRerunNonClonable() {
         Object cannotClone = new Object() { };
-        InjectionValues values = strategy.makeInjectionValues(new Object(), cannotClone);
+        InjectionValues values = strategy.cloneInjectionValues(new Object(), cannotClone);
         assertEquals(1, values.getArguments().length);
         assertEquals(ReturnValue.MISSING, values.getArguments()[0]);
     }
     
     public void shouldRerunIfCloneFails() {
         Object cannotClone = new BrokenCloneable();
-        InjectionValues values = strategy.makeInjectionValues(new Object(), cannotClone);
+        InjectionValues values = strategy.cloneInjectionValues(new Object(), cannotClone);
         assertEquals(1, values.getArguments().length);
         assertEquals(ReturnValue.MISSING, values.getArguments()[0]);
     }
@@ -115,7 +115,7 @@ public class CloneInjectionStrategyTest {
     public void shouldCloneFieldOfReceiver() {
         R r = new R();
         r.field = new D("field");
-        InjectionValues values = strategy.makeInjectionValues(r);
+        InjectionValues values = strategy.cloneInjectionValues(r);
         assertNotSame(r, values.getReceiver());
         assertTrue(values.getReceiver() instanceof R);
         assertToString("clone of field", ((R) values.getReceiver()).field);
@@ -125,7 +125,7 @@ public class CloneInjectionStrategyTest {
     public void shouldAcceptNullField() {
         R r = new R();
         r.field = null;
-        InjectionValues values = strategy.makeInjectionValues(r);
+        InjectionValues values = strategy.cloneInjectionValues(r);
         assertNotSame(r, values.getReceiver());
         assertTrue(values.getReceiver() instanceof R);
         assertEquals(null, ((R) values.getReceiver()).field);
@@ -135,7 +135,7 @@ public class CloneInjectionStrategyTest {
     public void shouldNotCloneImmutableField() {
         R r = new R();
         r.field = new String("field");
-        InjectionValues values = strategy.makeInjectionValues(r);
+        InjectionValues values = strategy.cloneInjectionValues(r);
         assertNotSame(r, values.getReceiver());
         assertTrue(values.getReceiver() instanceof R);
         assertEquals(r.field, ((R) values.getReceiver()).field);
