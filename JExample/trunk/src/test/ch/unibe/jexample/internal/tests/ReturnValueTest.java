@@ -74,7 +74,7 @@ public class ReturnValueTest {
         Example e = runNullExample();
 
         assertTrue(e.wasSuccessful());
-        assertEquals(null, e.getReturnValue().getValue());
+        assertEquals(null, e.returnValue().getValue());
     }
 
     private Example runNullExample() throws JExampleError {
@@ -89,15 +89,15 @@ public class ReturnValueTest {
     @Test
     public void nullIsCloneable() throws JExampleError {
         Example e = runNullExample();
-        assertEquals(null, e.getReturnValue().getValue());
+        assertEquals(null, e.returnValue().getValue());
     }
 
     @Test
     public void changeTestCaseField() throws Exception {
         Example e = runWithField("testChangeString");
 
-        assertNull(e.getReturnValue().getValue());
-        assertEquals("Hello, World", Reflection.getField(e.getReturnValue().getTestCaseInstance(), "aString"));
+        assertNull(e.returnValue().getValue());
+        assertEquals("Hello, World", Reflection.getField(e.returnValue().getTestCaseInstance(), "aString"));
     }
 
     @Test

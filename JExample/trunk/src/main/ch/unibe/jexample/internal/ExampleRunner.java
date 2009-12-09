@@ -32,7 +32,7 @@ class ExampleRunner {
      *         dependencies failed.
      */
     public ReturnValue run() {
-        if (example.hasErrors()) return abort(example.errors);
+        if (example.hasErrors()) return abort(example.getErrors());
         if (example.method.isIgnorePresent()) return ignore();
         if (!runDependencies()) return ignore();
         started();
@@ -56,11 +56,11 @@ class ExampleRunner {
     }
 
     private ReturnValue failExpectedException() {
-        return fail(new AssertionError("Expected exception: " + example.expectedException.getName()));
+        return fail(new AssertionError("Expected exception: " + example.method.expectedException().getName()));
     }
 
     private ReturnValue failUnexpectedException(Throwable ex) {
-        String message = "Unexpected exception, expected<" + example.expectedException.getName() + "> but was<"
+        String message = "Unexpected exception, expected<" + example.method.expectedException().getName() + "> but was<"
                 + ex.getClass().getName() + ">";
         return fail(new Exception(message, ex));
     }
@@ -75,7 +75,7 @@ class ExampleRunner {
     }
 
     private boolean isUnexpected(Throwable exception) {
-        return !example.expectedException.isAssignableFrom(exception.getClass());
+        return !example.method.expectedException().isAssignableFrom(exception.getClass());
     }
 
     /**
@@ -103,11 +103,11 @@ class ExampleRunner {
     private ReturnValue runExample() {
         try {
             ReturnValue value = example.bareInvoke();
-            if (example.expectedException != null) return failExpectedException();
+            if (example.method.expectedException() != null) return failExpectedException();
             return value;
         } catch (InvocationTargetException e) {
             Throwable actual = e.getTargetException();
-            if (example.expectedException == null) return fail(actual);
+            if (example.method.expectedException() == null) return fail(actual);
             if (isUnexpected(actual)) return failUnexpectedException(actual);
             return ReturnValue.SUCCESS;
         } catch (Throwable e) {

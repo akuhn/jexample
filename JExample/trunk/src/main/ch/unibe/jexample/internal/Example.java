@@ -6,6 +6,7 @@ import static ch.unibe.jexample.InjectionPolicy.NONE;
 import static ch.unibe.jexample.InjectionPolicy.RERUN;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
@@ -52,16 +53,14 @@ import ch.unibe.jexample.internal.util.JExampleError.Kind;
  */
 public class Example {
 
-    public final Class<? extends Throwable> expectedException;
     public final MethodReference method;
-    public final ExampleClass owner;
 
-    JExampleError errors;
-
-    private boolean sticky = false;
-    private final Node<Example> node;
     private final Description description;
+    private JExampleError errors;
+    private final Node<Example> node;
+    private final ExampleClass owner;
     private ReturnValue returnValue;
+    private boolean sticky = false;
 
     /*default*/ Example(MethodReference method, ExampleClass owner) {
         assert method != null && owner != null;
@@ -69,134 +68,30 @@ public class Example {
         this.method = method;
         this.description = method.createTestDescription();
         this.returnValue = ReturnValue.PENDING;
-        this.expectedException = method.initExpectedException();
         this.node = new Node<Example>(this);
     }
 
-    public Description getDescription() {
-        return description;
+    /** Do not flush cache of this example when done.
+     * 
+     */
+    public void beSticky() {
+        this.sticky = true;
     }
 
-    public ReturnValue getReturnValue() {
-        return returnValue;
-    }
-
-    public boolean hasErrors() {
-        if (errors == null) this.validate();
-        return errors.size() > 0;
-    }
-
-    public void run(RunNotifier notifier) {
-        if (!returnValue.hasBeenRun()) returnValue = new ExampleRunner(this, notifier).run();
-        if (this.isDone() && !sticky) returnValue = returnValue.withoutCache();
-    }
-
-    @Override
-    public String toString() {
-        return "Example: " + method;
-    }
-
-    public boolean wasSuccessful() {
-        return getReturnValue().isGreen();
-    }
-
-    void initializeDependencies(ExampleGraph exampleGraph) {
-        for (MethodReference m: method.collectDependencies()) {
-            if (m.isBroken()) {
-                node.makeBrokenEdge(m.getError());
-            }
-            else {
-                Example d = exampleGraph.makeExample(m);
-                node.addProvider(d.node);
-            }
-        }
-    }
-
-    protected ReturnValue bareInvoke() throws Exception {
-        owner.runBeforeClassBefores();
-        InjectionValues injection = InjectionValues.make(this);
-        Object newResult = method.invoke(injection.getReceiver(), injection.getArguments());
-        return new ReturnValue(newResult, injection.getReceiver());
-    }
-
-    private void validate() {
-        errors = new JExampleError();
-        if (this.node.isPartOfCycle()) {
-            errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
-        }
-        if (!method.isTestAnnotationPresent()) errors.add(
-                Kind.MISSING_ANNOTATION, 
-                "Method %s is not a test method, missing @Test or @Given annotation.",
-                this);
-        int d = this.node.producers().size();
-        int p = method.arity();
-        if (p > d) {
-            errors.add(Kind.MISSING_PROVIDERS, "Method %s has %d parameters but only %d dependencies.", toString(), p,
-                    d);
-        } else {
-            validateDependencyTypes();
-        }
-    }
-
-    private void validateDependencyTypes() {
-        Iterator<Edge<Example>> tms = this.node.producers().edges().iterator();
-        int position = 1;
-        for (Class<?> t: method.getParameterTypes()) {
-            Edge<Example> each = tms.next();
-            if (each.isBroken()) {
-                errors.add(Kind.NO_SUCH_PROVIDER,
-                        each.getError());
-                continue;
-            }
-            Example tm = each.getProducer().value;
-            Class<?> r = tm.method.getReturnType();
-            if (!t.isAssignableFrom(r)) {
-                errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
-                        "Parameter #%d in (%s) is not assignable from depedency (%s).", position, method, tm.method);
-            }
-            if (tm.expectedException != null) {
-                errors.add(Kind.PROVIDER_EXPECTS_EXCEPTION,
-                        "(%s): invalid dependency (%s), provider must not expect exception.", method, tm.method);
-            }
-            position++;
-        }
-        while (tms.hasNext()) {
-            Edge<Example> each = tms.next();
-            if (each.isBroken()) {
-                errors.add(Kind.NO_SUCH_PROVIDER,
-                        each.getError());
-                continue;
-            }
-        }
-    }
-    
-    public Producers<Example> producers() {
-        return node.producers();
-    }
-    
+    /** Outgoing dependencies.
+     * 
+     */
     public Consumers<Example> consumers() {
         return node.consumers();
     }
- 
-    /** Used to fetch return values when cloning had been failed
-     * (see callers of this method). Reruns this example if no
-     * cached return value is available, returns the cached value
-     * and flushes the cache.  
+
+    /** Get cached return values of all producers (up to the number of required arguments).
      * 
      */
-    public ReturnValue fetchReturnValueAndFlush() throws Exception {
-        ReturnValue value = returnValue;
-        returnValue = returnValue.withoutCache();
-        return value.isMissing() ? this.bareInvoke() : value;
-    }
-    
-    /** Returns true of this example and all its descendants are done.
-     * 
-     */
-    public boolean isDone() {
-        if (hasErrors() || returnValue.isRed() || returnValue.isWhite()) return true;
-        for (Example each: consumers()) if (!each.isDone()) return false;
-        return returnValue.hasBeenRun();
+    public Object[] fetchArguments() {
+        Object[] arguments = new Object[method.arity()];
+        for (int n = 0; n < arguments.length; n++) arguments[n] = producers().get(n).returnValue().getValue();
+        return arguments;
     }
 
     /** Returns cached receiver of first producer (or creates a new receiver instance).
@@ -206,20 +101,68 @@ public class Example {
      */
     public Object fetchReceiver() {
         Object receiver = null;
-        if (!producers().isEmpty()) receiver = producers().first().getReturnValue().getTestCaseInstance();
+        if (!producers().isEmpty()) receiver = producers().first().returnValue().getTestCaseInstance();
         if (!method.getActualClass().isInstance(receiver)) receiver = null;
         if (receiver == null) receiver = Reflection.newInstance(method.getActualClass());
         assert receiver != null;
         return receiver;        
     }
 
-    /** Returns cached return values of all producers (up to the number of required arguments).
+    /** Used to fetch return values when cloning has been failed
+     * (see {@link InjectionValues}).
+     * Re-runs this example if no cached return value is available,
+     * returns the return value (whether newly acquired or cached),
+     * and eventually flushes the cache.  
      * 
      */
-    public Object[] fetchArguments() {
-        Object[] arguments = new Object[method.arity()];
-        for (int n = 0; n < arguments.length; n++) arguments[n] = producers().get(n).getReturnValue().getValue();
-        return arguments;
+    public ReturnValue fetchReturnValueAndFlush() throws Exception {
+        ReturnValue value = returnValue;
+        returnValue = returnValue.withoutCache();
+        return value.isMissing() ? this.bareInvoke() : value;
+    }
+
+    public Description getDescription() {
+        return description;
+    }
+
+    public JExampleError getErrors() {
+        if (errors == null) {
+            errors = new JExampleError();
+            this.shouldHaveAnnotation();
+            this.dependenciesShouldNotBeCyclic();
+            this.dependenciesShouldExist();
+            this.shouldHaveEnoughProducers();
+            this.producersShouldBeAssignable();
+            this.producersShouldNotExpectException();
+        }
+        return errors;
+    }
+
+    public ReturnValue returnValue() {
+        return returnValue;
+    }
+
+    public boolean hasErrors() {
+        return getErrors().size() > 0;
+    }
+
+    /** Returns true of this example and all its descendants are done.
+     *<P> 
+     * TODO take into account whether a consumer actually requires a return value or not!
+     * 
+     */
+    public boolean isDone() {
+        if (hasErrors() || returnValue.isRed() || returnValue.isWhite()) return true;
+        for (Example each: consumers()) if (!each.isDone()) return false;
+        return returnValue.hasBeenRun();
+    }
+
+    /** Incoming dependencies
+     * (the first <I>n</I> are producing the parameters of this example).
+     * 
+     */
+    public Producers<Example> producers() {
+        return node.producers();
     }
 
     public InjectionStrategy resolveInjectionStrategy() {
@@ -232,11 +175,103 @@ public class Example {
         throw new AssertionError();
     }
 
-    /** Do not flush cache of this example when done.
+    /** Runs this example and caches the return value. 
+     * Return value is only cached if there are pending consumers.
+     * Before running the example all producers are run: 
+     * if any of the producers fails, this example is skipped.
+     * 
+     *<P>
+     * If this example has been run before it is not re-run, 
+     * use {@link #bareInvoke} to force a re-run.
      * 
      */
-    public void beSticky() {
-        this.sticky = true;
+    public void run(RunNotifier notifier) {
+        if (!returnValue.hasBeenRun()) returnValue = new ExampleRunner(this, notifier).run();
+        if (this.isDone() && !sticky) returnValue = returnValue.withoutCache();
+    }
+
+    @Override
+    public String toString() {
+        return "Example: " + method;
+    }
+
+    public boolean wasSuccessful() {
+        return returnValue().isGreen();
+    }
+    
+    /*default*/ void initializeDependencies(ExampleGraph exampleGraph) {
+        for (MethodReference m: method.collectDependencies()) {
+            if (m.isBroken()) {
+                node.makeBrokenEdge(m.getError());
+            }
+            else {
+                Example d = exampleGraph.makeExample(m);
+                node.addProvider(d.node);
+            }
+        }
+    }
+ 
+    /** Runs the example and returns its return value.
+     * Assumes all producers had been successful.
+     */
+    protected ReturnValue bareInvoke() throws Exception {
+        for (Example producer: producers()) assert producer.wasSuccessful();
+        owner.runBeforeClassBefores();
+        InjectionValues injection = InjectionValues.make(this);
+        Object newResult = method.invoke(injection.getReceiver(), injection.getArguments());
+        return new ReturnValue(newResult, injection.getReceiver());
+    }
+    
+    private void dependenciesShouldExist() {
+        for (Edge<Example> each: node.producers().edges()) {
+            if (each.isBroken()) errors.add(Kind.NO_SUCH_PROVIDER, each.getError());
+        }
+    }
+
+    private void dependenciesShouldNotBeCyclic() {
+        if (this.node.isPartOfCycle()) errors.add(Kind.RECURSIVE_DEPENDENCIES, "Part of a cycle!");
+    }
+
+    private void producersShouldBeAssignable() {
+        Class<?>[] types = this.method.getParameterTypes();
+        int n = 0;
+        for (Edge<Example> edge: producers().edges()) {
+            if (++n > method.arity()) break; // skip non-injected producers
+            if (edge.isBroken()) continue;
+            Example producer = edge.getProducer().value;
+            Class<?> returnType = producer.method.getReturnType();
+            if (!types[n-1].isAssignableFrom(returnType))
+                errors.add(Kind.PARAMETER_NOT_ASSIGNABLE,
+                        "Parameter #%d in (%s) is not assignable from depedency (%s).", 
+                        n, method, producer.method);
+        }
+    }
+
+    private void producersShouldNotExpectException() {
+        int n = 0;
+        for (Edge<Example> edge: producers().edges()) {
+            if (++n > method.arity()) break; // skip non-injected producers
+            if (edge.isBroken()) continue;
+            Example each = edge.getProducer().value;
+            if (each.method.expectedException() != null) 
+                 errors.add(Kind.PROVIDER_EXPECTS_EXCEPTION,
+                            "(%s): invalid dependency (%s), provider must not expect exception.", method, each.method);
+        }
+    }
+
+    private void shouldHaveAnnotation() {
+        if (!method.isTestAnnotationPresent()) 
+            errors.add(Kind.MISSING_ANNOTATION, 
+                    "Method %s is not a test method, missing @Test or @Given annotation.",
+                    this);
+    }
+
+    private void shouldHaveEnoughProducers() {
+        int d = this.node.producers().size();
+        int p = method.arity();
+        if (d < p) errors.add(Kind.MISSING_PROVIDERS, 
+                "Method %s has %d parameters but only %d dependencies.",
+                toString(), p, d);
     }
    
 }

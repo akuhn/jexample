@@ -115,7 +115,7 @@ public class MethodReference {
         return jmethod.hashCode() ^ getActualClass().hashCode();
     }
 
-    public Class<? extends Throwable> initExpectedException() {
+    public Class<? extends Throwable> expectedException() {
         Test annotation = jmethod.getAnnotation(Test.class);
         if (annotation == null) return null;
         if (annotation.expected() == None.class) return null;

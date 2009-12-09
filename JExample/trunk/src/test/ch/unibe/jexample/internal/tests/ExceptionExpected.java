@@ -59,7 +59,7 @@ public class ExceptionExpected {
         g.add(A.class);
         assertEquals(5, g.getExamples().size());
         for (Example each: g.getExamples()) {
-            assertEquals(CustomException.class, each.expectedException);
+            assertEquals(CustomException.class, each.method.expectedException());
         }
     }
 

@@ -67,7 +67,7 @@ public class DependenciesTest {
         Result result = g.runJExample();
         assertTrue(result.wasSuccessful());
         assertEquals(2, result.getRunCount());
-        assertNotSame(e.getReturnValue(), t.getReturnValue());
+        assertNotSame(e.returnValue(), t.returnValue());
     }
 
     @RunWith(JExample.class)

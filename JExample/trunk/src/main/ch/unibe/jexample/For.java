@@ -65,7 +65,7 @@ public abstract class For {
         	if (result.getFailures().size() != 1) throw new RuntimeException("Oops, what do we now!?");
         	throw new RuntimeException(result.getFailures().iterator().next().getException());
         }
-        return e.getReturnValue().getValue();
+        return e.returnValue().getValue();
     }
 
 }
