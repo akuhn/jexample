@@ -6,6 +6,10 @@ import org.junit.runner.notification.RunNotifier;
 
 public class JExample extends Runner {
 
+	public JExample(Class<?> testClas) {
+		
+	}
+	
 	@Override
 	public Description getDescription() {
 		// TODO Auto-generated method stub
