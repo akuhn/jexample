@@ -102,12 +102,11 @@ public class ExampleGraph {
     public void run(ExampleClass testClass, RunNotifier notifier) {
         if (!anyHasBeenRun) onStartRunning();
         anyHasBeenRun = true;
-        
-        for (Method m: callerClass.getMethods()) {
+                
+        for(Method m : testClass.getImplementingClass().getMethods()){
             if (!m.isAnnotationPresent(BeforeTestRun.class)) continue;
             Reflection.invoke(m, null);
         }
-
         
         for (Example e: this.getExamples()) {
             if (testClass.contains(e)) {
@@ -115,7 +114,7 @@ public class ExampleGraph {
             }
         }
         
-        for (Method m: callerClass.getMethods()) {
+        for(Method m : testClass.getImplementingClass().getMethods()){
             if (!m.isAnnotationPresent(AfterTestRun.class)) continue;
             Reflection.invoke(m, null);
         }
