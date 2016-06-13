@@ -2,6 +2,7 @@ package ch.unibe.jexample.internal;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,11 +16,14 @@ import org.junit.runner.Result;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
+import ch.unibe.jexample.AfterTestRun;
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.BeforeTestRun;
 import ch.unibe.jexample.internal.graph.Dependency;
 import ch.unibe.jexample.internal.util.CompositeRunner;
 import ch.unibe.jexample.internal.util.JExampleError;
 import ch.unibe.jexample.internal.util.MethodReference;
+import ch.unibe.jexample.internal.util.Reflection;
 
 /**
  * Validates, describes and runs all JExample tests. Implemented as a singleton
@@ -102,10 +106,21 @@ public class ExampleGraph {
     public void run(ExampleClass testClass, RunNotifier notifier) {
         if (!anyHasBeenRun) onStartRunning();
         anyHasBeenRun = true;
+                
+        for(Method m : testClass.getImplementingClass().getMethods()){
+            if (!m.isAnnotationPresent(BeforeTestRun.class)) continue;
+            Reflection.invoke(m, null);
+        }
+        
         for (Example e: this.getExamples()) {
             if (testClass.contains(e)) {
                 e.run(notifier);
             }
+        }
+        
+        for(Method m : testClass.getImplementingClass().getMethods()){
+            if (!m.isAnnotationPresent(AfterTestRun.class)) continue;
+            Reflection.invoke(m, null);
         }
     }
 
