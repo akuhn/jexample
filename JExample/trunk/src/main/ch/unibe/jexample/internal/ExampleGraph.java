@@ -16,7 +16,9 @@ import org.junit.runner.Result;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.RunNotifier;
 
+import ch.unibe.jexample.AfterTestRun;
 import ch.unibe.jexample.JExample;
+import ch.unibe.jexample.BeforeTestRun;
 import ch.unibe.jexample.internal.graph.Dependency;
 import ch.unibe.jexample.internal.util.CompositeRunner;
 import ch.unibe.jexample.internal.util.JExampleError;
