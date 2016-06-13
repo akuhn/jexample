@@ -21,6 +21,7 @@ import ch.unibe.jexample.internal.graph.Dependency;
 import ch.unibe.jexample.internal.util.CompositeRunner;
 import ch.unibe.jexample.internal.util.JExampleError;
 import ch.unibe.jexample.internal.util.MethodReference;
+import ch.unibe.jexample.internal.util.Reflection;
 
 /**
  * Validates, describes and runs all JExample tests. Implemented as a singleton
