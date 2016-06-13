@@ -2,6 +2,7 @@ package ch.unibe.jexample.internal;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
